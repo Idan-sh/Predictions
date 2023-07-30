@@ -1,6 +1,4 @@
-package com.idansh.engine.enviornment;
-
-import com.idansh.engine.enviornment.HasUniqueName;
+package com.idansh.engine;
 
 public class Property extends HasUniqueName {
     String type = null; // todo: Change to a Class of its own, or enum

@@ -1,6 +1,4 @@
-package com.idansh.engine.expression;
-
-import com.idansh.engine.expression.Expression;
+package com.idansh.engine;
 
 public class FunctionActivation implements Expression {
     private String name;
