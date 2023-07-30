@@ -14,5 +14,5 @@ public class Range {
 
         this.bottom = bottom;
         this.top = top;
-    };
+    }
 }
