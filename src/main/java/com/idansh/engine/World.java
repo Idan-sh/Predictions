@@ -12,6 +12,7 @@ public class World {
     private List<TerminationRule> terminationRules;
     private int currTick = 0;
 
+
     /* Functions */
     // todo: increase
     // todo: decrease
