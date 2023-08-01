@@ -1,16 +1,18 @@
-package com.idansh.engine;
+package com.idansh.engine.property;
 
+
+import com.idansh.engine.HasUniqueName;
+import com.idansh.engine.Range;
 
 import java.util.LinkedList;
 import java.util.List;
 
 /**
  * Property for an entity
- * Possible genetic types: decimal, float, boolean, string
+ * Possible value types: decimal, float, boolean, string
  */
-public class Property<T> extends HasUniqueName {
+public abstract class Property extends HasUniqueName {
     static List<String> namesPool = new LinkedList<>();
-    T value = null;
     Range range = null;      // If exists
     Boolean isRandom = null;   // Was the property assigned randomly
 
