@@ -1,4 +1,6 @@
-package com.idansh.engine;
+package com.idansh.engine.objects;
+
+import com.idansh.engine.rule.TerminationRule;
 
 import java.util.List;
 
@@ -11,13 +13,4 @@ public class World {
     private List<EnvironmentVariable<?>> environmentVariables;
     private List<TerminationRule> terminationRules;
     private int currTick = 0;
-
-
-    /* Functions */
-    // todo: increase
-    // todo: decrease
-    // todo: calculation
-    // todo: condition
-    // todo: set
-    // todo: kill
 }

@@ -1,4 +1,4 @@
-package com.idansh.engine;
+package com.idansh.engine.expression;
 
 /**
  * Base interface for helper functions or entity's property, or for another free value.

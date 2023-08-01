@@ -1,8 +1,6 @@
-package com.idansh.engine;
+package com.idansh.engine.objects.helpers;
 
 
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 /**

@@ -1,6 +1,7 @@
-package com.idansh.engine;
+package com.idansh.engine.objects;
 
 
+import com.idansh.engine.objects.helpers.HasUniqueName;
 import com.idansh.engine.property.Property;
 
 import java.util.LinkedList;

@@ -1,4 +1,6 @@
-package com.idansh.engine;
+package com.idansh.engine.rule;
+
+import com.idansh.engine.objects.helpers.HasUniqueName;
 
 import java.util.LinkedList;
 import java.util.List;

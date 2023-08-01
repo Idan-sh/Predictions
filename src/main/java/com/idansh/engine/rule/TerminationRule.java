@@ -1,4 +1,4 @@
-package com.idansh.engine;
+package com.idansh.engine.rule;
 
 /**
  * Determines a single term/rule that when met will end the simulation.

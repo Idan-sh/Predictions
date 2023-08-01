@@ -1,4 +1,4 @@
-package com.idansh.engine;
+package com.idansh.engine.rule;
 
 /**
  * Controls when a rule will be activated

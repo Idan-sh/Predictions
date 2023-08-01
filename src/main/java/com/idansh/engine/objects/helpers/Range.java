@@ -1,4 +1,4 @@
-package com.idansh.engine;
+package com.idansh.engine.objects.helpers;
 
 /**
  * A numeric range of the type Float or Integer.
