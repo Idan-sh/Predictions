@@ -5,10 +5,15 @@ import com.idansh.engine.property.Property;
 
 import java.util.Map;
 
-public class Entity {
-    private int amount;             // Amount of entities of this type in the environment
+/**
+ * Defines an instance of an entity created by an EntityFactory
+ */
+public class Entity{
+    String name;
     private Map<String, Property> properties;  // Properties that define this entity, key is a unique name
 
-    public Entity() {
+    public Entity(String name, Map<String, Property> properties) {
+        this.name = name;
+        this.properties = properties;
     }
 }

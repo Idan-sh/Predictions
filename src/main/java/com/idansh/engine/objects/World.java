@@ -2,6 +2,7 @@ package com.idansh.engine.objects;
 
 import com.idansh.engine.rule.TerminationRule;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -9,7 +10,8 @@ import java.util.Map;
  * and the various functions of the simulation.
  */
 public class World {
-    private Map<String, Entity> population;         // Population of entities, each got a unique name
+    private Map <String, EntityFactory> entityFactoryMap;   // Each entity factory will define a type of entity with a unique name, that can be instantiated over multiple instances
+    private List<Entity> population;                        // Population of entities, allows duplicates (e.g. multiple smokers entities)
     private Map<String, EnvironmentVariable<?>> environmentVariables;
     private Map<String, TerminationRule> terminationRules;
     private int currTick = 0;                       // The current iteration of the simulation
