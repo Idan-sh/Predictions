@@ -1,4 +1,4 @@
-package com.idansh.engine.property;
+package com.idansh.engine.property.objects;
 
 import com.idansh.engine.objects.helpers.Range;
 

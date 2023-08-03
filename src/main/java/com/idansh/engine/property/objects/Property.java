@@ -1,4 +1,4 @@
-package com.idansh.engine.property;
+package com.idansh.engine.property.objects;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -17,9 +17,9 @@ public abstract class Property {
         INTEGER, FLOAT, BOOLEAN, STRING;
     }
 
-    Boolean isRandom = null;   // Was the property assigned randomly
+    Boolean isRandom = null;    // Was the property assigned randomly
 
-    public Property() {
-
+    public Property(Boolean isRandom) {
+        this.isRandom = isRandom;
     }
 }

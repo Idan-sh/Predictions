@@ -2,7 +2,7 @@ package com.idansh.engine.objects;
 
 
 import com.idansh.engine.objects.helpers.Counter;
-import com.idansh.engine.property.Property;
+import com.idansh.engine.property.objects.Property;
 
 import java.util.Map;
 

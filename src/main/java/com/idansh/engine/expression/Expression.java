@@ -1,7 +1,7 @@
 package com.idansh.engine.expression;
 
 /**
- * Base interface for helper functions or entity's property, or for another free value.
+ * Base interface for - helper functions / entity's property / a free value.
  */
 public interface Expression {
 
