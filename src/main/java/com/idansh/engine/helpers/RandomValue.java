@@ -32,7 +32,12 @@ public abstract class RandomValue {
      * @param to maximum number of the range.
      */
     public static float getRandomFloat(int from, int to) {
-        return rnd.nextFloat() * (rnd.nextInt(to + 1 - from) + from);
+        int randomInt = rnd.nextInt(to + 1 - from) + from;    // Get a random int within the specified range
+        float randomFloat = rnd.nextFloat();    // Get a random float between 0 and 1 (included)
+
+        if(randomInt != 0)
+            return randomFloat * randomInt;
+        return randomFloat;
 
     }
 
