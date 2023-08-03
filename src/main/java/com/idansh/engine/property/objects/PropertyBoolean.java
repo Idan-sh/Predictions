@@ -6,7 +6,7 @@ import com.idansh.engine.property.creator.PropertyFactory;
 public class PropertyBoolean extends Property {
     Boolean value;
 
-    public PropertyBoolean(Boolean value, Boolean isRandom) {
+    public PropertyBoolean(Boolean isRandom, Boolean value) {
         super(isRandom);
         this.value = value;
     }

@@ -1,9 +1,12 @@
 package com.idansh.engine.property.objects;
 
-import com.idansh.engine.objects.helpers.Range;
+import com.idansh.engine.helpers.Range;
 
 public class PropertyInteger extends Property{
     int value;
-    Range range = null;      // If exists
 
+    public PropertyInteger(Boolean isRandom, int value) {
+        super(isRandom);
+        this.value = value;
+    }
 }

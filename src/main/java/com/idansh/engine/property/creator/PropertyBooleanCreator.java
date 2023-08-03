@@ -2,30 +2,38 @@ package com.idansh.engine.property.creator;
 
 import com.idansh.engine.property.objects.Property;
 import com.idansh.engine.property.objects.PropertyBoolean;
-import com.idansh.engine.random.RandomBoolean;
 
-import static com.idansh.engine.random.RandomBoolean.getRandomBoolean;
+import static com.idansh.engine.helpers.RandomValue.getRandomBoolean;
 
 public class PropertyBooleanCreator implements PropertyFactory{
-    Boolean value;
     Boolean isRandom;
+    Boolean value;
+
 
     /**
      * Constructor that builds a new property creator.
      * @param value constant value, will be ignored if isRandom param is true.
      * @param isRandom true if the value should be randomized.
      */
-    public PropertyBooleanCreator(Boolean value, Boolean isRandom) {
+    public PropertyBooleanCreator(Boolean isRandom, Boolean value) {
         this.isRandom = isRandom;
 
         if(!isRandom)
             this.value = value;
         else
-            this.value = getRandomBoolean(); // Assign random boolean value
+            this.value = null;
     }
 
+    /**
+     * Factory Method to create property instance.
+     * @return a new instance of a boolean property.
+     */
     @Override
     public Property createProperty() {
-        return new PropertyBoolean(value, isRandom);
+        // Means that isRandom is true
+        if(value == null)
+            value = getRandomBoolean(); // Assign random boolean value
+
+        return new PropertyBoolean(isRandom, value);
     }
 }

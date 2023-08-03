@@ -1,4 +1,4 @@
-package com.idansh.engine.objects.helpers;
+package com.idansh.engine.helpers;
 
 public class Counter {
     int count = 0;
