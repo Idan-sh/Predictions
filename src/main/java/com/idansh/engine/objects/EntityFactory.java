@@ -1,5 +1,6 @@
 package com.idansh.engine.objects;
 
+import com.idansh.engine.objects.helpers.Counter;
 import com.idansh.engine.property.Property;
 
 import java.util.Map;
@@ -9,11 +10,11 @@ import java.util.Map;
  * Using the Factory Method Design Pattern.
  */
 public class EntityFactory {
-    String name = null;                    // e.g. Smoker
-    private int amount = 0;             // Amount of entities of this type in the environment
+    private final String name;        // e.g. Smoker
+    private final Counter amount = new Counter();     // Amount of entities of this type in the environment
 
     // todo- check if properties should be entity-instance specific, or entity-type specific
-    private Map<String, Property> properties = null;  // Properties that define this entity, key is a unique name
+    private final Map<String, Property> properties;  // Properties that define this entity, key is a unique name
 
 
     /**
@@ -32,7 +33,7 @@ public class EntityFactory {
      * @return a new instance of this entity.
      */
     public Entity createEntity() {
-        amount++;
-        return new Entity(name, properties);
+        amount.addCount();
+        return new Entity(name, amount, properties);
     }
 }
