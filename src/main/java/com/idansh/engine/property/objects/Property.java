@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * A property for an entity, base class without the value
  * Extend to add value types.
- * ** Current possible value types: decimal, float, boolean, string
+ * @apiNote Current possible value types: int, float, boolean, string
  */
 public abstract class Property {
     /**
@@ -17,7 +17,7 @@ public abstract class Property {
         INTEGER, FLOAT, BOOLEAN, STRING;
     }
 
-    Boolean isRandom = null;    // Was the property assigned randomly
+    Boolean isRandom;    // Was the property randomly assigned
 
     public Property(Boolean isRandom) {
         this.isRandom = isRandom;

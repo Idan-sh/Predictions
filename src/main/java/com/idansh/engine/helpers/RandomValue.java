@@ -5,6 +5,8 @@ import java.util.Random;
 // todo- possibly add possibilities
 public abstract class RandomValue {
     private static final Random rnd = new Random();
+    private static final String VALID_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?,-(). ";
+
 
     /**
      * Get a random boolean value.
@@ -36,13 +38,23 @@ public abstract class RandomValue {
 
 
     /**
-     * Get a random number in a range, including both the bottom and top bounds.
-     * @param from minimum number of the range.
-     * @param to maximum number of the range.
+     * Get a random string in a pre-defined range (defined internally).
+     * @return a string of a random length with random characters.
      */
     public static String getRandomString() {
-        // todo- random string generator
-        return "";
-    }
+        final int maxStringLen = 52;        // The maximum length of a possible generated string
+        final int minStringLen = 1;         // The minimum length of a possible generated string
+        int stringLen = rnd.nextInt(maxStringLen - minStringLen) + minStringLen;  // Generate a random string length
 
+        // Start building the string:
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (int i = 0; i < stringLen; i++) {
+            int randomIndex = rnd.nextInt(VALID_CHARACTERS.length());   // Get an index of a random character
+            char randomChar = VALID_CHARACTERS.charAt(randomIndex);     // Get the random character at that index
+            stringBuilder.append(randomChar);                           // Add the random character to the string
+        }
+
+        return stringBuilder.toString();
+    }
 }
