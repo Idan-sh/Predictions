@@ -1,8 +1,10 @@
 package com.idansh.engine.objects;
 
 import com.idansh.engine.helpers.Counter;
+import com.idansh.engine.property.creator.PropertyFactory;
 import com.idansh.engine.property.objects.Property;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -12,17 +14,18 @@ import java.util.Map;
 public class EntityFactory {
     private final String name;                        // Unique name for this type of entity creation, e.g. "Smoker"
     private final Counter amount = new Counter();     // Amount of entities of this type in the environment
-    private final Map<String, Property> properties;   // Properties that define this entity, the value of which will be assigned on instance creation
+    private final Map<String, PropertyFactory> propertiesToAssign;   // Properties that define this entity, the value of which will be assigned on instance creation
 
 
     /**
      * Constructor that defines the properties of new instances' information.
      * @param name Unique name of the new type of entity
-     * @param properties the properties/information of each entity
+     * @param propertiesToAssign property instructions on how to create new properties
+     *                           that will be assigned to the newly created entity.
      */
-    public EntityFactory(String name, Map<String, Property> properties) {
+    public EntityFactory(String name, Map<String, PropertyFactory> propertiesToAssign) {
         this.name = name;
-        this.properties = properties;
+        this.propertiesToAssign = propertiesToAssign;
     }
 
 
@@ -34,6 +37,12 @@ public class EntityFactory {
     public Entity createEntity() {
         amount.addCount();
         // todo- assign the properties' values - random or constants
-        return new Entity(name, amount, properties);
+        Map<String, Property> assignedProperties = new HashMap<>();
+
+        // Iterate through all the properties to assign
+        propertiesToAssign.forEach(
+                (key, value) -> assignedProperties.put(key, value.createProperty()));  // Create a property instance from the corresponding property creator
+
+        return new Entity(name, amount, assignedProperties);
     }
 }

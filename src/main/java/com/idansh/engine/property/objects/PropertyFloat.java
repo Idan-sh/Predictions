@@ -1,7 +1,5 @@
 package com.idansh.engine.property.objects;
 
-import com.idansh.engine.helpers.Range;
-
 public class PropertyFloat extends Property{
     Float value;
 

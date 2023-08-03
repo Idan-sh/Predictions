@@ -1,8 +1,5 @@
 package com.idansh.engine.property.objects;
 
-
-import com.idansh.engine.property.creator.PropertyFactory;
-
 public class PropertyBoolean extends Property {
     Boolean value;
 

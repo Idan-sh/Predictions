@@ -1,10 +1,7 @@
 package com.idansh.engine.property.objects;
 
-import java.util.LinkedList;
-import java.util.List;
-
 /**
- * A property for an entity, base class without the value
+ * A property for an entity, base class without the value,
  * Extend to add value types.
  * @apiNote Current possible value types: int, float, boolean, string
  */
