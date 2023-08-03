@@ -1,17 +1,13 @@
 package com.idansh.engine.rule;
 
-import com.idansh.engine.objects.helpers.HasUniqueName;
-
 import java.util.LinkedList;
 import java.util.List;
 
-public class Rule extends HasUniqueName {
-    static List<String> namesPool = new LinkedList<>();
+public class Rule {
     private RuleActivation activation;
     private Integer numOfActions;
     private List<String> namesOfActions;
 
-    public Rule(String name) {
-        super(name, namesPool);
+    public Rule() {
     }
 }
