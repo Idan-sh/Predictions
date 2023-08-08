@@ -2,7 +2,7 @@ package com.idansh.engine.objects;
 
 import com.idansh.engine.helpers.Counter;
 import com.idansh.engine.property.creator.PropertyFactory;
-import com.idansh.engine.property.objects.Property;
+import com.idansh.engine.property.instance.Property;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +36,6 @@ public class EntityFactory {
      */
     public Entity createEntity() {
         amount.addCount();
-        // todo- assign the properties' values - random or constants
         Map<String, Property> assignedProperties = new HashMap<>();
 
         // Iterate through all the properties to assign
