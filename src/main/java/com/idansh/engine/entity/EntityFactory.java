@@ -9,6 +9,8 @@ import java.util.Map;
 
 /**
  * Factory class for creating instances of entities.
+ * Each EntityFactory has a unique name, a counter for the amount of entities of its type and
+ * the properties that will be assigned to entity instances that will be created using the factory method.
  * Using the Factory Method Design Pattern.
  */
 public class EntityFactory {
@@ -28,10 +30,17 @@ public class EntityFactory {
         this.populationCounter = new Counter(initPopulation);
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public int getPopulationCount() {
+        return populationCounter.getCount();
+    }
 
     /**
-     * Factory Method for creating an instance of this entity according to the properties defined.
-     * The properties' values will be defined randomly or by the values that were set.
+     * Factory Method for creating a single instance of this entity according to the properties defined.
+     * The properties' values will be defined randomly or by the fixed values that were set.
      * @return a new instance of this entity.
      */
     public Entity createEntity() {
@@ -52,4 +61,5 @@ public class EntityFactory {
     public void addProperty(PropertyFactory propertyFactory) {
         propertiesToAssign.put(propertyFactory.getName(), propertyFactory);
     }
+
 }
