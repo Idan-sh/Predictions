@@ -13,9 +13,9 @@ import java.util.Map;
  * and the various functions of the simulation.
  */
 public class World {
-    private Map <String, EntityFactory> entityFactoryMap;   // Each entity factory will define a type of entity with a unique name, that can be instantiated over multiple instances
-    private List<Entity> population;                        // Population of entities, allows duplicates (e.g. multiple smokers entities)
-    private Map<String, TerminationRule> terminationRules;
+    private Map <String, EntityFactory> entityFactoryMap;   // Each entity factory will define instructions on how to instantiate a single entity with a unique name
+    private List<Entity> population;                        // Population of all entities that exist in the simulated world, allows duplicates (e.g. multiple smokers entities)
+    private Map<String, TerminationRule> terminationRules;  // Rules on when to end the simulation
 
     // The static modifier may be removed if multiple simulations can co-exist (!!!)
     public static Map<String, EnvironmentVariable<?>> environmentVariables;    // Can be accessed from anywhere

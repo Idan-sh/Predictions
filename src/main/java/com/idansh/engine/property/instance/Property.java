@@ -16,7 +16,7 @@ public class Property {
         this.value = value;
     }
 
-    public void setValue(Object value) {
+    public void updateValue(Object value) {
         this.value = value;
     }
 

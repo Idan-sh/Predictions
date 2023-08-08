@@ -20,12 +20,11 @@ public class EntityFactory {
     /**
      * Constructor that defines the properties of new instances' information.
      * @param name Unique name of the new type of entity.
-     * @param propertiesToAssign property instructions on how to create new properties
-     *                           that will be assigned to the newly created entity.
+     * @param initPopulation The initial population amount of this entity.
      */
-    public EntityFactory(String name, int initPopulation, Map<String, PropertyFactory> propertiesToAssign) {
+    public EntityFactory(String name, int initPopulation) {
         this.name = name;
-        this.propertiesToAssign = propertiesToAssign;
+        this.propertiesToAssign = new HashMap<>();
         this.populationCounter = new Counter(initPopulation);
     }
 
@@ -36,13 +35,13 @@ public class EntityFactory {
      * @return a new instance of this entity.
      */
     public Entity createEntity() {
-        Map<String, Property> assignedProperties = new HashMap<>();
+        Entity entityInstance = new Entity(name, populationCounter);
 
         // Iterate through all the properties to assign
         propertiesToAssign.forEach(
-                (key, value) -> assignedProperties.put(key, value.createProperty()));  // Create a property instance from the corresponding property creator
+                (key, value) -> entityInstance.addProperty(value.createProperty()));  // Create a property instance from the corresponding property creator
 
-        return new Entity(name, populationCounter, assignedProperties);
+        return entityInstance;
     }
 
 
