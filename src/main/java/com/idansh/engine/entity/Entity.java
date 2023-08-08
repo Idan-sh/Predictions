@@ -1,4 +1,4 @@
-package com.idansh.engine.objects;
+package com.idansh.engine.entity;
 
 
 import com.idansh.engine.helpers.Counter;
@@ -11,11 +11,11 @@ import java.util.Map;
  */
 public class Entity{
     private final String name;        // The name of this entity's type
-    private final Counter amount;     // The amount of entities of this type currently in the world
+    private final Counter populationCounter;     // The amount of entities of this type currently in the world
     private final Map<String, Property> properties;  // Properties that define this entity, key is a unique name
 
-    public Entity(String name, Counter amount, Map<String, Property> properties) {
-        this.amount = amount;
+    public Entity(String name, Counter populationCounter, Map<String, Property> properties) {
+        this.populationCounter = populationCounter;
         this.name = name;
         this.properties = properties;
     }

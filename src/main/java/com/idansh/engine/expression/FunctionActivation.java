@@ -1,7 +1,7 @@
 package com.idansh.engine.expression;
 
-import com.idansh.engine.objects.EnvironmentVariable;
-import com.idansh.engine.objects.World;
+import com.idansh.engine.environment.variable.EnvironmentVariable;
+import com.idansh.engine.world.World;
 
 import java.util.Random;
 

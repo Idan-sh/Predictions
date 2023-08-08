@@ -19,4 +19,16 @@ public class Property {
     public void setValue(Object value) {
         this.value = value;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public PropertyType getValueType() {
+        return valueType;
+    }
+
+    public Object getValue() {
+        return value;
+    }
 }

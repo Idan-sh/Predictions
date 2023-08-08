@@ -5,7 +5,7 @@ import com.idansh.engine.helpers.Range;
 import com.idansh.engine.property.creator.generator.value.api.ValueGenerator;
 
 /**
- * Value generator for random integer values.
+ * Value generator for random float values.
  */
 public class RandomFloatValueGenerator implements ValueGenerator<Float> {
     private final Range range;

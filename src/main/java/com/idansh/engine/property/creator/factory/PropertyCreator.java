@@ -1,11 +1,11 @@
-package com.idansh.engine.property.creator;
+package com.idansh.engine.property.creator.factory;
 
 import com.idansh.engine.property.instance.Property;
 import com.idansh.engine.property.instance.PropertyType;
 import com.idansh.engine.property.creator.generator.value.api.ValueGenerator;
 
 /**
- * Created properties by the type defined, using a value generator.
+ * Creates properties by the value type defined, using a value generator.
  * @param <T> The type of the property.
  */
 public abstract class PropertyCreator<T> implements PropertyFactory{
@@ -26,6 +26,7 @@ public abstract class PropertyCreator<T> implements PropertyFactory{
         this.valueGenerator = valueGenerator;
     }
 
+
     /**
      * Factory Method to create a property instance.
      * @return a new instance of a boolean property.
@@ -33,5 +34,11 @@ public abstract class PropertyCreator<T> implements PropertyFactory{
     @Override
     public Property createProperty() {
         return new Property(name, type, valueGenerator.generateValue());
+    }
+
+
+    @Override
+    public String getName() {
+        return name;
     }
 }

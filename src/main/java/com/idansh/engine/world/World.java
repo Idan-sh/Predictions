@@ -1,5 +1,8 @@
-package com.idansh.engine.objects;
+package com.idansh.engine.world;
 
+import com.idansh.engine.entity.Entity;
+import com.idansh.engine.entity.EntityFactory;
+import com.idansh.engine.environment.variable.EnvironmentVariable;
 import com.idansh.engine.rule.TerminationRule;
 
 import java.util.List;
