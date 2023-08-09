@@ -7,12 +7,12 @@ package com.idansh.engine.property.instance;
  */
 public class Property {
     private final String name;
-    private final PropertyType valueType;
+    private final PropertyType type;
     private Object value;
 
-    public Property(String name, PropertyType valueType, Object value) {
+    public Property(String name, PropertyType type, Object value) {
         this.name = name;
-        this.valueType = valueType;
+        this.type = type;
         this.value = value;
     }
 
@@ -24,8 +24,8 @@ public class Property {
         return name;
     }
 
-    public PropertyType getValueType() {
-        return valueType;
+    public PropertyType getType() {
+        return type;
     }
 
     public Object getValue() {

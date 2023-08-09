@@ -41,4 +41,9 @@ public abstract class PropertyCreator<T> implements PropertyFactory{
     public String getName() {
         return name;
     }
+
+
+    public PropertyType getType() {
+        return type;
+    }
 }

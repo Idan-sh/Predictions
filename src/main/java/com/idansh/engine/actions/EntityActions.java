@@ -1,50 +1,46 @@
-package com.idansh.engine.handler;
+package com.idansh.engine.actions;
 
 import com.idansh.engine.expression.Expression;
 
-public interface EngineHandler {
-
-    /* Functions */
-
+/**
+ * Actions that will be preformed in the context of an entity instance.
+ */
+public interface EntityActions {
     /**
-     * Increases the value of a numeric property of a certain entity.
-     * @param entityName name of the entity
+     * Increases the value of a numeric property of the entity.
      * @param propertyName name of the property whose value will be changed
      * @param amount the amount to be added to the property's value
      */
-    public void increase(String entityName, String propertyName, Expression amount);
+    public void increase(String propertyName, Expression amount);
 
 
     /**
-     * Decreases the value of a numeric property of a certain entity.
-     * @param entityName name of the entity
+     * Decreases the value of a numeric property of the entity.
      * @param propertyName name of the property whose value will be changed
      * @param amount the amount to be subtracted from the property's value
      */
-    public void decrease(String entityName, String propertyName, Expression amount);
+    public void decrease(String propertyName, Expression amount);
 
 
     /**
-     * Perform a mathematical calculation on a value of a property of a certain entity.
+     * Perform a mathematical calculation on a value of a property of the entity.
      * Possible calculations: Multiply / Divide
      * Receives two argument numbers (arg1, arg2) that will be used for the calculation.
-     * @param entityName name of the entity
      * @param propertyName name of the property that will hold the result of the calculation
      */
-    public void calculation(String entityName, String propertyName, Expression arg1, Expression arg2);
+    public void calculation(String propertyName, Expression arg1, Expression arg2);
 
 
     /**
      * Checks if a single condition is met,
      * if the condition is met then the received actions will be performed.
      * Referred by the singularity value "single"
-     * @param entityName name of the entity
      * @param propertyName name of the property that will be checked by the condition
      * @param operator comparison operator for the condition.
      *                 possible values:  = (equal) / != (not equal) / bt (greater than) / lt (less than)
      * @param value a number that will be compared to the property's value
      */
-    public void condition(String entityName, String propertyName, String operator, Expression value);
+    public void condition(String propertyName, String operator, Expression value);
 
 
     /**
@@ -56,18 +52,17 @@ public interface EngineHandler {
      */
     public void condition(String logicOp);
 
+
     /**
-     * Sets the value of any property of a certain entity.
-     * @param entityName name of the entity
+     * Sets the value of a property (of any type) of the entity.
      * @param propertyName name of the property whose value will be changed
      * @param amount the amount to be subtracted from the property's value
      */
-    public void set(String entityName, String propertyName, Expression amount);
+    public void set(String propertyName, Expression amount);
 
 
     /**
-     * Kills an entity (removes it from the world)
-     * @param entityName name of the entity
+     * Kills a single entity from the population.
      */
-    public void kill(String entityName);
+    public void kill();
 }

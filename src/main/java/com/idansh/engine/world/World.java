@@ -1,6 +1,5 @@
 package com.idansh.engine.world;
 
-import com.idansh.engine.entity.Entity;
 import com.idansh.engine.entity.EntityFactory;
 import com.idansh.engine.environment.variable.EnvironmentVariable;
 import com.idansh.engine.rule.TerminationRule;
@@ -83,4 +82,16 @@ public class World {
 
         terminationRules.put(terminationRule.getName(), terminationRule);
     }
+
+    /**
+     * Returns reference to an existing entity factory.
+     * @param name The name of the factory to search
+     */
+    public EntityFactory getEntityFactory(String name) {
+        if(!entityFactories.containsKey(name))
+            throw new IllegalArgumentException("Error: could not find the received entity factory!");
+
+        return entityFactories.get(name);
+    }
 }
+
