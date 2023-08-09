@@ -12,7 +12,7 @@ import java.util.Map;
  * the properties that will be assigned to entity instances that will be created using the factory method.
  * Using the Factory Method Design Pattern.
  */
-public class Entity {
+public class EntityFactory {
     private final String name;        // Unique name for this type of entity creation, e.g. "Smoker"
     private final Counter populationCounter;     // Amount of entities of this type in the environment
     private final Map<String, PropertyFactory> propertiesToAssign;   // Properties that define this entity, the value of which will be assigned on instance creation
@@ -37,12 +37,14 @@ public class Entity {
         return populationCounter.getCount();
     }
 
+
     public PropertyFactory getPropertyFactory(String name) {
         if(!propertiesToAssign.containsKey(name))
             throw new IllegalArgumentException("Error: the property factory with the given name does not exist!");
 
         return propertiesToAssign.get(name);
     }
+
 
     /**
      * Factory Method for creating a single instance of this entity according to the properties defined.

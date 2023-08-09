@@ -2,6 +2,7 @@ package com.idansh.engine.entity;
 
 
 import com.idansh.engine.helpers.Counter;
+import com.idansh.engine.property.creator.factory.PropertyFactory;
 import com.idansh.engine.property.instance.Property;
 
 import java.util.HashMap;
@@ -27,6 +28,9 @@ public class Entity {
      * @return Returns the property with the provided name, or null if the property was not found
      */
     public Property getPropertyByName(String name) {
+        if(!properties.containsKey(name))
+            throw new IllegalArgumentException("Error: the property with the given name does not exist!");
+
         return properties.get(name);
     }
 
