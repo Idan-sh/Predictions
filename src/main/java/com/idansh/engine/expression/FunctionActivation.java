@@ -1,6 +1,5 @@
 package com.idansh.engine.expression;
 
-import com.idansh.engine.environment.variable.EnvironmentVariable;
 import com.idansh.engine.world.World;
 
 import java.util.Random;
@@ -18,11 +17,12 @@ public class FunctionActivation implements Expression {
 
     @Override
     public Object environment(String name) {
-        EnvironmentVariable<?> var = World.environmentVariables.get(name);
-
-        if(var == null)
-            throw new RuntimeException("Error: invalid environment variable name.");
-        return var.getValue();
+//        EnvironmentVariable<?> var = World.environmentVariables.get(name);
+//
+//        if(var == null)
+//            throw new RuntimeException("Error: invalid environment variable name.");
+//        return var.getValue();
+        return null;
     }
 
     @Override

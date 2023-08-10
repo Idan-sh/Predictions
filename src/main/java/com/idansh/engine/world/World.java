@@ -2,7 +2,9 @@ package com.idansh.engine.world;
 
 import com.idansh.engine.entity.Entity;
 import com.idansh.engine.entity.EntityFactory;
-import com.idansh.engine.environment.variable.EnvironmentVariable;
+import com.idansh.engine.entity.EntityManager;
+import com.idansh.engine.environment.EnvironmentVariablesManager;
+import com.idansh.engine.property.instance.Property;
 import com.idansh.engine.rule.TerminationRule;
 
 import java.util.ArrayList;
@@ -15,62 +17,29 @@ import java.util.Map;
  * and the various functions of the simulation.
  */
 public class World {
-    private final Map <String, EntityFactory> entityFactories;   // Each entity factory will define instructions on how to instantiate a single entity with a unique name
-    private final List<Entity> population;                        // Population of all entities that exist in the simulated world, allows duplicates (e.g. multiple smokers entities)
     private final Map<String, TerminationRule> terminationRules;  // Rules on when to end the simulation
-
-    // The static modifier may be removed if multiple simulations can co-exist (!!!)
-    public static Map<String, EnvironmentVariable<?>> environmentVariables;    // Can be accessed from anywhere
+    private final EnvironmentVariablesManager environmentVariablesManager;    // Contains all the environment variables of the simulation
+    private final EntityManager entityManager;
     private int currTick;                     // The current iteration of the simulation
 
-    static {
-        environmentVariables = new HashMap<>();
-    }
 
     /**
      * Initialize the simulated world.
      */
     public World() {
-        this.entityFactories = new HashMap<>();
-        this.population = new ArrayList<>();
         this.terminationRules = new HashMap<>();
+        this.environmentVariablesManager = new EnvironmentVariablesManager();
+        this.entityManager = new EntityManager();
         this.currTick = 0;
     }
 
-    /**
-     * Adds a new EntityFactory to the simulated world, from which entities will be created.
-     */
-    public void addEntityFactory(EntityFactory entityFactory) {
-        if(entityFactories.containsKey(entityFactory.getName()))
-            throw new IllegalArgumentException("Error: received entityFactory's name already exists!");
-
-        entityFactories.put(entityFactory.getName(), entityFactory);
-    }
-
-
-    /**
-     * Initializes the population of the world with entities using the entity factories.
-     */
-    public void initEntityPopulation() {
-        // Run through all teh entity factories, on each factory create populationCount instances.
-        entityFactories.forEach(
-                (name , factory) -> {
-                    for (int i = 0; i < factory.getPopulationCount(); i++) {
-                        population.add(factory.createEntity());
-                    }
-                }
-        );
-    }
 
 
     /**
      * Adds a new environment variable to the simulated world.
      */
-    public void addEnvironmentVariable(EnvironmentVariable<?> environmentVariable) {
-        if(environmentVariables.containsKey(environmentVariable.getName()))
-            throw new IllegalArgumentException("Error: received environmentVariable's name already exists!");
-
-        environmentVariables.put(environmentVariable.getName(), environmentVariable);
+    public void addEnvironmentVariable(Property property) {
+        environmentVariablesManager.addEnvironmentVariable(property);
     }
 
 
@@ -84,15 +53,6 @@ public class World {
         terminationRules.put(terminationRule.getName(), terminationRule);
     }
 
-    /**
-     * Returns reference to an existing entity factory.
-     * @param name The name of the factory to search
-     */
-    public EntityFactory getEntityFactory(String name) {
-        if(!entityFactories.containsKey(name))
-            throw new IllegalArgumentException("Error: could not find the received entity factory!");
 
-        return entityFactories.get(name);
-    }
 }
 
