@@ -1,6 +1,7 @@
 package com.idansh.engine.actions;
 
 import com.idansh.engine.entity.Entity;
+import com.idansh.engine.environment.ActiveEnvironmentVariables;
 
 /**
  * Kills a single entity from the population.
@@ -8,8 +9,8 @@ import com.idansh.engine.entity.Entity;
 public class KillAction extends Action {
 
 
-    public KillAction(Entity entity) {
-        super(entity);
+    public KillAction(Entity entity, ActiveEnvironmentVariables activeEnvironmentVariables) {
+        super(entity, activeEnvironmentVariables);
     }
 
     public void invoke() {

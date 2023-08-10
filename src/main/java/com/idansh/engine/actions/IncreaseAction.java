@@ -1,11 +1,12 @@
 package com.idansh.engine.actions;
 
 import com.idansh.engine.entity.Entity;
+import com.idansh.engine.environment.ActiveEnvironmentVariables;
 import com.idansh.engine.expression.Expression;
 import com.idansh.engine.property.instance.Property;
 
 /**
- * Increases the value of a numeric property of the entity.
+ * Increases the value of a numeric property of an entity.
  */
 public class IncreaseAction extends Action {
     String propertyName;
@@ -16,8 +17,8 @@ public class IncreaseAction extends Action {
      * @param propertyName name of the property whose value will be changed.
      * @param amount the amount to be added to the property's value.
      */
-    public IncreaseAction(Entity entity, String propertyName, Expression amount) {
-        super(entity);
+    public IncreaseAction(Entity entity, ActiveEnvironmentVariables activeEnvironmentVariables, String propertyName, Expression amount) {
+        super(entity, activeEnvironmentVariables);
         this.propertyName = propertyName;
         this.amount = amount;
     }

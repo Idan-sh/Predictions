@@ -1,6 +1,7 @@
 package com.idansh.engine.actions;
 
 import com.idansh.engine.entity.Entity;
+import com.idansh.engine.environment.ActiveEnvironmentVariables;
 import com.idansh.engine.expression.Expression;
 import com.idansh.engine.property.instance.Property;
 
@@ -18,8 +19,8 @@ public class CalculationAction extends Action {
      * Using two argument expressions.
      * @param propertyName name of the property that will hold the result of the calculation
      */
-    public CalculationAction(Entity entity, String propertyName, Expression arg1, Expression arg2) {
-        super(entity);
+    public CalculationAction(Entity entity, ActiveEnvironmentVariables activeEnvironmentVariables, String propertyName, Expression arg1, Expression arg2) {
+        super(entity, activeEnvironmentVariables);
         this.propertyName = propertyName;
         this.arg1 = arg1;
         this.arg2 = arg2;

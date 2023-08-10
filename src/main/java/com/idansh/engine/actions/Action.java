@@ -1,14 +1,17 @@
 package com.idansh.engine.actions;
 
 import com.idansh.engine.entity.Entity;
+import com.idansh.engine.environment.ActiveEnvironmentVariables;
 import com.idansh.engine.property.instance.Property;
 import com.idansh.engine.property.instance.PropertyType;
 
 public abstract class Action {
     private final Entity entity;
+    private final ActiveEnvironmentVariables activeEnvironmentVariables;
 
-    public Action(Entity entity) {
+    public Action(Entity entity, ActiveEnvironmentVariables activeEnvironmentVariables) {
         this.entity = entity;
+        this.activeEnvironmentVariables = activeEnvironmentVariables;
     }
 
     public Entity getContextEntity() {
