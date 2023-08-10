@@ -47,7 +47,7 @@ public class World {
      * Adds a new environment variable to the simulated world.
      */
     public void addTerminationRule(TerminationRule terminationRule) {
-        if(environmentVariables.containsKey(terminationRule.getName()))
+        if(terminationRules.containsKey(terminationRule.getName()))
             throw new IllegalArgumentException("Error: received terminationRule's name already exists!");
 
         terminationRules.put(terminationRule.getName(), terminationRule);
