@@ -1,9 +1,19 @@
 package com.idansh.engine.actions;
 
-public class KillAction {
+import com.idansh.engine.entity.Entity;
 
-    /**
-     * Kills a single entity from the population.
-     */
-    public void kill();
+/**
+ * Kills a single entity from the population.
+ */
+public class KillAction extends Action {
+
+
+    public KillAction(Entity entity) {
+        super(entity);
+    }
+
+    public void invoke() {
+        // todo- complete kill action
+    }
+
 }

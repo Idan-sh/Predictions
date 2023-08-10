@@ -29,6 +29,7 @@ public class DecreaseAction extends Action {
         if(!super.isNumericProperty(propertyFactory))
             throw new IllegalArgumentException("Error: can preform increase only on numeric property factories!");
 
-        // todo- preform decrease on a property instance of an entity instance (not on the entity factory i guess)
+        // todo- preform decrease on the property
+        // todo- make sure after the decrease the value is within the property range
     }
 }

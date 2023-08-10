@@ -23,11 +23,12 @@ public class IncreaseAction extends Action {
     }
 
     public void invoke() {
-        Property propertyFactory = super.getContextEntity().getPropertyByName(propertyName);
+        Property property = super.getContextEntity().getPropertyByName(propertyName);
 
-        if(!super.isNumericProperty(propertyFactory))
+        if(!super.isNumericProperty(property))
             throw new IllegalArgumentException("Error: can preform increase only on numeric property factories!");
 
-        // todo- preform increase on a property instance of an entity instance (not on the entity factory i guess)
+        // todo- preform increase on the property
+        // todo- make sure after the increase the value is within the property range
     }
 }
