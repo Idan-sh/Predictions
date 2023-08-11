@@ -2,7 +2,10 @@ package com.idansh.engine.helpers;
 
 import java.util.Random;
 
-// todo- possibly add possibilities
+/**
+ * Abstract class that contains static methods which
+ * returns random values of various types.
+ */
 public abstract class RandomValue {
     private static final Random rnd = new Random();
     private static final String VALID_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?,-(). ";

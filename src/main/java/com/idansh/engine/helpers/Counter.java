@@ -1,7 +1,11 @@
 package com.idansh.engine.helpers;
 
 public class Counter {
-    int count = 0;
+    int count;
+
+    public Counter(int init){
+        this.count = init;
+    }
 
     public void addCount() {
         count++;
