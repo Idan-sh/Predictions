@@ -17,7 +17,7 @@ public class World {
     private final Map<String, TerminationRule> terminationRules;            // Rules on when to end the simulation
     private final EnvironmentVariablesManager environmentVariablesManager;  // Contains all the environment variables factories
     private ActiveEnvironmentVariables activeEnvironmentVariables;          // Contains all the activated environment variables
-    private final EntityManager entityManager;                              // Contains all the entities (population) of the simulation
+    public final EntityManager entityManager;                              // Contains all the entities (population) of the simulation
     private int currTick;                                                   // The current iteration of the simulation
 
 

@@ -8,7 +8,7 @@ import com.idansh.engine.property.creator.generator.value.api.ValueGenerator;
  * Creates properties by the value type defined, using a value generator.
  * @param <T> The type of the property.
  */
-public abstract class PropertyCreator<T> implements PropertyFactory{
+public class PropertyCreator<T> implements PropertyFactory{
     private final String name;
     private final PropertyType type;
     private final ValueGenerator<T> valueGenerator;
