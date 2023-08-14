@@ -1,5 +1,6 @@
 package com.idansh.jaxb.unmarshal.converter;
 
+import com.idansh.engine.actions.Action;
 import com.idansh.engine.entity.EntityFactory;
 import com.idansh.engine.helpers.Range;
 import com.idansh.engine.property.creator.factory.PropertyCreator;
@@ -12,6 +13,7 @@ import com.idansh.engine.property.creator.generator.value.random.RandomIntegerVa
 import com.idansh.engine.property.creator.generator.value.random.RandomStringValueGenerator;
 import com.idansh.engine.property.instance.PropertyType;
 import com.idansh.engine.rule.Rule;
+import com.idansh.engine.rule.RuleActivation;
 import com.idansh.engine.rule.TerminationRule;
 import com.idansh.engine.world.World;
 import com.idansh.jaxb.schema.generated.*;
@@ -133,21 +135,6 @@ public class Converter {
 
 
     /**
-     * Converts a PRDRule object that was read from the XML file
-     * into a Rule Object.
-     * @param prdRule PRDRule object that was read from the XML file.
-     * @return Rule object with the data of the PRDRule received.
-     */
-    private static Rule ruleConvert(PRDRule prdRule) {
-        Rule retRule;
-
-        // todo- implement ruleConvert
-
-        return retRule;
-    }
-
-
-    /**
      * Converts a PRDEnvProperty object that was read from the XML file
      * into a PropertyFactory Object.
      * @param prdEnvProperty PRDEnvProperty object that was read from the XML file.
@@ -194,5 +181,171 @@ public class Converter {
      */
     private static Range rangeConvert(PRDRange prdRange) {
         return new Range(prdRange.getFrom(), prdRange.getTo());
+    }
+
+
+    /**
+     * Converts a PRDRule object that was read from the XML file
+     * into a Rule Object.
+     * @param prdRule PRDRule object that was read from the XML file.
+     * @return Rule object with the data of the PRDRule received.
+     */
+    private static Rule ruleConvert(PRDRule prdRule) {
+        Rule retRule = new Rule(
+                prdRule.getName(),
+                activationConvert(prdRule.getPRDActivation()));
+
+        // Iterates over all prdActions, converts them to actions and adds them to the rule
+        prdRule.getPRDActions().getPRDAction().forEach(
+                a -> retRule.addAction(actionConvert(a))
+        );
+
+        return retRule;
+    }
+
+
+    /**
+     * Converts a PRDActivation object that was read from the XML file
+     * into a RuleActivation Object.
+     * @param prdActivation PRDActivation object that was read from the XML file.
+     * @return RuleActivation object with the data of the PRDActivation received.
+     */
+    private static RuleActivation activationConvert(PRDActivation prdActivation) {
+        return new RuleActivation(prdActivation.getTicks(), prdActivation.getProbability());
+    }
+
+
+    // todo- ------------------------  finish from here!!! --------------------------
+
+    /**
+     * Converts a PRDAction object that was read from the XML file
+     * into a Action Object.
+     * @param prdAction PRDAction object that was read from the XML file.
+     * @return Action object with the data of the PRDAction received.
+     */
+    private static Action actionConvert(PRDAction prdAction) {
+        Action ret = null;
+        ExpressionConverterAndValidator expressionConverterAndValidator = new ExpressionConverterAndValidator(environmentProperties, entities);
+
+        try {
+            switch (ActionType.valueOf(prdAction.getType())) {
+                case INCREASE:
+                    ret = new IncreaseAction(prdAction.getProperty(), prdAction.getEntity(), expressionConverterAndValidator.analyzeAndGetValue(prdAction, prdAction.getBy()));
+                case DECREASE:
+                    ret = new DecreaseAction(prdAction.getProperty(), prdAction.getEntity(), expressionConverterAndValidator.analyzeAndGetValue(prdAction, prdAction.getBy()));
+                case CALCULATION:
+                    ret = getMulOrDiv(prdAction, expressionConverterAndValidator);
+                case CONDITION:
+                    ret = getSingleOrMultiple(prdAction, expressionConverterAndValidator);
+                case SET:
+                    ret = new SetAction(prdAction.getProperty(), prdAction.getEntity(), expressionConverterAndValidator.analyzeAndGetValue(prdAction,prdAction.getValue()));
+                case KILL:
+                    ret = new KillAction(prdAction.getProperty(), prdAction.getEntity());
+                case REPLACE:
+                    break;
+                case PROXIMITY:
+                    break;
+            }
+        } catch (Exception e) {
+            String err = String.format("\"%s\" is not a valid Action type.", prdAction.getType());
+            throw new IllegalArgumentException(err);
+        }
+        return ret;
+    }
+
+
+    /**
+     * Converts the given PRDAction to multiply or divide calculation action.
+     *
+     * @param prdAction the given PRDAction generated from reading the XML file
+     * @return a CalculationAction representation of the given PRDActivation.
+     */
+    private CalculationAction getMulOrDiv(PRDAction prdAction, ExpressionConverterAndValidator expressionConverterAndValidator){
+        CalculationAction ret = null;
+        PRDMultiply mul = prdAction.getPRDMultiply();
+        PRDDivide div = prdAction.getPRDDivide();
+
+        // Without loss of generality, if mul equals null - the calculation action is not a multiply action.
+        if(mul != null){
+            ret = new CalculationAction(prdAction.getProperty(),prdAction.getEntity(), expressionConverterAndValidator.analyzeAndGetValue(prdAction, mul.getArg1()),
+                    expressionConverterAndValidator.analyzeAndGetValue(prdAction, mul.getArg2()), ClaculationType.MULTIPLY);
+        } else if (div != null) {
+            ret = new CalculationAction(prdAction.getProperty(),prdAction.getEntity(), expressionConverterAndValidator.analyzeAndGetValue(prdAction, div.getArg1()),
+                    expressionConverterAndValidator.analyzeAndGetValue(prdAction, div.getArg2()), ClaculationType.DIVIDE);
+        }
+        else {
+            // Throw exception.
+        }
+        return ret;
+    }
+
+    /**
+     * Converts the given PRDAction to single or multiple condition action.
+     *
+     * @param prdAction the given PRDAction generated from reading the XML file
+     * @return an AbstractConditionAction representation of the given PRDActivation.
+     */
+    private AbstractConditionAction getSingleOrMultiple(PRDAction prdAction, ExpressionConverterAndValidator expressionConverterAndValidator){
+        AbstractConditionAction ret = null;
+        PRDCondition prdCondition = prdAction.getPRDCondition();
+        ThenOrElse thenActions = null, elseActions = null;
+        // Then and else objects are created in this method.
+        getAndCreateThenOrElse(prdAction, thenActions, elseActions);
+
+        if(prdCondition.getSingularity().equals("single")){
+            ret = new SingleCondition(prdAction.getProperty(), prdAction.getEntity(), expressionConverterAndValidator.analyzeAndGetValue(prdAction, prdAction.getValue()), thenActions, elseActions, prdCondition.getOperator());
+        } else if (prdCondition.getSingularity().equals("multiple")) {
+            ret = new MultipleCondition(prdAction.getProperty(), prdAction.getEntity(), expressionConverterAndValidator.analyzeAndGetValue(prdAction, prdAction.getValue()), thenActions, elseActions, prdCondition.getLogical());
+        }
+        else {
+            // Throw exception.
+        }
+
+        return ret;
+    }
+
+    /**
+     * Converts the given PRDAction to Then and Else objects which contain a set of actions to invoke.
+     * According to the XML file, if one of them has no actions to invoke, the object remains null.
+     *
+     * @param prdAction the given PRDAction generated from reading the XML file
+     * @param thenActions empty ThenOrElse object to be created.
+     * @param elseActions empty ThenOrElse object to be created.
+     */
+    private void getAndCreateThenOrElse(PRDAction prdAction, ThenOrElse thenActions, ThenOrElse elseActions){
+        // 'getThenOrElseActionSet' creates the Set of Actions for them both.
+        // Because 'PRDThen' and 'PRDElse' are different objects, when we want to create the set for 'Then'
+        // we send null for 'prdElse', same for Else.
+        Set<Action> thenActionsSet = getThenOrElseActionSet(prdAction.getPRDThen(), null);
+        Set<Action> elseActionsSet = getThenOrElseActionSet(null, prdAction.getPRDElse());
+
+        if(!thenActionsSet.isEmpty()){
+            thenActions = new ThenOrElse(thenActionsSet);
+        }
+
+        if(!elseActionsSet.isEmpty()){
+            elseActions = new ThenOrElse(elseActionsSet);
+        }
+    }
+
+
+    /**
+     * Converts the given PRDThen or PRDElse to The set of actions to invoke.
+     * For example: if prdThen equals null, the method creates the set from the prdElse.
+     *
+     * @param prdThen the given PRDThen generated from reading the XML file
+     * @param prdElse the given PRDElse generated from reading the XML file
+     * @return a Set of actions representation of the given PRDThen or PRDElse.
+     */
+    private Set<Action> getThenOrElseActionSet(PRDThen prdThen, PRDElse prdElse){
+        Set<Action> ret = new HashSet<>();
+
+        if(prdThen != null){
+            prdThen.getPRDAction().forEach(a-> ret.add(PRDAction2Action(a)));
+        } else if (prdElse != null) {
+            prdElse.getPRDAction().forEach(a-> ret.add(PRDAction2Action(a)));
+        }
+
+        return ret;
     }
 }
