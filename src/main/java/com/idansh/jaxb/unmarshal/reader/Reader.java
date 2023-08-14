@@ -7,7 +7,6 @@ import com.idansh.jaxb.unmarshal.converter.Converter;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -27,7 +26,7 @@ public class Reader {
     public static World readWorld(String path) {
         try {
             InputStream inputStream = new FileInputStream(path);
-            PRDWorld prdWorld = deserializeFrom(inputStream);
+            PRDWorld prdWorld = deserializeXML(inputStream);
 
             return Converter.worldConvert(prdWorld);
         } catch (FileNotFoundException | JAXBException e) {
@@ -40,7 +39,7 @@ public class Reader {
      * @param inputStream the XML file that contains the world data.
      * @return PRDWorld object read from the XML file.
      */
-    private static PRDWorld deserializeFrom(InputStream inputStream) throws JAXBException {
+    private static PRDWorld deserializeXML(InputStream inputStream) throws JAXBException {
         JAXBContext jaxbContext = JAXBContext.newInstance(PRDWorld.class);
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
         return (PRDWorld) unmarshaller.unmarshal(inputStream);
