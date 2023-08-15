@@ -172,63 +172,36 @@ public class ExpressionConverter {
 
 
     /**
-     * If 'analyzeAndGetValue' enter this method, the given value from the XML is not a function or a property.
-     * This method parse the string to one of the following types: Integer, Double, Boolean or String.
-     *
-     * @param prdValueStr the PRDAction value string.
-     * @return the given value string parse into one of the four types.
+     * Parse the string to one of the following:
+     * Integer, Double, Boolean, String.
+     * Will try to convert to integer, then to float, then to boolean,
+     * and if all fails will keep as string.
+     * @param prdStr PRDAction's value string.
+     * @return the given value string parse into one of the types
      */
-    private Object parseValue(String prdValueStr){
-        Boolean flag = false;
-        Object ret = null;
+    private Object parseValue(String prdStr){
+        Object retValue;
 
-        ret = getIntOrDouble(prdValueStr, flag);
-        if(flag){
-            ret = getBooleanOrStr(prdValueStr);
-        }
-
-        return ret;
-    }
-
-    /**
-     * 'parseValue' helper, the boolean flag is an input member in order to change his value for the next checks outside this method.
-     */
-    private Object getIntOrDouble(String prdValueStr, Boolean flag){
-        Object ret = null;
-
-        try{
-            ret = Integer.parseInt(prdValueStr);
-        }
-        catch (NumberFormatException e){
-            flag = true;
-        }
-        if(flag){
-            try{
-                ret = Double.parseDouble(prdValueStr);
-            }
-            catch (NumberFormatException e) {
-                flag = true;
-            }
-        }
-
-        return ret;
-    }
-
-    /**
-     * 'parseValue' helper.
-     */
-    private Object getBooleanOrStr(String prdValueStr){
-        Object ret;
         try {
-            ret = Boolean.valueOf(prdValueStr);
-        }
-        catch (IllegalArgumentException e){
-            ret = prdValueStr;
+            // Try to convert to integer
+            retValue = Integer.parseInt(prdStr);
+        } catch (NumberFormatException notInt) {
+            try {
+                // Try to convert to float
+                retValue = Float.parseFloat(prdStr);
+            } catch (NumberFormatException notFloat) {
+                // Try to convert to boolean
+                if(prdStr.equalsIgnoreCase("true"))
+                    retValue = true;
+                else if (prdStr.equalsIgnoreCase("false"))
+                    retValue = false;
+                else // Keep as string
+                    retValue = prdStr;
+            }
         }
 
-        return ret;
+        return retValue;
     }
-
 
 
     /**
