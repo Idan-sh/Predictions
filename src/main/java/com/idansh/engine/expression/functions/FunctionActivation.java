@@ -1,9 +1,6 @@
-package com.idansh.engine.expression.helper.functions;
+package com.idansh.engine.expression.functions;
 
-import com.idansh.engine.expression.Expression;
-import com.idansh.engine.world.World;
-
-import java.util.Random;
+import com.idansh.engine.expression.api.Expression;
 
 /**
  * An expression that activates an helper function.

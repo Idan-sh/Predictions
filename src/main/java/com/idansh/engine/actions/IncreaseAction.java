@@ -1,6 +1,6 @@
 package com.idansh.engine.actions;
 
-import com.idansh.engine.expression.Expression;
+import com.idansh.engine.expression.api.Expression;
 import com.idansh.engine.property.instance.Property;
 import com.idansh.engine.world.World;
 

@@ -16,7 +16,7 @@ public class ExpressionDigest {
         this.entityManager = world.entityManager;
     }
 
-    public analyzeExpression() {
+    public void analyzeExpression() {
 
 
     }
