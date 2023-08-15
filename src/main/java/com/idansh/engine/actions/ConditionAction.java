@@ -3,6 +3,7 @@ package com.idansh.engine.actions;
 import com.idansh.engine.entity.Entity;
 import com.idansh.engine.environment.ActiveEnvironmentVariables;
 import com.idansh.engine.expression.Expression;
+import com.idansh.engine.world.World;
 
 
 public class ConditionAction extends Action {
@@ -26,8 +27,8 @@ public class ConditionAction extends Action {
      *                     possible values:  = (equal) / != (not equal) / bt (greater than) / lt (less than)
      * @param value        a number that will be compared to the property's value
      */
-    public ConditionAction(Entity entity, ActiveEnvironmentVariables activeEnvironmentVariables, String propertyName, String operator, Expression value) {
-        super(entity, activeEnvironmentVariables);
+    public ConditionAction(World worldContext, String entityContext, String propertyName, String operator, Expression value) {
+        super(worldContext, entityContext);
         this.type = Type.SINGLE;
         this.propertyName = propertyName;
         this.operator = operator;
@@ -44,8 +45,8 @@ public class ConditionAction extends Action {
      *
      * @param logicOp the logic operand OR/AND that will be used
      */
-    public ConditionAction(Entity entity, ActiveEnvironmentVariables activeEnvironmentVariables, String logicOp) {
-        super(entity, activeEnvironmentVariables);
+    public ConditionAction(World worldContext, String entityContext, String logicOp) {
+        super(worldContext, entityContext);
         this.type = Type.MULTI;
         this.logicOp = logicOp;
         this.propertyName = null;

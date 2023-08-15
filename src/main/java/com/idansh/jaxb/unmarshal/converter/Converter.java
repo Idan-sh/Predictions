@@ -1,6 +1,8 @@
 package com.idansh.jaxb.unmarshal.converter;
 
 import com.idansh.engine.actions.Action;
+import com.idansh.engine.actions.DecreaseAction;
+import com.idansh.engine.actions.IncreaseAction;
 import com.idansh.engine.entity.EntityFactory;
 import com.idansh.engine.helpers.Range;
 import com.idansh.engine.property.creator.factory.PropertyCreator;
@@ -18,6 +20,8 @@ import com.idansh.engine.rule.TerminationRule;
 import com.idansh.engine.world.World;
 import com.idansh.jaxb.schema.generated.*;
 import org.jetbrains.annotations.NotNull;
+
+import static com.sun.xml.internal.bind.v2.runtime.output.Encoded.entities;
 
 /**
  * A static class with methods to convert generated data from the XML scheme to the simulation's objects.
@@ -219,38 +223,41 @@ public class Converter {
 
     /**
      * Converts a PRDAction object that was read from the XML file
-     * into a Action Object.
+     * into an Action Object.
      * @param prdAction PRDAction object that was read from the XML file.
      * @return Action object with the data of the PRDAction received.
      */
-    private static Action actionConvert(PRDAction prdAction) {
-        Action ret = null;
+    private static Action actionConvert(PRDAction prdAction, World worldContext) {
+        Action retAction = null;
         ExpressionConverterAndValidator expressionConverterAndValidator = new ExpressionConverterAndValidator(environmentProperties, entities);
 
-        try {
-            switch (ActionType.valueOf(prdAction.getType())) {
-                case INCREASE:
-                    ret = new IncreaseAction(prdAction.getProperty(), prdAction.getEntity(), expressionConverterAndValidator.analyzeAndGetValue(prdAction, prdAction.getBy()));
-                case DECREASE:
-                    ret = new DecreaseAction(prdAction.getProperty(), prdAction.getEntity(), expressionConverterAndValidator.analyzeAndGetValue(prdAction, prdAction.getBy()));
-                case CALCULATION:
-                    ret = getMulOrDiv(prdAction, expressionConverterAndValidator);
-                case CONDITION:
-                    ret = getSingleOrMultiple(prdAction, expressionConverterAndValidator);
-                case SET:
-                    ret = new SetAction(prdAction.getProperty(), prdAction.getEntity(), expressionConverterAndValidator.analyzeAndGetValue(prdAction,prdAction.getValue()));
-                case KILL:
-                    ret = new KillAction(prdAction.getProperty(), prdAction.getEntity());
-                case REPLACE:
-                    break;
-                case PROXIMITY:
-                    break;
+        switch (Action.Type.valueOf(prdAction.getType())) {
+            case INCREASE:
+                retAction = new IncreaseAction(worldContext, , prdAction.getProperty(), expressionConverterAndValidator.analyzeAndGetValue(prdAction, prdAction.getBy()));
+
+            case DECREASE:
+                retAction = new DecreaseAction(prdAction.getProperty(), prdAction.getEntity(), expressionConverterAndValidator.analyzeAndGetValue(prdAction, prdAction.getBy()));
+
+            case CALCULATION:
+                retAction = getMulOrDiv(prdAction, expressionConverterAndValidator);
+
+            case CONDITION:
+                retAction = getSingleOrMultiple(prdAction, expressionConverterAndValidator);
+
+            case SET:
+                retAction = new SetAction(prdAction.getProperty(), prdAction.getEntity(), expressionConverterAndValidator.analyzeAndGetValue(prdAction,prdAction.getValue()));
+
+            case KILL:
+                retAction = new KillAction(prdAction.getProperty(), prdAction.getEntity());
+
+//            case REPLACE:
+//                break;
+
+//            case PROXIMITY:
+//                break;
             }
-        } catch (Exception e) {
-            String err = String.format("\"%s\" is not a valid Action type.", prdAction.getType());
-            throw new IllegalArgumentException(err);
-        }
-        return ret;
+
+        return retAction;
     }
 
 

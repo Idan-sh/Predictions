@@ -1,11 +1,10 @@
 package com.idansh.engine.entity;
 
-import com.idansh.engine.helpers.Counter;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class EntityManager {
     private final Map<String, EntityFactory> entityFactories;   // Each entity factory will define instructions on how to instantiate a single entity with a unique name
@@ -53,6 +52,23 @@ public class EntityManager {
             throw new IllegalArgumentException("Error: could not find the received entity factory!");
 
         return entityFactories.get(name);
+    }
+
+
+    public Entity getEntityInPopulation(String name) {
+        AtomicReference<Entity> retEntity = new AtomicReference<>();
+
+        population.forEach(
+                e -> {
+                    if(e.getName().equals(name))
+                        retEntity.set(e);
+                }
+        );
+
+        if(retEntity.get() == null)
+            throw new IllegalArgumentException("Error: entity name \"" + name + "\" does not exist in the population!");
+
+        return retEntity.get();
     }
 
 
