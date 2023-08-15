@@ -39,14 +39,18 @@ public class Converter {
                 p -> retWorld.addEnvironmentVariableFactory(environmentVariableConvert(p))
         );
 
+        retWorld.InitEnvironmentVariables();
+
         // Iterates over all PRDEntities, converts each entity and adds it to the world
         prdWorld.getPRDEntities().getPRDEntity().forEach(
                 e -> retWorld.entityManager.addEntityFactory(entityConvert(e))
         );
 
+        retWorld.entityManager.initEntityPopulation();
+
         // Iterates over all PRDRules, converts each rule and adds it to the world
         prdWorld.getPRDRules().getPRDRule().forEach(
-                r -> retWorld.addRule(ruleConvert(r))
+                r -> retWorld.addRule(ruleConvert(r, retWorld))
         );
 
         // Iterate over all PRDTerminations, converts each termination rule and adds it to the world
@@ -190,14 +194,14 @@ public class Converter {
      * @param prdRule PRDRule object that was read from the XML file.
      * @return Rule object with the data of the PRDRule received.
      */
-    private static Rule ruleConvert(PRDRule prdRule) {
+    private static Rule ruleConvert(PRDRule prdRule, World worldContext) {
         Rule retRule = new Rule(
                 prdRule.getName(),
                 activationConvert(prdRule.getPRDActivation()));
 
         // Iterates over all prdActions, converts them to actions and adds them to the rule
         prdRule.getPRDActions().getPRDAction().forEach(
-                a -> retRule.addAction(actionConvert(a))
+                a -> retRule.addAction(actionConvert(a, worldContext))
         );
 
         return retRule;
@@ -225,27 +229,27 @@ public class Converter {
      */
     private static Action actionConvert(PRDAction prdAction, World worldContext) {
         Action retAction = null;
-        ExpressionConverterAndValidator expressionConverterAndValidator = new ExpressionConverterAndValidator(environmentProperties, entities);
+        ExpressionConverter expressionConverter = new ExpressionConverter(environmentProperties, entities);
 
         switch (Action.Type.valueOf(prdAction.getType())) {
             case INCREASE:
-                retAction = new IncreaseAction(worldContext, prdAction.getEntity(), prdAction.getProperty(), expressionConverterAndValidator.analyzeAndGetValue(prdAction, prdAction.getBy()));
+                retAction = new IncreaseAction(worldContext, prdAction.getEntity(), prdAction.getProperty(), expressionConverter.analyzeAndGetValue(prdAction, prdAction.getBy()));
                 break;
 
             case DECREASE:
-                retAction = new DecreaseAction(worldContext, prdAction.getEntity(), prdAction.getProperty(), expressionConverterAndValidator.analyzeAndGetValue(prdAction, prdAction.getBy()));
+                retAction = new DecreaseAction(worldContext, prdAction.getEntity(), prdAction.getProperty(), expressionConverter.analyzeAndGetValue(prdAction, prdAction.getBy()));
                 break;
 
             case CALCULATION:
-                retAction = calculationActionConvert(prdAction, expressionConverterAndValidator);
+                retAction = calculationActionConvert(prdAction, expressionConverter);
                 break;
 
             case CONDITION:
-                retAction = getSingleOrMultiple(prdAction, expressionConverterAndValidator);
+                retAction = getSingleOrMultiple(prdAction, expressionConverter);
                 break;
 
             case SET:
-                retAction = new SetAction(worldContext, prdAction.getEntity(), prdAction.getProperty(), expressionConverterAndValidator.analyzeAndGetValue(prdAction,prdAction.getValue()));
+                retAction = new SetAction(worldContext, prdAction.getEntity(), prdAction.getProperty(), expressionConverter.analyzeAndGetValue(prdAction,prdAction.getValue()));
                 break;
 
             case KILL:

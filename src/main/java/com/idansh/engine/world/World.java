@@ -35,6 +35,9 @@ public class World {
         this.currTick = 0;
     }
 
+    public ActiveEnvironmentVariables getActiveEnvironmentVariables() {
+        return activeEnvironmentVariables;
+    }
 
     /**
      * Adds a new environment variable factory to the simulated world,
@@ -42,6 +45,15 @@ public class World {
      */
     public void addEnvironmentVariableFactory(PropertyFactory propertyFactory) {
         environmentVariablesManager.addEnvironmentVariableFactory(propertyFactory);
+    }
+
+
+    /**
+     * Creates the environment variables for the simulation to use,
+     * according to the environment variable factories defined.
+     */
+    public void InitEnvironmentVariables() {
+        activeEnvironmentVariables = environmentVariablesManager.createActiveEnvironmentVariables();
     }
 
 
@@ -73,8 +85,6 @@ public class World {
      * Starts the simulation using the defined initial properties.
      */
     public void startSimulation() {
-        activeEnvironmentVariables = environmentVariablesManager.createActiveEnvironmentVariables();    // Create the environment variables for the simulation to use
-
         // todo- continue with the simulation iterations...
     }
 }

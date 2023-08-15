@@ -37,7 +37,6 @@ public class ActiveEnvironmentVariables {
         if (!envVariables.containsKey(name))
             throw new IllegalArgumentException("Error: could not find environment variable with name " + name);
 
-
         return envVariables.get(name);
     }
 }
