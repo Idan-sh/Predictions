@@ -19,8 +19,6 @@ import com.idansh.engine.world.World;
 import com.idansh.jaxb.schema.generated.*;
 import org.jetbrains.annotations.NotNull;
 
-import static com.sun.xml.internal.bind.v2.runtime.output.Encoded.entities;
-
 /**
  * A static class with methods to convert generated data from the XML scheme to the simulation's objects.
  */
@@ -217,7 +215,7 @@ public class Converter {
     }
 
 
-    // todo- ------------------------  finish from here!!! --------------------------
+    // todo- ------------------------  finish expression converter --------------------------
 
     /**
      * Converts a PRDAction object that was read from the XML file
@@ -232,18 +230,23 @@ public class Converter {
         switch (Action.Type.valueOf(prdAction.getType())) {
             case INCREASE:
                 retAction = new IncreaseAction(worldContext, prdAction.getEntity(), prdAction.getProperty(), expressionConverterAndValidator.analyzeAndGetValue(prdAction, prdAction.getBy()));
+                break;
 
             case DECREASE:
                 retAction = new DecreaseAction(worldContext, prdAction.getEntity(), prdAction.getProperty(), expressionConverterAndValidator.analyzeAndGetValue(prdAction, prdAction.getBy()));
+                break;
 
             case CALCULATION:
-                retAction = getMulOrDiv(prdAction, expressionConverterAndValidator);
+                retAction = calculationActionConvert(prdAction, expressionConverterAndValidator);
+                break;
 
             case CONDITION:
                 retAction = getSingleOrMultiple(prdAction, expressionConverterAndValidator);
+                break;
 
             case SET:
                 retAction = new SetAction(worldContext, prdAction.getEntity(), prdAction.getProperty(), expressionConverterAndValidator.analyzeAndGetValue(prdAction,prdAction.getValue()));
+                break;
 
             case KILL:
                 retAction = new KillAction(worldContext, prdAction.getEntity());
@@ -260,28 +263,33 @@ public class Converter {
 
 
     /**
-     * Converts the given PRDAction to multiply or divide calculation action.
-     *
-     * @param prdAction the given PRDAction generated from reading the XML file
-     * @return a CalculationAction representation of the given PRDActivation.
+     * Converts a PRDAction of calculation that was read from the XML file
+     * into a CalculationAction Object.
+     * @param prdAction PRDAction object that was read from the XML file.
+     * @return Rule object with the data of the PRDRule received.
      */
-    private CalculationAction getMulOrDiv(PRDAction prdAction, ExpressionConverterAndValidator expressionConverterAndValidator){
-        CalculationAction ret = null;
-        PRDMultiply mul = prdAction.getPRDMultiply();
-        PRDDivide div = prdAction.getPRDDivide();
+    private static CalculationAction calculationActionConvert(PRDAction prdAction, ExpressionConverterAndValidator expressionConverterAndValidator){
+        CalculationAction retCalculationAction;
+        PRDMultiply prdMultiply = prdAction.getPRDMultiply();
+        PRDDivide prdDivide = prdAction.getPRDDivide();
 
-        // Without loss of generality, if mul equals null - the calculation action is not a multiply action.
-        if(mul != null){
-            ret = new CalculationAction(prdAction.getProperty(),prdAction.getEntity(), expressionConverterAndValidator.analyzeAndGetValue(prdAction, mul.getArg1()),
-                    expressionConverterAndValidator.analyzeAndGetValue(prdAction, mul.getArg2()), ClaculationType.MULTIPLY);
-        } else if (div != null) {
-            ret = new CalculationAction(prdAction.getProperty(),prdAction.getEntity(), expressionConverterAndValidator.analyzeAndGetValue(prdAction, div.getArg1()),
-                    expressionConverterAndValidator.analyzeAndGetValue(prdAction, div.getArg2()), ClaculationType.DIVIDE);
+        if(prdMultiply != null){
+            retCalculationAction = new CalculationAction(
+                    prdAction.getProperty(),prdAction.getEntity(),
+                    expressionConverterAndValidator.analyzeAndGetValue(prdAction, prdMultiply.getArg1()),
+                    expressionConverterAndValidator.analyzeAndGetValue(prdAction, prdMultiply.getArg2()),
+                    ClaculationType.MULTIPLY);
+        } else if (prdDivide != null) {
+            retCalculationAction = new CalculationAction(
+                    prdAction.getProperty(),prdAction.getEntity(),
+                    expressionConverterAndValidator.analyzeAndGetValue(prdAction, prdDivide.getArg1()),
+                    expressionConverterAndValidator.analyzeAndGetValue(prdAction, prdDivide.getArg2()),
+                    ClaculationType.DIVIDE);
         }
         else {
-            // Throw exception.
+            throw new RuntimeException("Error: invalid calculation action received from XML!");
         }
-        return ret;
+        return retCalculationAction;
     }
 
     /**
