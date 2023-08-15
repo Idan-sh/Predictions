@@ -233,7 +233,7 @@ public class Converter {
 
         switch (Action.Type.valueOf(prdAction.getType())) {
             case INCREASE:
-                retAction = new IncreaseAction(worldContext, , prdAction.getProperty(), expressionConverterAndValidator.analyzeAndGetValue(prdAction, prdAction.getBy()));
+                retAction = new IncreaseAction(worldContext, prdAction.getEntity(), prdAction.getProperty(), expressionConverterAndValidator.analyzeAndGetValue(prdAction, prdAction.getBy()));
 
             case DECREASE:
                 retAction = new DecreaseAction(prdAction.getProperty(), prdAction.getEntity(), expressionConverterAndValidator.analyzeAndGetValue(prdAction, prdAction.getBy()));

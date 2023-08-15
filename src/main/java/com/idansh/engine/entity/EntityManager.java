@@ -1,9 +1,6 @@
 package com.idansh.engine.entity;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class EntityManager {
@@ -55,17 +52,15 @@ public class EntityManager {
     }
 
 
+    /**
+     * Returns an entity in the population with the given name.
+     */
     public Entity getEntityInPopulation(String name) {
-        AtomicReference<Entity> retEntity = new AtomicReference<>();
+        // Find an entity with the given name in the population
+        Optional<Entity> retEntity =
+                population.stream().filter(e -> e.getName().equals(name)).findAny();
 
-        population.forEach(
-                e -> {
-                    if(e.getName().equals(name))
-                        retEntity.set(e);
-                }
-        );
-
-        if(retEntity.get() == null)
+        if(!retEntity.isPresent())
             throw new IllegalArgumentException("Error: entity name \"" + name + "\" does not exist in the population!");
 
         return retEntity.get();
