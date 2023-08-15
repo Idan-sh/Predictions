@@ -1,6 +1,7 @@
 package com.idansh.jaxb.unmarshal.converter;
 
 import com.idansh.engine.actions.*;
+import com.idansh.engine.actions.condition.ConditionAction;
 import com.idansh.engine.entity.EntityFactory;
 import com.idansh.engine.helpers.Range;
 import com.idansh.engine.property.creator.factory.PropertyCreator;
@@ -270,7 +271,7 @@ public class Converter {
      * Converts a PRDAction of calculation that was read from the XML file
      * into a CalculationAction Object.
      * @param prdAction PRDAction object that was read from the XML file.
-     * @return Rule object with the data of the PRDRule received.
+     * @return CalculationAction object with the data of the PRDAction received.
      */
     private static CalculationAction calculationActionConvert(World worldContext, PRDAction prdAction, ExpressionConverter expressionConverter){
         CalculationAction retCalculationAction;
@@ -303,22 +304,28 @@ public class Converter {
 
 
     /**
-     * Converts the given PRDAction to single or multiple condition action.
-     *
+     * Converts PRDAction to single or multiple condition action.
      * @param prdAction the given PRDAction generated from reading the XML file
      * @return an AbstractConditionAction representation of the given PRDActivation.
      */
-    private AbstractConditionAction conditionActionConvert(PRDAction prdAction, ExpressionConverter expressionConverter){
-        AbstractConditionAction ret = null;
+
+    /**
+     * Converts a PRDAction of single or multiple condition that was read from the XML file
+     * into a ConditionAction Object.
+     * @param prdAction PRDAction object that was read from the XML file.
+     * @return ConditionAction object with the data of the PRDAction received.
+     */
+    private static ConditionAction conditionActionConvert(PRDAction prdAction, ExpressionConverter expressionConverter){
+        ConditionAction retConditionAction;
         PRDCondition prdCondition = prdAction.getPRDCondition();
         ThenOrElse thenActions = null, elseActions = null;
         // Then and else objects are created in this method.
         getAndCreateThenOrElse(prdAction, thenActions, elseActions);
 
         if(prdCondition.getSingularity().equals("single")){
-            ret = new SingleCondition(prdAction.getProperty(), prdAction.getEntity(), expressionConverter.convertExpression(prdAction, prdAction.getValue()), thenActions, elseActions, prdCondition.getOperator());
+            retConditionAction = new SingleCondition(prdAction.getProperty(), prdAction.getEntity(), expressionConverter.convertExpression(prdAction, prdAction.getValue()), thenActions, elseActions, prdCondition.getOperator());
         } else if (prdCondition.getSingularity().equals("multiple")) {
-            ret = new MultipleCondition(prdAction.getProperty(), prdAction.getEntity(), expressionConverter.convertExpression(prdAction, prdAction.getValue()), thenActions, elseActions, prdCondition.getLogical());
+            retConditionAction = new MultipleCondition(prdAction.getProperty(), prdAction.getEntity(), expressionConverter.convertExpression(prdAction, prdAction.getValue()), thenActions, elseActions, prdCondition.getLogical());
         }
         else {
             // Throw exception.
