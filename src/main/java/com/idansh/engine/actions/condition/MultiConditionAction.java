@@ -13,8 +13,8 @@ public class MultiConditionAction extends ConditionAction{
      *
      * @param logicOp the logic operand OR/AND that will be used
      */
-    public MultiConditionAction(World worldContext, String entityContext, String logicOp) {
-        super(worldContext, entityContext, Type.MULTI);
+    public MultiConditionAction(World worldContext, String entityContext, String logicOp, ThenOrElseActions thenActions, ThenOrElseActions elseActions) {
+        super(worldContext, entityContext, Type.MULTI, thenActions, elseActions);
         this.logicOp = logicOp;
     }
 }

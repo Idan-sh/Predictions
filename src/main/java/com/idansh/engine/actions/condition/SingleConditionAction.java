@@ -18,8 +18,8 @@ public class SingleConditionAction extends ConditionAction{
      *                     possible values:  = (equal) / != (not equal) / bt (greater than) / lt (less than)
      * @param value        a number that will be compared to the property's value
      */
-    public SingleConditionAction(World worldContext, String entityContext, String propertyName, String operator, Expression value) {
-        super(worldContext, entityContext, Type.SINGLE);
+    public SingleConditionAction(World worldContext, String entityContext, String propertyName, String operator, Expression value, ThenOrElseActions thenActions, ThenOrElseActions elseActions) {
+        super(worldContext, entityContext, Type.SINGLE, thenActions, elseActions);
         this.propertyName = propertyName;
         this.operator = operator;
         this.value = value;

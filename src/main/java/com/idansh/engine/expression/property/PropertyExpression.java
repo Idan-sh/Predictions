@@ -17,5 +17,6 @@ public class PropertyExpression implements Expression {
      */
     public int invoke() {
         // todo- complete invoke
+        return 0;
     }
 }

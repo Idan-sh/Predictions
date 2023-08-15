@@ -33,7 +33,7 @@ public abstract class Action {
     /**
      * Invokes the action, according to the action's type.
      */
-    abstract void invoke();
+    public abstract void invoke();
 
 
     /**

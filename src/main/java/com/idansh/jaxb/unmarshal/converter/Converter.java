@@ -2,6 +2,9 @@ package com.idansh.jaxb.unmarshal.converter;
 
 import com.idansh.engine.actions.*;
 import com.idansh.engine.actions.condition.ConditionAction;
+import com.idansh.engine.actions.condition.MultiConditionAction;
+import com.idansh.engine.actions.condition.SingleConditionAction;
+import com.idansh.engine.actions.condition.ThenOrElseActions;
 import com.idansh.engine.entity.EntityFactory;
 import com.idansh.engine.helpers.Range;
 import com.idansh.engine.property.creator.factory.PropertyCreator;
@@ -220,8 +223,6 @@ public class Converter {
     }
 
 
-    // todo- ------------------------  finish expression converter --------------------------
-
     /**
      * Converts a PRDAction object that was read from the XML file
      * into an Action Object.
@@ -234,27 +235,53 @@ public class Converter {
 
         switch (Action.Type.valueOf(prdAction.getType())) {
             case INCREASE:
-                retAction = new IncreaseAction(worldContext, prdAction.getEntity(), prdAction.getProperty(), expressionConverter.convertExpression(prdAction, prdAction.getBy()));
+                retAction = new IncreaseAction(
+                        worldContext,
+                        prdAction.getEntity(),
+                        prdAction.getProperty(),
+                        expressionConverter.convertExpression(prdAction, prdAction.getBy())
+                );
                 break;
 
             case DECREASE:
-                retAction = new DecreaseAction(worldContext, prdAction.getEntity(), prdAction.getProperty(), expressionConverter.convertExpression(prdAction, prdAction.getBy()));
+                retAction = new DecreaseAction(
+                        worldContext,
+                        prdAction.getEntity(),
+                        prdAction.getProperty(),
+                        expressionConverter.convertExpression(prdAction, prdAction.getBy())
+                );
                 break;
 
             case CALCULATION:
-                retAction = calculationActionConvert(worldContext, prdAction, expressionConverter);
+                retAction = calculationActionConvert(
+                        worldContext,
+                        prdAction,
+                        expressionConverter
+                );
                 break;
 
             case CONDITION:
-                retAction = conditionActionConvert(prdAction, expressionConverter);
+                retAction = conditionActionConvert(
+                        prdAction,
+                        worldContext,
+                        expressionConverter
+                );
                 break;
 
             case SET:
-                retAction = new SetAction(worldContext, prdAction.getEntity(), prdAction.getProperty(), expressionConverter.convertExpression(prdAction, prdAction.getBy()));
+                retAction = new SetAction(
+                        worldContext,
+                        prdAction.getEntity(),
+                        prdAction.getProperty(),
+                        expressionConverter.convertExpression(prdAction, prdAction.getBy())
+                );
                 break;
 
             case KILL:
-                retAction = new KillAction(worldContext, prdAction.getEntity());
+                retAction = new KillAction(
+                        worldContext,
+                        prdAction.getEntity()
+                );
 
             case REPLACE:
                 break;
@@ -304,79 +331,64 @@ public class Converter {
 
 
     /**
-     * Converts PRDAction to single or multiple condition action.
-     * @param prdAction the given PRDAction generated from reading the XML file
-     * @return an AbstractConditionAction representation of the given PRDActivation.
-     */
-
-    /**
      * Converts a PRDAction of single or multiple condition that was read from the XML file
      * into a ConditionAction Object.
      * @param prdAction PRDAction object that was read from the XML file.
      * @return ConditionAction object with the data of the PRDAction received.
      */
-    private static ConditionAction conditionActionConvert(PRDAction prdAction, ExpressionConverter expressionConverter){
+    private static ConditionAction conditionActionConvert(PRDAction prdAction, World worldContext, ExpressionConverter expressionConverter){
         ConditionAction retConditionAction;
         PRDCondition prdCondition = prdAction.getPRDCondition();
-        ThenOrElse thenActions = null, elseActions = null;
-        // Then and else objects are created in this method.
-        getAndCreateThenOrElse(prdAction, thenActions, elseActions);
 
+        final ThenOrElseActions thenActions = new ThenOrElseActions(), elseActions = new ThenOrElseActions();
+
+        // Convert Then/Else action sets
+        thenOrElseConvert(prdAction, worldContext, thenActions, elseActions);
+
+        //
         if(prdCondition.getSingularity().equals("single")){
-            retConditionAction = new SingleCondition(prdAction.getProperty(), prdAction.getEntity(), expressionConverter.convertExpression(prdAction, prdAction.getValue()), thenActions, elseActions, prdCondition.getOperator());
+            retConditionAction = new SingleConditionAction(
+                    worldContext,
+                    prdAction.getEntity(),
+                    prdAction.getProperty(),
+                    prdCondition.getOperator(),
+                    expressionConverter.convertExpression(prdAction, prdAction.getValue()),
+                    thenActions,
+                    elseActions
+            );
         } else if (prdCondition.getSingularity().equals("multiple")) {
-            retConditionAction = new MultipleCondition(prdAction.getProperty(), prdAction.getEntity(), expressionConverter.convertExpression(prdAction, prdAction.getValue()), thenActions, elseActions, prdCondition.getLogical());
+            retConditionAction = new MultiConditionAction(
+                    worldContext,
+                    prdAction.getEntity(),
+                    prdCondition.getLogical(),
+                    thenActions,
+                    elseActions
+            );
         }
         else {
-            // Throw exception.
+            throw new RuntimeException("Error: invalid condition action received from XML!");
         }
 
-        return ret;
+        return retConditionAction;
     }
 
 
     /**
-     * Converts the given PRDAction to Then and Else objects which contain a set of actions to invoke.
-     * According to the XML file, if one of them has no actions to invoke, the object remains null.
-     *
-     * @param prdAction the given PRDAction generated from reading the XML file
-     * @param thenActions empty ThenOrElse object to be created.
-     * @param elseActions empty ThenOrElse object to be created.
+     * Convert Then and Else action sets from XML file, adds them into the proper action sets.
+     * @param prdAction PRDAction object that was read from the XML file.
+     * @param thenActions ThenElseActions action set for the Then actions.
+     * @param elseActions ThenElseActions action set for the Else actions.
      */
-    private void getAndCreateThenOrElse(PRDAction prdAction, ThenOrElse thenActions, ThenOrElse elseActions){
-        // 'getThenOrElseActionSet' creates the Set of Actions for them both.
-        // Because 'PRDThen' and 'PRDElse' are different objects, when we want to create the set for 'Then'
-        // we send null for 'prdElse', same for Else.
-        Set<Action> thenActionsSet = getThenOrElseActionSet(prdAction.getPRDThen(), null);
-        Set<Action> elseActionsSet = getThenOrElseActionSet(null, prdAction.getPRDElse());
+    private static void thenOrElseConvert(PRDAction prdAction, World worldContext, final ThenOrElseActions thenActions, final ThenOrElseActions elseActions){
+        prdAction.getPRDThen().getPRDAction().forEach(
+                a -> thenActions.addAction(actionConvert(a, worldContext))
+        );
 
-        if(!thenActionsSet.isEmpty()){
-            thenActions = new ThenOrElse(thenActionsSet);
-        }
+        if(thenActions.isEmpty())
+            throw new RuntimeException("Error: Then actions set received from XML is empty!");
 
-        if(!elseActionsSet.isEmpty()){
-            elseActions = new ThenOrElse(elseActionsSet);
-        }
-    }
-
-
-    /**
-     * Converts the given PRDThen or PRDElse to The set of actions to invoke.
-     * For example: if prdThen equals null, the method creates the set from the prdElse.
-     *
-     * @param prdThen the given PRDThen generated from reading the XML file
-     * @param prdElse the given PRDElse generated from reading the XML file
-     * @return a Set of actions representation of the given PRDThen or PRDElse.
-     */
-    private Set<Action> getThenOrElseActionSet(PRDThen prdThen, PRDElse prdElse){
-        Set<Action> ret = new HashSet<>();
-
-        if(prdThen != null){
-            prdThen.getPRDAction().forEach(a-> ret.add(PRDAction2Action(a)));
-        } else if (prdElse != null) {
-            prdElse.getPRDAction().forEach(a-> ret.add(PRDAction2Action(a)));
-        }
-
-        return ret;
+        prdAction.getPRDElse().getPRDAction().forEach(
+                a -> elseActions.addAction(actionConvert(a, worldContext))
+        );
     }
 }

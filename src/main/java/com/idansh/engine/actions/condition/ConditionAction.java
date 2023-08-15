@@ -11,10 +11,15 @@ public abstract class ConditionAction extends Action {
     }
 
     private final Type type;
+    private final ThenOrElseActions thenActions;
+    private final ThenOrElseActions elseActions;
 
-    public ConditionAction(World worldContext, String entityContext, Type type) {
+
+    public ConditionAction(World worldContext, String entityContext, Type type, ThenOrElseActions thenActions, ThenOrElseActions elseActions) {
         super(worldContext, entityContext);
         this.type = type;
+        this.thenActions = thenActions;
+        this.elseActions = elseActions;
     }
 
     public void invoke() {
