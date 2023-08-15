@@ -229,15 +229,15 @@ public class Converter {
      */
     private static Action actionConvert(PRDAction prdAction, World worldContext) {
         Action retAction = null;
-        ExpressionConverter expressionConverter = new ExpressionConverter(environmentProperties, entities);
+        ExpressionConverter expressionConverter = new ExpressionConverter(worldContext);
 
         switch (Action.Type.valueOf(prdAction.getType())) {
             case INCREASE:
-                retAction = new IncreaseAction(worldContext, prdAction.getEntity(), prdAction.getProperty(), expressionConverter.analyzeAndGetValue(prdAction, prdAction.getBy()));
+                retAction = new IncreaseAction(worldContext, prdAction.getEntity(), prdAction.getProperty(), expressionConverter.convertExpression(prdAction));
                 break;
 
             case DECREASE:
-                retAction = new DecreaseAction(worldContext, prdAction.getEntity(), prdAction.getProperty(), expressionConverter.analyzeAndGetValue(prdAction, prdAction.getBy()));
+                retAction = new DecreaseAction(worldContext, prdAction.getEntity(), prdAction.getProperty(), expressionConverter.convertExpression(prdAction));
                 break;
 
             case CALCULATION:
@@ -249,7 +249,7 @@ public class Converter {
                 break;
 
             case SET:
-                retAction = new SetAction(worldContext, prdAction.getEntity(), prdAction.getProperty(), expressionConverter.analyzeAndGetValue(prdAction,prdAction.getValue()));
+                retAction = new SetAction(worldContext, prdAction.getEntity(), prdAction.getProperty(), expressionConverter.convertExpression(prdAction));
                 break;
 
             case KILL:
@@ -272,7 +272,7 @@ public class Converter {
      * @param prdAction PRDAction object that was read from the XML file.
      * @return Rule object with the data of the PRDRule received.
      */
-    private static CalculationAction calculationActionConvert(PRDAction prdAction, ExpressionConverterAndValidator expressionConverterAndValidator){
+    private static CalculationAction calculationActionConvert(PRDAction prdAction, ExpressionConverter expressionConverter){
         CalculationAction retCalculationAction;
         PRDMultiply prdMultiply = prdAction.getPRDMultiply();
         PRDDivide prdDivide = prdAction.getPRDDivide();
@@ -280,14 +280,14 @@ public class Converter {
         if(prdMultiply != null){
             retCalculationAction = new CalculationAction(
                     prdAction.getProperty(),prdAction.getEntity(),
-                    expressionConverterAndValidator.analyzeAndGetValue(prdAction, prdMultiply.getArg1()),
-                    expressionConverterAndValidator.analyzeAndGetValue(prdAction, prdMultiply.getArg2()),
+                    expressionConverter.convertExpression(prdAction, prdMultiply.getArg1()),
+                    expressionConverter.convertExpression(prdAction, prdMultiply.getArg2()),
                     ClaculationType.MULTIPLY);
         } else if (prdDivide != null) {
             retCalculationAction = new CalculationAction(
                     prdAction.getProperty(),prdAction.getEntity(),
-                    expressionConverterAndValidator.analyzeAndGetValue(prdAction, prdDivide.getArg1()),
-                    expressionConverterAndValidator.analyzeAndGetValue(prdAction, prdDivide.getArg2()),
+                    expressionConverter.analyzeAndGetValue(prdAction, prdDivide.getArg1()),
+                    expressionConverter.analyzeAndGetValue(prdAction, prdDivide.getArg2()),
                     ClaculationType.DIVIDE);
         }
         else {

@@ -1,7 +1,14 @@
 package com.idansh.jaxb.unmarshal.converter;
 
+import com.idansh.engine.entity.Entity;
 import com.idansh.engine.entity.EntityManager;
 import com.idansh.engine.environment.ActiveEnvironmentVariables;
+import com.idansh.engine.expression.api.Expression;
+import com.idansh.engine.expression.functions.EnvironmentFunction;
+import com.idansh.engine.expression.functions.FunctionActivation;
+import com.idansh.engine.expression.functions.RandomFunction;
+import com.idansh.engine.expression.property.PropertyExpression;
+import com.idansh.engine.property.instance.Property;
 import com.idansh.engine.world.World;
 import com.idansh.jaxb.schema.generated.PRDAction;
 
@@ -10,36 +17,38 @@ import com.idansh.jaxb.schema.generated.PRDAction;
  * which the simulation can use.
  */
 public class ExpressionConverter {
+    private final ActiveEnvironmentVariables environmentVariables;
+    private final EntityManager entityManager;
 
-    /**
-     * Analyze the value string from the PRDAction, in case the given string represent a function, a property or just a regular value.
-     * The method also checks whether the object matches the property's value type and the action's type.
-     * if yes, the method return the requested object
-     * Otherwise, an exception thrown in order to stop this action object creation.
-     *
-     * @param prdAction the given PRDTAction generated from reading the XML file
-     * @param prdValueStr the given value name from the given PRDTAction generated from reading the XML file.
-     * The name sent separately in order to analyze the two arguments of 'Calculation' action too.
-     * @return the value requested object.
-     */
-    public Object analyzeAndGetValue(PRDAction prdAction, String expressionStr){
-        Object value;
-        value = getObjectIfFunction(prdValueStr);
-        if(value == null){
-            value = getIfProperty(prdAction, prdValueStr);
-        }
-        if(value == null){
-            value = parseValue(prdValueStr);
-        }
-        if(!compareActionValueToGivenPropertyValue(prdAction, value)){
-            // validation error occurred.
-            throw new RuntimeException();
-        }
-
-        return value;
+    public ExpressionConverter(World world) {
+        this.environmentVariables = world.getActiveEnvironmentVariables();
+        this.entityManager = world.entityManager;
     }
 
+    /**
+     * Converts a PRDAction object that was read from the XML file
+     * into an Expression Object.
+     * @param prdAction PRDAction object that was read from the XML file.
+     * @return Action object with the data of the PRDAction received.
+     */
+    public Expression convertExpression(PRDAction prdAction) {
+        Expression retExpression;
 
+        // Try to convert to FunctionExpression
+        retExpression = getFunctionExpression(prdAction.getBy());
+
+        // Try to convert to PropertyExpression
+        if(retExpression == null) {
+            retExpression = getPropertyExpression(prdAction);
+        }
+
+        // Convert to FixedExpression
+        if(retExpression == null) {
+
+        }
+
+        return retExpression;
+    }
 
 
     /**
@@ -70,51 +79,97 @@ public class ExpressionConverter {
         return value;
     }
 
+
+    // -------------------------- Function --------------------------
+
     /**
-     * Check if the PRDAction value is a function name and return the value from the given function.
-     * If the value is not a function name, the return value will be null.
-     *
-     * @param prdValueStr the PRDAction value string.
-     * @return the return value from the function if exists.
+     * Checks if the PRDAction is a function expression.
+     * If it is then returns the proper function expression, otherwise returns null.
+     * @param prdStr PRDAction's value string.
      */
-    private Object getObjectIfFunction(String prdValueStr){
-        String functionName = getFucntionName(prdValueStr);
-        Object ret = null;
-        try{
-            switch (HelperFunctionsType.valueOf(functionName)){
+    private Expression getFunctionExpression(String prdStr) {
+        Expression retFunctionExpression = null;
+        String functionName = getFunctionName(prdStr);
+
+        if (functionName != null) {
+            switch (FunctionActivation.Type.valueOf(functionName)) {
                 case ENVIRONMENT:
-                    ret = StaticHelperFunctions.environment(getFunctionParam(prdValueStr), environmentVariables);
+                    retFunctionExpression = new EnvironmentFunction(environmentVariables, getFunctionArgument(prdStr));
+                    break;
+
                 case RANDOM:
-                    ret = StaticHelperFunctions.random(Integer.parseInt(getFunctionParam(prdValueStr)));
+                    retFunctionExpression = new RandomFunction(Integer.parseInt(getFunctionArgument(prdStr)));
+                    break;
+
                 case EVALUATE:
-                    ret = null;
+                    retFunctionExpression = null;
+                    break;
+
                 case PERCENT:
-                    ret = null;
+                    retFunctionExpression = null;
+                    break;
+
                 case TICKS:
-                    ret = null;
+                    retFunctionExpression = null;
+                    break;
             }
         }
-        catch (Exception e) {
-            // Value is not a function
-            ret = null;
+
+        return retFunctionExpression;
+    }
+
+
+    /**
+     * Get the function's name from a string, if the string does not contain one, return null.
+     * @param str string value of PRDAction from the input XML file.
+     */
+    private String getFunctionName(String str) {
+        String retStr = null;
+        int ind = str.indexOf("(");
+
+        if(ind != -1)
+            retStr = str.substring(0, ind);
+
+        return retStr;
+    }
+
+
+    /**
+     * Get the function's argument from a string, if the string does not contain one, return null.
+     * @param str string value of PRDAction from the input XML file.
+     */
+    private String getFunctionArgument(String str){
+        String ret = null;
+        int openInd = str.indexOf("(");
+        int closeInd = str.indexOf(")");
+
+        if (openInd != -1 && closeInd != -1 && closeInd > openInd) {
+            ret = str.substring(openInd + 1, closeInd);
         }
 
         return ret;
     }
 
+
+    // -------------------------- Property --------------------------
+
     /**
-     * Check if the PRDAction value is a property name and return the property object.
-     * If the value is not a property name, the return value will be null.
-     *
-     * @param prdAction the given PRDTAction generated from reading the XML file
-     * @param prdValueStr the PRDAction value string.
-     * @return the requested property if exists.
+     * Checks if the PRDAction is a property expression.
+     * If it is then returns a new property expression with its name, otherwise returns null.
+     * @param prdAction PRDAction received from the XML file.
      */
-    private Property getIfProperty(PRDAction prdAction, String prdValueStr) {
-        String entityName = prdAction.getEntity();
-        Entity entity = entities.get(entityName);
-        return entity.getProperties().get(prdValueStr);
+    private Expression getPropertyExpression(PRDAction prdAction) {
+        try{
+            // Try to get an entity with the given name, if one does not exist continue
+            entityManager.getEntityInPopulation(prdAction.getEntity());
+            return new PropertyExpression(prdAction.getBy());
+        } catch (IllegalArgumentException ignored) { }
+        return null;
     }
+
+
+    // ------------------------ Fixed Value ------------------------
+
 
     /**
      * If 'analyzeAndGetValue' enter this method, the given value from the XML is not a function or a property.
@@ -174,42 +229,7 @@ public class ExpressionConverter {
         return ret;
     }
 
-    /**
-     * Extract the function name from the given value string if a function name exists in the string.
-     * Otherwise, return null.
-     *
-     * @param prdValueStr the given value from the given PRDTAction generated from reading the XML file
-     * @return the function name in the given string.
-     */
-    private String getFucntionName(String prdValueStr){
-        String ret = null;
-        int openParenIndex = prdValueStr.indexOf("(");
 
-        if (openParenIndex != -1) {
-            ret = prdValueStr.substring(0, openParenIndex);
-        }
-
-        return ret;
-    }
-
-    /**
-     * Extract the function's params from the given value string if the params exist in the string.
-     * Otherwise, return null.
-     *
-     * @param prdValueStr the given value from the given PRDTAction generated from reading the XML file
-     * @return the functions params in the given string.
-     */
-    private String getFunctionParam(String prdValueStr){
-        String ret = null;
-        int openParenIndex = prdValueStr.indexOf("(");
-        int closeParenIndex = prdValueStr.indexOf(")");
-
-        if (openParenIndex != -1 && closeParenIndex != -1 && closeParenIndex > openParenIndex) {
-            ret = prdValueStr.substring(openParenIndex + 1, closeParenIndex);
-        }
-
-        return ret;
-    }
 
     /**
      * After the object has been decodes, this method checks whether the object matches the property's value type and the action's type.
