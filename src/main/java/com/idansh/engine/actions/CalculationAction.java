@@ -9,8 +9,14 @@ import com.idansh.engine.world.World;
  * Receives two argument expressions (arg1, arg2) that will be used for the calculation.
  */
 public class CalculationAction extends Action {
+    public enum Type {
+        MULTIPLY, DIVIDE
+    }
+
     private final String propertyName;
     private final Expression arg1, arg2;
+
+    private Type type;
 
     /**
      * Perform a mathematical calculation on a value of a property of the entity,
@@ -19,11 +25,12 @@ public class CalculationAction extends Action {
      * @param entityContext name entity on which the action will be preformed.
      * @param propertyName name of the property whose value will be changed.
      */
-    public CalculationAction(World worldContext, String entityContext, String propertyName, Expression arg1, Expression arg2) {
+    public CalculationAction(World worldContext, String entityContext, String propertyName, Expression arg1, Expression arg2, Type type) {
         super(worldContext, entityContext);
         this.propertyName = propertyName;
         this.arg1 = arg1;
         this.arg2 = arg2;
+        this.type = type;
     }
 
 

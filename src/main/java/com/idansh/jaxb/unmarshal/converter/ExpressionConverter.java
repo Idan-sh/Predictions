@@ -4,11 +4,11 @@ import com.idansh.engine.entity.Entity;
 import com.idansh.engine.entity.EntityManager;
 import com.idansh.engine.environment.ActiveEnvironmentVariables;
 import com.idansh.engine.expression.api.Expression;
-import com.idansh.engine.expression.functions.EnvironmentFunction;
-import com.idansh.engine.expression.functions.FunctionActivation;
-import com.idansh.engine.expression.functions.RandomFunction;
+import com.idansh.engine.expression.fixed.FixedValueExpression;
+import com.idansh.engine.expression.functions.EnvironmentFunctionExpression;
+import com.idansh.engine.expression.functions.FunctionActivationExpression;
+import com.idansh.engine.expression.functions.RandomFunctionExpression;
 import com.idansh.engine.expression.property.PropertyExpression;
-import com.idansh.engine.property.instance.Property;
 import com.idansh.engine.world.World;
 import com.idansh.jaxb.schema.generated.PRDAction;
 
@@ -28,14 +28,16 @@ public class ExpressionConverter {
     /**
      * Converts a PRDAction object that was read from the XML file
      * into an Expression Object.
+     * Checks if the expression's value's typ matches the action's type.
+     * If the type matches, returns the Expression object, otherwise throws exception.
      * @param prdAction PRDAction object that was read from the XML file.
      * @return Action object with the data of the PRDAction received.
      */
-    public Expression convertExpression(PRDAction prdAction) {
+    public Expression convertExpression(PRDAction prdAction, String prdStr) {
         Expression retExpression;
 
         // Try to convert to FunctionExpression
-        retExpression = getFunctionExpression(prdAction.getBy());
+        retExpression = getFunctionExpression(prdStr);
 
         // Try to convert to PropertyExpression
         if(retExpression == null) {
@@ -44,39 +46,15 @@ public class ExpressionConverter {
 
         // Convert to FixedExpression
         if(retExpression == null) {
+            retExpression = getFixedValue(prdStr);
+        }
 
+        // Check for type error
+        if(!compareActionValueToGivenPropertyValue(prdAction, value)){
+            throw new RuntimeException("Error: the created expression's type does not match the action's type!");
         }
 
         return retExpression;
-    }
-
-
-    /**
-     * Analyze the value string from the PRDAction, in case the given string represent a function, a property or just a regular value.
-     * The method also checks whether the object matches the property's value type and the action's type.
-     * if yes, the method return the requested object
-     * Otherwise, an exception thrown in order to stop this action object creation.
-     *
-     * @param prdAction the given PRDTAction generated from reading the XML file
-     * @param prdValueStr the given value name from the given PRDTAction generated from reading the XML file.
-     * The name sent separately in order to analyze the two arguments of 'Calculation' action too.
-     * @return the value requested object.
-     */
-    public Object analyzeAndGetValue(PRDAction prdAction, String prdValueStr){
-        Object value;
-        value = getObjectIfFunction(prdValueStr);
-        if(value == null){
-            value = getIfProperty(prdAction, prdValueStr);
-        }
-        if(value == null){
-            value = parseValue(prdValueStr);
-        }
-        if(!compareActionValueToGivenPropertyValue(prdAction, value)){
-            // validation error occurred.
-            throw new RuntimeException();
-        }
-
-        return value;
     }
 
 
@@ -92,13 +70,13 @@ public class ExpressionConverter {
         String functionName = getFunctionName(prdStr);
 
         if (functionName != null) {
-            switch (FunctionActivation.Type.valueOf(functionName)) {
+            switch (FunctionActivationExpression.Type.valueOf(functionName)) {
                 case ENVIRONMENT:
-                    retFunctionExpression = new EnvironmentFunction(environmentVariables, getFunctionArgument(prdStr));
+                    retFunctionExpression = new EnvironmentFunctionExpression(environmentVariables, getFunctionArgument(prdStr));
                     break;
 
                 case RANDOM:
-                    retFunctionExpression = new RandomFunction(Integer.parseInt(getFunctionArgument(prdStr)));
+                    retFunctionExpression = new RandomFunctionExpression(Integer.parseInt(getFunctionArgument(prdStr)));
                     break;
 
                 case EVALUATE:
@@ -161,8 +139,13 @@ public class ExpressionConverter {
     private Expression getPropertyExpression(PRDAction prdAction) {
         try{
             // Try to get an entity with the given name, if one does not exist continue
-            entityManager.getEntityInPopulation(prdAction.getEntity());
-            return new PropertyExpression(prdAction.getBy());
+            Entity entity = entityManager.getEntityInPopulation(prdAction.getEntity());
+
+            // Try to get the entity's property with the given name, if one does not exist continue
+            String propertyName = prdAction.getBy();
+            entity.getPropertyByName(propertyName);
+
+            return new PropertyExpression(propertyName);
         } catch (IllegalArgumentException ignored) { }
         return null;
     }
@@ -172,14 +155,15 @@ public class ExpressionConverter {
 
 
     /**
-     * Parse the string to one of the following:
-     * Integer, Double, Boolean, String.
+     * Parses a string to one of the following:
+     * Integer, Double, Boolean, String,
+     * and creates a FixedValueExpression with the resulted value.
      * Will try to convert to integer, then to float, then to boolean,
      * and if all fails will keep as string.
      * @param prdStr PRDAction's value string.
-     * @return the given value string parse into one of the types
+     * @return a FixedValueExpression with the resulted converted value.
      */
-    private Object parseValue(String prdStr){
+    private Expression getFixedValue(String prdStr){
         Object retValue;
 
         try {
@@ -200,113 +184,8 @@ public class ExpressionConverter {
             }
         }
 
-        return retValue;
-    }
+        // todo- check value for type error
 
-
-    /**
-     * After the object has been decodes, this method checks whether the object matches the property's value type and the action's type.
-     * If not, return false.
-     *
-     * @param prdAction the given PRDTAction generated from reading the XML file
-     * @param value the action value object.
-     * @return true if the object complete the checks successfully, otherwise return false.
-     */
-    private boolean compareActionValueToGivenPropertyValue(PRDAction prdAction, Object value){
-        boolean ret = true;
-
-        if (value instanceof Integer) {
-            ret = compareIntegerOrDoubleCase(prdAction);
-        } else if (value instanceof Double) {
-            ret = compareIntegerOrDoubleCase(prdAction);
-        } else if (value instanceof Boolean) {
-            ret = compareBooleanCase(prdAction);
-        } else if (value instanceof String) {
-            ret = compareStringCase(prdAction);
-        }
-
-        return ret;
-    }
-
-    /**
-     * 'compareActionValueToGivenPropertyValue' helper for integer or double actions/properties.
-     */
-    private boolean compareIntegerOrDoubleCase(PRDAction prdAction){
-        String actionType = prdAction.getType(), entityName = prdAction.getEntity(), propertyName = prdAction.getProperty();
-        Entity entity = entities.get(entityName);
-        ActionType type = ActionType.valueOf(actionType);
-        PropertyType propertyType;
-        boolean ret = true;
-
-        if(type != ActionType.INCREASE && type != ActionType.DECREASE && type != ActionType.CALCULATION && type != ActionType.CONDITION)
-        {
-            addErrorToList(prdAction, prdAction.getValue(), "Action type not allowed");
-            ret = false;
-        }
-
-        propertyType = entity.getProperties().get(propertyName).getType();
-        if ((!propertyType.name().equals("INT")) && (!propertyType.name().equals("DOUBLE"))){
-            addErrorToList(entity.getProperties().get(propertyName), propertyType.name(), "The property value type doesn't match the action value type");
-            ret= false;
-        }
-
-        return ret;
-    }
-
-    /**
-     * 'compareActionValueToGivenPropertyValue' helper for boolean actions/properties.
-     */
-    private boolean compareBooleanCase(PRDAction prdAction){
-        String actionType = prdAction.getType(), entityName = prdAction.getEntity(), propertyName = prdAction.getProperty();
-        Entity entity = entities.get(entityName);
-        ActionType type = ActionType.valueOf(actionType);
-        PropertyType propertyType;
-        PRDCondition prdCondition;
-        boolean ret = true;
-
-        if(type == ActionType.INCREASE || type == ActionType.DECREASE || type == ActionType.CALCULATION) {
-            addErrorToList(prdAction, prdAction.getValue(), "Action type not allowed");
-            ret = false;
-        }
-
-        if(type == ActionType.CONDITION){
-            prdCondition = prdAction.getPRDCondition();
-            if(prdCondition.getSingularity().equals("single") && (prdCondition.getOperator().equals("bt") || prdCondition.getOperator().equals("lt"))){
-                addErrorToList(prdAction, prdAction.getValue(), "Condition operator type not allowed");
-                ret = false;
-            }
-        }
-
-        propertyType = entity.getProperties().get(propertyName).getType();
-        if ((!propertyType.name().equals("BOOLEAN"))){
-            addErrorToList(prdAction, prdAction.getValue(), "The property value type doesn't match the action value type");
-            ret = false;
-        }
-
-        return ret;
-    }
-
-    /**
-     * 'compareActionValueToGivenPropertyValue' helper for String actions/properties.
-     */
-    private boolean compareStringCase(PRDAction prdAction){
-        String actionType = prdAction.getType(), entityName = prdAction.getEntity(), propertyName = prdAction.getProperty();
-        Entity entity = entities.get(entityName);
-        ActionType type = ActionType.valueOf(actionType);
-        PropertyType propertyType;
-        boolean ret = true;
-
-        if(type == ActionType.INCREASE || type == ActionType.DECREASE || type == ActionType.CALCULATION) {
-            addErrorToList(prdAction, prdAction.getValue(), "Action type not allowed");
-            ret = false;
-        }
-
-        propertyType = entity.getProperties().get(propertyName).getType();
-        if ((!propertyType.name().equals("STRING"))){
-            addErrorToList(prdAction, prdAction.getValue(), "The property value type doesn't match the action value type");
-            ret = false;
-        }
-
-        return ret;
+        return new FixedValueExpression(retValue);
     }
 }

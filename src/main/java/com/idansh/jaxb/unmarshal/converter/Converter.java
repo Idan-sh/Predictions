@@ -233,33 +233,33 @@ public class Converter {
 
         switch (Action.Type.valueOf(prdAction.getType())) {
             case INCREASE:
-                retAction = new IncreaseAction(worldContext, prdAction.getEntity(), prdAction.getProperty(), expressionConverter.convertExpression(prdAction));
+                retAction = new IncreaseAction(worldContext, prdAction.getEntity(), prdAction.getProperty(), expressionConverter.convertExpression(prdAction, prdAction.getBy()));
                 break;
 
             case DECREASE:
-                retAction = new DecreaseAction(worldContext, prdAction.getEntity(), prdAction.getProperty(), expressionConverter.convertExpression(prdAction));
+                retAction = new DecreaseAction(worldContext, prdAction.getEntity(), prdAction.getProperty(), expressionConverter.convertExpression(prdAction, prdAction.getBy()));
                 break;
 
             case CALCULATION:
-                retAction = calculationActionConvert(prdAction, expressionConverter);
+                retAction = calculationActionConvert(worldContext, prdAction, expressionConverter);
                 break;
 
             case CONDITION:
-                retAction = getSingleOrMultiple(prdAction, expressionConverter);
+                retAction = conditionActionConvert(prdAction, expressionConverter);
                 break;
 
             case SET:
-                retAction = new SetAction(worldContext, prdAction.getEntity(), prdAction.getProperty(), expressionConverter.convertExpression(prdAction));
+                retAction = new SetAction(worldContext, prdAction.getEntity(), prdAction.getProperty(), expressionConverter.convertExpression(prdAction, prdAction.getBy()));
                 break;
 
             case KILL:
                 retAction = new KillAction(worldContext, prdAction.getEntity());
 
-//            case REPLACE:
-//                break;
+            case REPLACE:
+                break;
 
-//            case PROXIMITY:
-//                break;
+            case PROXIMITY:
+                break;
             }
 
         return retAction;
@@ -272,29 +272,35 @@ public class Converter {
      * @param prdAction PRDAction object that was read from the XML file.
      * @return Rule object with the data of the PRDRule received.
      */
-    private static CalculationAction calculationActionConvert(PRDAction prdAction, ExpressionConverter expressionConverter){
+    private static CalculationAction calculationActionConvert(World worldContext, PRDAction prdAction, ExpressionConverter expressionConverter){
         CalculationAction retCalculationAction;
         PRDMultiply prdMultiply = prdAction.getPRDMultiply();
         PRDDivide prdDivide = prdAction.getPRDDivide();
 
         if(prdMultiply != null){
             retCalculationAction = new CalculationAction(
-                    prdAction.getProperty(),prdAction.getEntity(),
+                    worldContext,
+                    prdAction.getEntity(),
+                    prdAction.getProperty(),
                     expressionConverter.convertExpression(prdAction, prdMultiply.getArg1()),
                     expressionConverter.convertExpression(prdAction, prdMultiply.getArg2()),
-                    ClaculationType.MULTIPLY);
+                    CalculationAction.Type.MULTIPLY);
         } else if (prdDivide != null) {
             retCalculationAction = new CalculationAction(
-                    prdAction.getProperty(),prdAction.getEntity(),
-                    expressionConverter.analyzeAndGetValue(prdAction, prdDivide.getArg1()),
-                    expressionConverter.analyzeAndGetValue(prdAction, prdDivide.getArg2()),
-                    ClaculationType.DIVIDE);
+                    worldContext,
+                    prdAction.getEntity(),
+                    prdAction.getProperty(),
+                    expressionConverter.convertExpression(prdAction, prdDivide.getArg1()),
+                    expressionConverter.convertExpression(prdAction, prdDivide.getArg2()),
+                    CalculationAction.Type.DIVIDE);
         }
         else {
             throw new RuntimeException("Error: invalid calculation action received from XML!");
         }
+
         return retCalculationAction;
     }
+
 
     /**
      * Converts the given PRDAction to single or multiple condition action.
@@ -302,7 +308,7 @@ public class Converter {
      * @param prdAction the given PRDAction generated from reading the XML file
      * @return an AbstractConditionAction representation of the given PRDActivation.
      */
-    private AbstractConditionAction getSingleOrMultiple(PRDAction prdAction, ExpressionConverterAndValidator expressionConverterAndValidator){
+    private AbstractConditionAction conditionActionConvert(PRDAction prdAction, ExpressionConverter expressionConverter){
         AbstractConditionAction ret = null;
         PRDCondition prdCondition = prdAction.getPRDCondition();
         ThenOrElse thenActions = null, elseActions = null;
@@ -310,9 +316,9 @@ public class Converter {
         getAndCreateThenOrElse(prdAction, thenActions, elseActions);
 
         if(prdCondition.getSingularity().equals("single")){
-            ret = new SingleCondition(prdAction.getProperty(), prdAction.getEntity(), expressionConverterAndValidator.analyzeAndGetValue(prdAction, prdAction.getValue()), thenActions, elseActions, prdCondition.getOperator());
+            ret = new SingleCondition(prdAction.getProperty(), prdAction.getEntity(), expressionConverter.convertExpression(prdAction, prdAction.getValue()), thenActions, elseActions, prdCondition.getOperator());
         } else if (prdCondition.getSingularity().equals("multiple")) {
-            ret = new MultipleCondition(prdAction.getProperty(), prdAction.getEntity(), expressionConverterAndValidator.analyzeAndGetValue(prdAction, prdAction.getValue()), thenActions, elseActions, prdCondition.getLogical());
+            ret = new MultipleCondition(prdAction.getProperty(), prdAction.getEntity(), expressionConverter.convertExpression(prdAction, prdAction.getValue()), thenActions, elseActions, prdCondition.getLogical());
         }
         else {
             // Throw exception.
@@ -320,6 +326,7 @@ public class Converter {
 
         return ret;
     }
+
 
     /**
      * Converts the given PRDAction to Then and Else objects which contain a set of actions to invoke.
