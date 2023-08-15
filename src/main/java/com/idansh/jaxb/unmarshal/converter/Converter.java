@@ -1,8 +1,6 @@
 package com.idansh.jaxb.unmarshal.converter;
 
-import com.idansh.engine.actions.Action;
-import com.idansh.engine.actions.DecreaseAction;
-import com.idansh.engine.actions.IncreaseAction;
+import com.idansh.engine.actions.*;
 import com.idansh.engine.entity.EntityFactory;
 import com.idansh.engine.helpers.Range;
 import com.idansh.engine.property.creator.factory.PropertyCreator;
@@ -236,7 +234,7 @@ public class Converter {
                 retAction = new IncreaseAction(worldContext, prdAction.getEntity(), prdAction.getProperty(), expressionConverterAndValidator.analyzeAndGetValue(prdAction, prdAction.getBy()));
 
             case DECREASE:
-                retAction = new DecreaseAction(prdAction.getProperty(), prdAction.getEntity(), expressionConverterAndValidator.analyzeAndGetValue(prdAction, prdAction.getBy()));
+                retAction = new DecreaseAction(worldContext, prdAction.getEntity(), prdAction.getProperty(), expressionConverterAndValidator.analyzeAndGetValue(prdAction, prdAction.getBy()));
 
             case CALCULATION:
                 retAction = getMulOrDiv(prdAction, expressionConverterAndValidator);
@@ -245,10 +243,10 @@ public class Converter {
                 retAction = getSingleOrMultiple(prdAction, expressionConverterAndValidator);
 
             case SET:
-                retAction = new SetAction(prdAction.getProperty(), prdAction.getEntity(), expressionConverterAndValidator.analyzeAndGetValue(prdAction,prdAction.getValue()));
+                retAction = new SetAction(worldContext, prdAction.getEntity(), prdAction.getProperty(), expressionConverterAndValidator.analyzeAndGetValue(prdAction,prdAction.getValue()));
 
             case KILL:
-                retAction = new KillAction(prdAction.getProperty(), prdAction.getEntity());
+                retAction = new KillAction(worldContext, prdAction.getEntity());
 
 //            case REPLACE:
 //                break;

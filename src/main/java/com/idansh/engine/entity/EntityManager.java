@@ -69,10 +69,13 @@ public class EntityManager {
 
     /**
      * Kills a single entity of the given ID from the population.
-     * @param id ID of the entity to kill.
+     * @param entityToKill an entity instance in the population to kill.
      */
-    public void killEntity(int id) {
-        // todo- implement kill
+    public void killEntity(Entity entityToKill) {
+        if(!population.contains(entityToKill))
+            throw new IllegalArgumentException("Error: cannot kill entity with name " + entityToKill.getName() + ", this entity does not exist in the population!");
+
+        population.remove(entityToKill);
     }
 
 }

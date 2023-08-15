@@ -1,7 +1,5 @@
 package com.idansh.engine.actions;
 
-import com.idansh.engine.entity.Entity;
-import com.idansh.engine.environment.ActiveEnvironmentVariables;
 import com.idansh.engine.expression.Expression;
 import com.idansh.engine.property.instance.Property;
 import com.idansh.engine.world.World;
@@ -25,7 +23,7 @@ public class IncreaseAction extends Action {
     }
 
     public void invoke() {
-        Property property = super.getWorldContext().entityManager.getEntityInPopulation(getContextEntity()).getPropertyByName(propertyName);
+        Property property = super.getWorldContext().entityManager.getEntityInPopulation(getEntityContext()).getPropertyByName(propertyName);
 
         if(!super.isNumericProperty(property))
             throw new IllegalArgumentException("Error: can preform increase only on numeric property factories!");
