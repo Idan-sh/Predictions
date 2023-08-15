@@ -13,7 +13,8 @@ public class DecreaseAction extends Action {
     Expression amount;
 
     /**
-     * @param entity the entity on which the action will be preformed.
+     * @param worldContext reference to the simulated world in which the action is preformed.
+     * @param entityContext name entity on which the action will be preformed.
      * @param propertyName name of the property whose value will be changed.
      * @param amount the amount to be added to the property's value.
      */

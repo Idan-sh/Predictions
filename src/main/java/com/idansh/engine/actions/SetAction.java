@@ -14,8 +14,10 @@ public class SetAction extends Action {
 
 
     /**
-     * @param propertyName name of the property whose value will be changed
-     * @param amount the amount to be subtracted from the property's value
+     * @param worldContext reference to the simulated world in which the action is preformed.
+     * @param entityContext name entity on which the action will be preformed.
+     * @param propertyName name of the property whose value will be changed.
+     * @param amount the amount to be added to the property's value.
      */
     public SetAction(World worldContext, String entityContext, String propertyName, Expression amount) {
         super(worldContext, entityContext);

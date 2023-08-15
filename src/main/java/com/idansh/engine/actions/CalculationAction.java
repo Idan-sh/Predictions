@@ -18,7 +18,9 @@ public class CalculationAction extends Action {
     /**
      * Perform a mathematical calculation on a value of a property of the entity,
      * Using two argument expressions.
-     * @param propertyName name of the property that will hold the result of the calculation
+     * @param worldContext reference to the simulated world in which the action is preformed.
+     * @param entityContext name entity on which the action will be preformed.
+     * @param propertyName name of the property whose value will be changed.
      */
     public CalculationAction(World worldContext, String entityContext, String propertyName, Expression arg1, Expression arg2) {
         super(worldContext, entityContext);
