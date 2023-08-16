@@ -49,10 +49,10 @@ public class ExpressionConverter {
             retExpression = getFixedValue(prdStr);
         }
 
-        // Check for type error
-        if(!compareActionValueToGivenPropertyValue(prdAction, value)){
-            throw new RuntimeException("Error: the created expression's type does not match the action's type!");
-        }
+//        // Check for type error
+//        if(!compareActionValueToGivenPropertyValue(prdAction, value)){
+//            throw new RuntimeException("Error: the created expression's type does not match the action's type!");
+//        }
 
         return retExpression;
     }
