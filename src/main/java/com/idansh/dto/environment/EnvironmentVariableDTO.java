@@ -4,11 +4,11 @@ package com.idansh.dto.environment;
  * Created from user input in the UI,
  * and sent into the engine manager for initial setup of the environment variables.
  */
-public class EnvironmentVariableInputDTO {
+public class EnvironmentVariableDTO {
     private String name;
     private Object value;
 
-    public EnvironmentVariableInputDTO(String name, Object value) {
+    public EnvironmentVariableDTO(String name, Object value) {
         this.name = name;
         this.value = value;
     }
