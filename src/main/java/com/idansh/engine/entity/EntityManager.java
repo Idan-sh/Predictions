@@ -1,11 +1,7 @@
 package com.idansh.engine.entity;
 
-import com.idansh.engine.helpers.Counter;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class EntityManager {
     private final Map<String, EntityFactory> entityFactories;   // Each entity factory will define instructions on how to instantiate a single entity with a unique name
@@ -57,11 +53,29 @@ public class EntityManager {
 
 
     /**
-     * Kills a single entity of the given ID from the population.
-     * @param id ID of the entity to kill.
+     * Returns an entity in the population with the given name.
      */
-    public void killEntity(int id) {
-        // todo- implement kill
+    public Entity getEntityInPopulation(String name) {
+        // Find an entity with the given name in the population
+        Optional<Entity> retEntity =
+                population.stream().filter(e -> e.getName().equals(name)).findAny();
+
+        if(!retEntity.isPresent())
+            throw new IllegalArgumentException("Error: entity name \"" + name + "\" does not exist in the population!");
+
+        return retEntity.get();
+    }
+
+
+    /**
+     * Kills a single entity of the given ID from the population.
+     * @param entityToKill an entity instance in the population to kill.
+     */
+    public void killEntity(Entity entityToKill) {
+        if(!population.contains(entityToKill))
+            throw new IllegalArgumentException("Error: cannot kill entity with name " + entityToKill.getName() + ", this entity does not exist in the population!");
+
+        population.remove(entityToKill);
     }
 
 }

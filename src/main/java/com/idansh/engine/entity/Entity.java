@@ -22,6 +22,11 @@ public class Entity {
         this.properties = new HashMap<>();
     }
 
+    public String getName() {
+        return name;
+    }
+
+
     /**
      * Finds and returns a property of the entity.
      * @param name The name of the property (which is unique to one property)

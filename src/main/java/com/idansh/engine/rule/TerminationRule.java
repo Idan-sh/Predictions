@@ -12,19 +12,12 @@ public class TerminationRule {
     public enum Type {
         TICKS, SECONDS;
     }
-
-    String name;
-    int value;  // nof ticks/seconds
     Type type;  // the type of the termination rule
+    int value;  // nof ticks/seconds
 
-    public TerminationRule(String name, int value, Type type) {
-        this.name = name;
-        this.value = value;
+    public TerminationRule(Type type, int value) {
         this.type = type;
-    }
-
-    public String getName() {
-        return name;
+        this.value = value;
     }
 
     public int getValue() {
