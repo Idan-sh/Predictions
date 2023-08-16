@@ -1,0 +1,44 @@
+package com.idansh.dto.property;
+
+
+import com.idansh.dto.range.RangeDTO;
+
+/**
+ * Contains details/information of a main entity's property.
+ */
+public class PropertyDTO {
+    private final String name;
+    private final String type;
+    private final RangeDTO rangeDTO; // optional
+    private final boolean isRandomGenerated;
+
+    public PropertyDTO(String name, String type, RangeDTO rangeDTO, boolean isRandomGenerated) {
+        this.name = name;
+        this.type = type;
+        this.rangeDTO = rangeDTO;
+        this.isRandomGenerated = isRandomGenerated;
+    }
+
+    public PropertyDTO(String name, String type, boolean isRandomGenerated) {
+        this.rangeDTO = null;
+        this.name = name;
+        this.type = type;
+        this.isRandomGenerated = isRandomGenerated;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public RangeDTO getRangeDTO() {
+        return rangeDTO;
+    }
+
+    public boolean isRandomGenerated() {
+        return isRandomGenerated;
+    }
+}

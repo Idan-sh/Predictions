@@ -1,7 +1,10 @@
 package com.idansh.engine.manager;
 
+import com.idansh.dto.simulation.CurrentSimulationDTO;
+import com.idansh.dto.simulation.SimulationResultDTO;
 import com.idansh.engine.manager.result.SimulationResult;
 import com.idansh.engine.world.World;
+import com.idansh.jaxb.unmarshal.reader.Reader;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,53 +15,67 @@ import java.util.Map;
  */
 public class EngineManager {
     private World currWorld;
-    private final Map<String, SimulationResult> pastSimulations;
+    private final Map<Integer, SimulationResult> pastSimulations;
 
     public EngineManager() {
         currWorld = null;
         pastSimulations = new HashMap<>();
     }
 
+
+    public CurrentSimulationDTO getCurrentSimulationDetails() {
+        return new CurrentSimulationDTO(); // todo: add current simulation details to DTO
+    }
+
+
+    /**
+     * Finds a simulation result from the past simulations and returns its information/details.
+     * @param simulationId the ID of the simulation to get.
+     * @return DTO containing its information/details.
+     */
+    public SimulationResultDTO getSimulationDetailsById(int simulationId) {
+        SimulationResult simulationResult = pastSimulations.get(simulationId);
+        return new SimulationResultDTO(); // todo: add simulation details to constructor
+    }
+
+        private SimulationResult getResultDataById(int id) {
+        return pastSimulations.get(id);
+    }
+
+
+    /**
+     * Adds a newly finished simulation to the past simulations collection.
+     * @param simulationResult a simulation result that contains information/details of the last simulation ran.
+     */
+    private void addSimulationResult(SimulationResult simulationResult){
+        pastSimulations.put(simulationResult.getId(), simulationResult);
+    }
+
+
+    /**
+     * Loads a simulation for XML file.
+     * @param path path to the XML file location in the machine.
+     */
+    public void loadSimulationFromFile(String path) {
+        if (Reader.isValidPath(path)) {
+            currWorld = Reader.readWorld(path);
+        }
+    }
+
+
+    public void runSimulation(DTOThirdFunction dtoThirdFunction) {
+        // fetch the user data input into the simulation's environment properties.
+        fetchDTOThirdFunctionObject(dtoThirdFunction);
+        // run the simulation.
+        this.world.invoke();
+        // TODO : add the simulation result data to 'pastSimulations' and return to the UI these results.
+    }
+
     // ------------------------------------------------------------------------------------------------------------------------------
-//
-//    @Override
-//    public String getCurrentSimulationDetails() {
-//        return null;
-//    }
-//
-//    @Override
-//    public String getSimulationDetailsById(int simId) {
-//        return null;
-//    }
-//
-//    @Override
-//    public ResultData[] getPastSimulationResultData() {
-//        return pastSimulations.values().toArray(new ResultData[0]);
-//    }
-//
-//    private void addResultData(ResultData resultData){
-//        pastSimulations.put(resultData.getId(), resultData);
-//    }
-//
-//    private ResultData getResultDataById(String id){
-//        return pastSimulations.get(id);
-//    }
-//
-//    @Override
-//    public void loadSimulationFromFile(DTOFirstFunction dto) {
-//        if (Reader.isValidPath(dto.getPath())) {
-//            this.world = Reader.readWorldFromXML(dto.getPath());
-//        }
-//    }
-//
-//    @Override
-//    public void runSimulation(DTOThirdFunction dtoThirdFunction) {
-//        // fetch the user data input into the simulation's environment properties.
-//        fetchDTOThirdFunctionObject(dtoThirdFunction);
-//        // run the simulation.
-//        this.world.invoke();
-//        // TODO : add the simulation result data to 'pastSimulations' and return to the UI these results.
-//    }
+
+
+
+
 //
 //
 //    /**

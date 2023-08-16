@@ -7,6 +7,7 @@ import com.idansh.jaxb.unmarshal.converter.Converter;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -43,5 +44,17 @@ public class Reader {
         JAXBContext jaxbContext = JAXBContext.newInstance(PRDWorld.class);
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
         return (PRDWorld) unmarshaller.unmarshal(inputStream);
+    }
+
+
+    /**
+     * Checks if a path to an XML file is valid.
+     * @param path path to the XML file.
+     * @return true if the file exists and ends with ".xml", false otherwise,
+     */
+    public static boolean isValidPath(String path) {
+        File filePath = new File(path);
+
+        return filePath.exists() && path.endsWith(".xml");
     }
 }

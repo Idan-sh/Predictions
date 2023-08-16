@@ -5,7 +5,7 @@ package com.idansh.engine.rule;
  */
 public class RuleActivation {
     private int ticks;          // In every how many clock ticks will the rule try to activate
-    private double probability = 1; // Decimal number between 0 (never happens) and 1 (always happens)
+    private double probability = 1; // number between 0 (never happens) and 1 (always happens)
 
     public RuleActivation(int ticks, double probability) {
         this.ticks = ticks;
