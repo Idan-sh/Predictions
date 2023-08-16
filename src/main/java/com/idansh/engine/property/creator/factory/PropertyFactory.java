@@ -38,4 +38,9 @@ public interface PropertyFactory {
     boolean isNumericProperty();
 
 
+    /**
+     * Updates the value of the property factory.
+     * Has to be of the same type of the property.
+     */
+    void updateValue(Object newValue);
 }

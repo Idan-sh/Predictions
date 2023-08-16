@@ -1,6 +1,7 @@
 package com.idansh.engine.property.creator.factory;
 
 import com.idansh.engine.helpers.Range;
+import com.idansh.engine.property.creator.generator.value.fixed.FixedValueGenerator;
 import com.idansh.engine.property.instance.Property;
 import com.idansh.engine.property.instance.PropertyType;
 import com.idansh.engine.property.creator.generator.value.api.ValueGenerator;
@@ -13,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 public class PropertyCreator<T> implements PropertyFactory{
     private final String name;
     private final PropertyType type;
-    private final ValueGenerator<T> valueGenerator;
+    private ValueGenerator<T> valueGenerator;
     private final Range range;
 
 
@@ -56,6 +57,13 @@ public class PropertyCreator<T> implements PropertyFactory{
         return new Property(name, type, valueGenerator.generateValue());
     }
 
+    @Override
+    public void updateValue(Object newValue) {
+        if(!valueGenerator.generateValue().getClass().equals(newValue.getClass()))
+            throw new IllegalArgumentException("updateValue- value received is not of the property factory's type!");
+
+        valueGenerator = new FixedValueGenerator<>((T) newValue);
+    }
 
     @Override
     public String getName() {

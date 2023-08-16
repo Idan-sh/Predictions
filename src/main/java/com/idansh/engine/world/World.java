@@ -3,6 +3,7 @@ package com.idansh.engine.world;
 import com.idansh.engine.entity.EntityManager;
 import com.idansh.engine.environment.ActiveEnvironmentVariables;
 import com.idansh.engine.environment.EnvironmentVariablesManager;
+import com.idansh.engine.manager.result.SimulationResult;
 import com.idansh.engine.property.creator.factory.PropertyFactory;
 import com.idansh.engine.rule.Rule;
 import com.idansh.engine.rule.TerminationRule;
@@ -17,8 +18,8 @@ import java.util.Map;
 public class World {
     private final Map<TerminationRule.Type, TerminationRule> terminationRulesMap;  // Rules on when to end the simulation
     private final Map<String, Rule> rulesMap;                                    // Rules that can activate during the simulation
-    private final EnvironmentVariablesManager environmentVariablesManager;      // Contains all the environment variables factories
     private ActiveEnvironmentVariables activeEnvironmentVariables;              // Contains all the activated environment variables
+    public final EnvironmentVariablesManager environmentVariablesManager;      // Contains all the environment variables factories
     public final EntityManager entityManager;                                   // Contains all the entities (population) of the simulation
     private int currTick;                                                       // The current iteration of the simulation
 
@@ -78,6 +79,12 @@ public class World {
             throw new IllegalArgumentException("Error: received Rule's name - " + rule.getName() + " already exists!");
 
         rulesMap.put(rule.getName(), rule);
+    }
+
+    public SimulationResult run() {
+        // todo- run simulation and return result;
+
+        return null;
     }
 }
 
