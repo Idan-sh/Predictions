@@ -27,7 +27,7 @@ public class IncreaseAction extends Action {
         Property property = super.getWorldContext().entityManager.getEntityInPopulation(getEntityContext()).getPropertyByName(propertyName);
 
         if(!property.isNumericProperty())
-            throw new IllegalArgumentException("Error: can preform increase only on numeric property factories!");
+            throw new IllegalArgumentException("Error: can preform increase only on numeric properties!");
 
         property.addNumToValue(amount.getValue());
     }
