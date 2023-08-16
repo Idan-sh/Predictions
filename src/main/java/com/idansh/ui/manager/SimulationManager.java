@@ -6,8 +6,7 @@ import com.idansh.ui.display.ConsoleOut;
 import com.sun.nio.sctp.IllegalReceiveException;
 
 /**
- * Handles the simulations, user inputs and connects with the engine through
- * the various DTOs.
+ * Handles the simulations.
  * The main loop of the simulation will run through this class.
  */
 public class SimulationManager {

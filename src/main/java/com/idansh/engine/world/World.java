@@ -79,13 +79,5 @@ public class World {
 
         rulesMap.put(rule.getName(), rule);
     }
-
-
-    /**
-     * Starts the simulation using the defined initial properties.
-     */
-    public void startSimulation() {
-        // todo- continue with the simulation iterations...
-    }
 }
 
