@@ -12,4 +12,9 @@ public class FixedValueExpression implements Expression {
     public FixedValueExpression(Object value) {
         this.value = value;
     }
+
+    @Override
+    public Object getValue() {
+        return value;
+    }
 }

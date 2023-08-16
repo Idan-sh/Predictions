@@ -34,13 +34,4 @@ public abstract class Action {
      * Invokes the action, according to the action's type.
      */
     public abstract void invoke();
-
-
-    /**
-     * Checks if a given property is of the type FLOAT or INTEGER.
-     * @return true if the property factory given is numeric, false otherwise.
-     */
-    protected boolean isNumericProperty(Property property) {
-        return PropertyType.INTEGER.equals(property.getType()) || PropertyType.FLOAT.equals(property.getType());
-    }
 }

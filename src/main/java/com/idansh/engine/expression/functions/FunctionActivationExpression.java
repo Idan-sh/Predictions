@@ -21,4 +21,7 @@ public abstract class FunctionActivationExpression implements Expression {
     public Type getType() {
         return type;
     }
+
+    @Override
+    public abstract Object getValue();
 }

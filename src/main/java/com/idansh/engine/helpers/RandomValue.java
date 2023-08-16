@@ -17,15 +17,16 @@ public abstract class RandomValue {
     public static Boolean getRandomBoolean() {
         return rnd.nextBoolean();
     }
-
-
     /**
      * Get a random decimal number in a range, including both the bottom and top bounds.
+     * If from/to params received have a fraction, they will be rounded down to the closest integer,
      * @param from minimum number of the range.
      * @param to maximum number of the range.
      */
-    public static int getRandomInt(int from, int to) {
-        return rnd.nextInt(to + 1 - from) + from;
+    public static int getRandomInt(double from, double to) {
+        int fromInt = (int) from;
+        int toInt = (int) to;
+        return rnd.nextInt(toInt + 1 - fromInt) + fromInt;
     }
 
 
@@ -34,14 +35,9 @@ public abstract class RandomValue {
      * @param from minimum number of the range.
      * @param to maximum number of the range.
      */
-    public static float getRandomFloat(int from, int to) {
-        int randomInt = rnd.nextInt(to + 1 - from) + from;    // Get a random int within the specified range
-        float randomFloat = rnd.nextFloat();    // Get a random float between 0 and 1 (included)
-
-        if(randomInt != 0)
-            return randomFloat * randomInt;
-        return randomFloat;
-
+    public static float getRandomFloat(double from, double to) {
+        double randomDouble = from + (to - from) * rnd.nextDouble(); // Get a random double within the specified range
+        return (float) randomDouble; // Convert to float and return it
     }
 
 

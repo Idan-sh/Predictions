@@ -27,10 +27,24 @@ public class DecreaseAction extends Action {
     public void invoke() {
         Property property = super.getWorldContext().entityManager.getEntityInPopulation(getEntityContext()).getPropertyByName(propertyName);
 
-        if(!super.isNumericProperty(property))
+        if(!property.isNumericProperty())
             throw new IllegalArgumentException("Error: can preform increase only on numeric property factories!");
 
-        // todo- preform decrease on the property
-        // todo- make sure after the decrease the value is within the property range
+        getWorldContext().entityManager.getEntityInPopulation(getEntityContext()).getPropertyByName(propertyName).addNumToValue(invertValue(amount.getValue()));
+    }
+
+
+    /**
+     * Inverts a number, from positive to negative or from negative to positive.
+     * @param valueToInvert number of the type Integer or Float (non-primitive).
+     * @return inverted value of the number received.
+     */
+    private Object invertValue(Object valueToInvert) {
+        if(valueToInvert instanceof Integer)
+            return ((int) valueToInvert) * (-1);
+        if(valueToInvert instanceof Float)
+            return ((float) valueToInvert) * (-1);
+
+        throw new IllegalArgumentException("Error: invertValue can be preformed only on Integer or Float (non-primitive) values!");
     }
 }

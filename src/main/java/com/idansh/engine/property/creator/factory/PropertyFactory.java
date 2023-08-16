@@ -23,4 +23,11 @@ public interface PropertyFactory {
      * @return The type of the property
      */
     PropertyType getType();
+
+
+    /**
+     * Checks if the property is of the type FLOAT or INTEGER.
+     * @return true if the property factory given is numeric, false otherwise.
+     */
+    boolean isNumericProperty();
 }

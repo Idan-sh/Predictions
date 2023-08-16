@@ -13,15 +13,14 @@ public class EnvironmentFunctionExpression extends FunctionActivationExpression 
         this.activeEnvironmentVariables = activeEnvironmentVariables;
     }
 
-
     /**
      * Finds and returns the value of an environment variable.
      * The return value is in object format and needs to be converted,
      * according to the PropertyType of the returned value.
      * @return The value of the environment variable.
      */
-    public Object invoke() {
-        Property activeEnvironmentVariable = activeEnvironmentVariables.getActiveEnvironmentVariable(environmentVariableName);
-        return activeEnvironmentVariable.getValue();
+    @Override
+    public Object getValue() {
+        return activeEnvironmentVariables.getActiveEnvironmentVariable(environmentVariableName).getValue();
     }
 }

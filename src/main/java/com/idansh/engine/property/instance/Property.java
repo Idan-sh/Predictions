@@ -2,8 +2,6 @@ package com.idansh.engine.property.instance;
 
 import com.idansh.engine.helpers.Range;
 
-import java.util.Optional;
-
 /**
  * A property for an entity, base class without the value,
  * Extend to add value types.
@@ -43,5 +41,56 @@ public class Property {
 
     public Object getValue() {
         return value;
+    }
+
+
+    /**
+     * Checks if the property is of the type FLOAT or INTEGER.
+     * @return true if the property factory given is numeric, false otherwise.
+     */
+    public boolean isNumericProperty() {
+        return PropertyType.INTEGER.equals(type) || PropertyType.FLOAT.equals(type);
+    }
+
+
+    /**
+     * Adds a number of the type Integer/Float (non-primitive) to the property's value.
+     * @param toAdd the number to add to the property's value.
+     */
+    public void addNumToValue(Object toAdd) {
+        if(!this.isNumericProperty())
+            throw new IllegalArgumentException("Error: can preform addNumToValue only on numeric properties!");
+
+        if(!(toAdd instanceof Integer) && !(toAdd instanceof Float))
+            throw new IllegalArgumentException("Error: can only add a number (non-primitive) to the property's value!");
+
+        // Perform the addition only if it won't exceed the range bounds.
+        if(!isRangeOverflow(toAdd)) {
+            if(type.equals(PropertyType.INTEGER))
+                value = (int) value + (int) toAdd;
+            else
+                if(type.equals(PropertyType.FLOAT))
+                    value = (float) value + (float) toAdd;
+        }
+    }
+
+
+    /**
+     * Checks if the value reached above the top of the range,
+     * or reached below the bottom of the range.
+     * If so, returns true, otherwise returns false.
+     */
+    private boolean isRangeOverflow(Object toAdd) {
+        if(range == null)
+            return false;
+
+        if(type.equals(PropertyType.INTEGER)) {
+            return (int) value + (int) toAdd > range.getTop() || (int) value + (int) toAdd < range.getBottom();
+        }
+        else if(type.equals(PropertyType.FLOAT)) {
+            return (float) value + (float) toAdd > range.getTop() || (float) value + (float) toAdd < range.getBottom();
+        }
+
+        throw new IllegalArgumentException("Error: can only perform checkRange on numeric properties!");
     }
 }

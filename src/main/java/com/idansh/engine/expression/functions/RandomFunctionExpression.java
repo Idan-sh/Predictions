@@ -20,8 +20,8 @@ public class RandomFunctionExpression extends FunctionActivationExpression {
     /**
      * @return randomly generated integer between 0 and max
      */
-    public int invoke() {
+    @Override
+    public Object getValue() {
         Random random = new Random();
-        return random.nextInt(maxValue + 1);
-    }
+        return random.nextInt(maxValue + 1);    }
 }
