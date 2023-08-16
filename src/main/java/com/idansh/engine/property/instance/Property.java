@@ -54,6 +54,53 @@ public class Property {
 
 
     /**
+     * Sets a new value to the property.
+     * @param toAdd the number to add to the property's value.
+     */
+    public void setValue(Object newValue) {
+        // Checks if the newValue is a number, and if so, checks if it's in the range.
+        if((newValue instanceof Integer || newValue instanceof Float) && isRangeOverflow(newValue))
+            throw new IllegalArgumentException("Error: newValue received in setValue is not in the property's range!");
+
+        if(!isNewValueOfPropertyType(newValue))
+            throw new IllegalArgumentException("Error: newValue received in setValue is not in the property's type!");
+
+        // Update the value
+        this.value = newValue;
+    }
+
+
+    /**
+     * Checks if the received newValue is of the type of the property.
+     * if so returns true, otherwise returns false.
+     */
+    private boolean isNewValueOfPropertyType(Object newValue) {
+        switch(type) {
+            case INTEGER:
+                if (newValue instanceof Integer)
+                    return true;
+                break;
+
+            case FLOAT:
+                if (newValue instanceof Float)
+                    return true;
+                break;
+
+            case BOOLEAN:
+                if (newValue instanceof Boolean)
+                    return true;
+                break;
+
+            case STRING:
+                if (newValue instanceof String)
+                    return true;
+                break;
+        }
+        return false;
+    }
+
+
+    /**
      * Adds a number of the type Integer/Float (non-primitive) to the property's value.
      * @param toAdd the number to add to the property's value.
      */

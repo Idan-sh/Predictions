@@ -25,12 +25,12 @@ public class DecreaseAction extends Action {
     }
 
     public void invoke() {
-        Property property = super.getWorldContext().entityManager.getEntityInPopulation(getEntityContext()).getPropertyByName(propertyName);
+        Property property = getWorldContext().entityManager.getEntityInPopulation(getEntityContext()).getPropertyByName(propertyName);
 
         if(!property.isNumericProperty())
             throw new IllegalArgumentException("Error: can preform increase only on numeric property factories!");
 
-        getWorldContext().entityManager.getEntityInPopulation(getEntityContext()).getPropertyByName(propertyName).addNumToValue(invertValue(amount.getValue()));
+        property.addNumToValue(invertValue(amount.getValue()));
     }
 
 
