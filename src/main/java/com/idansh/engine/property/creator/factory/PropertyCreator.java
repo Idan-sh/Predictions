@@ -63,10 +63,15 @@ public class PropertyCreator<T> implements PropertyFactory{
     }
 
 
+    @Override
     public PropertyType getType() {
         return type;
     }
 
+    @Override
+    public Object getValue() {
+        return valueGenerator.generateValue();
+    }
 
     @Override
     public boolean isNumericProperty() {

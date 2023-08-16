@@ -19,10 +19,12 @@ import com.idansh.jaxb.schema.generated.PRDAction;
 public class ExpressionConverter {
     private final ActiveEnvironmentVariables environmentVariables;
     private final EntityManager entityManager;
+    private final World worldContext;
 
     public ExpressionConverter(World world) {
         this.environmentVariables = world.getActiveEnvironmentVariables();
         this.entityManager = world.entityManager;
+        this.worldContext = world;
     }
 
     /**
@@ -138,14 +140,16 @@ public class ExpressionConverter {
      */
     private Expression getPropertyExpression(PRDAction prdAction) {
         try{
+            String entityName = prdAction.getEntity();
+            String propertyName = prdAction.getBy();
+
             // Try to get an entity with the given name, if one does not exist continue
-            Entity entity = entityManager.getEntityInPopulation(prdAction.getEntity());
+            Entity entity = entityManager.getEntityInPopulation(entityName);
 
             // Try to get the entity's property with the given name, if one does not exist continue
-            String propertyName = prdAction.getBy();
             entity.getPropertyByName(propertyName);
 
-            return new PropertyExpression(propertyName);
+            return new PropertyExpression(worldContext, entityName, propertyName);
         } catch (IllegalArgumentException ignored) { }
         return null;
     }

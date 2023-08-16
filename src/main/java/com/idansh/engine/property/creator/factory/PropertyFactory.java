@@ -14,15 +14,21 @@ public interface PropertyFactory {
 
 
     /**
-     * @return The name of the property
+     * @return The name of the property factory.
      */
     String getName();
 
 
     /**
-     * @return The type of the property
+     * @return The type of the property factory.
      */
     PropertyType getType();
+
+
+    /**
+     * @return The value of the property factory.
+     */
+    Object getValue();
 
 
     /**
@@ -30,4 +36,6 @@ public interface PropertyFactory {
      * @return true if the property factory given is numeric, false otherwise.
      */
     boolean isNumericProperty();
+
+
 }

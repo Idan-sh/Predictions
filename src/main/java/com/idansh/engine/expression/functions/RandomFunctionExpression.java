@@ -9,7 +9,7 @@ public class RandomFunctionExpression extends FunctionActivationExpression {
     final int maxValue;
 
     /**
-     * @param max an integer that is greater than 0
+     * @param maxValue an integer that is greater than 0
      */
     public RandomFunctionExpression(int maxValue) {
         super(Type.RANDOM);

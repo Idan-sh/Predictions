@@ -9,7 +9,7 @@ public abstract class FunctionActivationExpression implements Expression {
     public enum Type{
         ENVIRONMENT, RANDOM, EVALUATE, PERCENT, TICKS
     }
-    private Type type;
+    private final Type type;
 
     public FunctionActivationExpression(Type type) {
         this.type = type;

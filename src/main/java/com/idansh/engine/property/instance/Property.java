@@ -55,7 +55,7 @@ public class Property {
 
     /**
      * Sets a new value to the property.
-     * @param toAdd the number to add to the property's value.
+     * @param newValue the number to set as the property's value.
      */
     public void setValue(Object newValue) {
         // Checks if the newValue is a number, and if so, checks if it's in the range.
@@ -102,6 +102,7 @@ public class Property {
 
     /**
      * Adds a number of the type Integer/Float (non-primitive) to the property's value.
+     * If the addition exceeds the range bounds, sets the bound exceeded as the new value.
      * @param toAdd the number to add to the property's value.
      */
     public void addNumToValue(Object toAdd) {
@@ -111,13 +112,27 @@ public class Property {
         if(!(toAdd instanceof Integer) && !(toAdd instanceof Float))
             throw new IllegalArgumentException("Error: can only add a number (non-primitive) to the property's value!");
 
-        // Perform the addition only if it won't exceed the range bounds.
-        if(!isRangeOverflow(toAdd)) {
-            if(type.equals(PropertyType.INTEGER))
-                value = (int) value + (int) toAdd;
-            else
-                if(type.equals(PropertyType.FLOAT))
-                    value = (float) value + (float) toAdd;
+        // Perform the addition
+        if(type.equals(PropertyType.INTEGER))
+        value = (Integer) value + (int) toAdd;
+        else
+            if(type.equals(PropertyType.FLOAT))
+                value = (Float) value + (float) toAdd;
+
+        // Check if exceeded the range, if so then set the bound exceeded as the new value
+        if(range != null) {
+            if(value instanceof Integer) {
+                if ((Integer) value > range.getTop())
+                    value = (int) range.getTop();
+                else if((Integer) value < range.getBottom())
+                    value = (int) range.getBottom();
+            }
+            else if(value instanceof Float) {
+                if ((Float) value > range.getTop())
+                    value = (float) range.getTop();
+                else if((Float) value < range.getBottom())
+                    value = (float) range.getBottom();
+            }
         }
     }
 

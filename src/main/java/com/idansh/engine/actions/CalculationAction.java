@@ -17,8 +17,7 @@ public class CalculationAction extends Action {
 
     private final String propertyName;
     private final Expression arg1, arg2;
-
-    private Type type;
+    private final Type type;
 
     /**
      * Perform a mathematical calculation on a value of a property of the entity,
