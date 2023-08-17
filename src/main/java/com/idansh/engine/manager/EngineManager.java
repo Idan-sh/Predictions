@@ -1,17 +1,18 @@
 package com.idansh.engine.manager;
 
 import com.idansh.dto.entity.EntityDTO;
-import com.idansh.dto.environment.EnvironmentVariablesSetDTO;
+import com.idansh.dto.environment.EnvironmentVariablesListDTO;
 import com.idansh.dto.property.PropertyDTO;
 import com.idansh.dto.range.RangeDTO;
 import com.idansh.dto.rule.RuleDTO;
+import com.idansh.dto.rule.TerminationRuleDTO;
 import com.idansh.dto.simulation.CurrentSimulationDTO;
 import com.idansh.dto.simulation.SimulationResultDTO;
 import com.idansh.engine.helpers.Range;
-import com.idansh.engine.manager.result.SimulationIdGenerator;
 import com.idansh.engine.manager.result.SimulationResult;
 import com.idansh.engine.property.creator.factory.PropertyFactory;
 import com.idansh.engine.property.instance.PropertyType;
+import com.idansh.engine.rule.TerminationRule;
 import com.idansh.engine.world.World;
 import com.idansh.jaxb.unmarshal.reader.Reader;
 
@@ -89,13 +90,20 @@ public class EngineManager {
                     rule.getActionsSet().forEach(
                             a -> ruleDTO.addActionName(a.getActionTypeString())
                     );
+
+                    currentSimulationDTO.addRuleDTO(ruleDTO);
                 }
         );
 
         // Add Termination Rules:
         currWorld.getTerminationRulesMap().forEach(
-                (terminationRuleName, terminationRule) -> {
+                (terminationRuleType, terminationRule) -> {
+                    TerminationRuleDTO terminationRuleDTO = new TerminationRuleDTO(
+                            TerminationRule.Type.getTypeString(terminationRuleType),
+                            terminationRule.getValue()
+                    );
 
+                    currentSimulationDTO.addTerminationRuleDTO(terminationRuleDTO);
                 }
         );
 
@@ -139,10 +147,10 @@ public class EngineManager {
     /**
      * Start running the current simulation that was loaded.
      * Loads user received input for environment variables.
-     * @param environmentVariablesSetDTO contains data of environment variables to update in the simulation.
+     * @param environmentVariablesListDTO contains data of environment variables to update in the simulation.
      */
-    public SimulationResultDTO runSimulation(EnvironmentVariablesSetDTO environmentVariablesSetDTO) {
-        updateEnvironmentVariablesFromInput(environmentVariablesSetDTO);
+    public SimulationResultDTO runSimulation(EnvironmentVariablesListDTO environmentVariablesListDTO) {
+        updateEnvironmentVariablesFromInput(environmentVariablesListDTO);
 
         // Run the simulation
         SimulationResult simulationResult = currWorld.run();
@@ -157,10 +165,10 @@ public class EngineManager {
 
     /**
      * Updates the values of received environment variables in the simulated world.
-     * @param environmentVariablesSetDTO DTO that contains data of multiple environment variables received from the user.
+     * @param environmentVariablesListDTO DTO that contains data of multiple environment variables received from the user.
      */
-    private void updateEnvironmentVariablesFromInput(EnvironmentVariablesSetDTO environmentVariablesSetDTO) {
-        environmentVariablesSetDTO.getEnvironmentVariableInputDTOs().forEach(
+    private void updateEnvironmentVariablesFromInput(EnvironmentVariablesListDTO environmentVariablesListDTO) {
+        environmentVariablesListDTO.getEnvironmentVariableInputDTOs().forEach(
                 e -> {
                     PropertyFactory environmentVariable = currWorld.environmentVariablesManager.getEnvironmentVariable(e.getName());
                     environmentVariable.updateValue(e.getValue());
@@ -174,13 +182,13 @@ public class EngineManager {
      * @return EnvironmentVariablesSetDTO containing a list of all active environment variables,
      * with their names and values.
      */
-    public EnvironmentVariablesSetDTO getEnvironmentVariablesSetDTO() {
-        EnvironmentVariablesSetDTO environmentVariablesSetDTO = new EnvironmentVariablesSetDTO();
+    public EnvironmentVariablesListDTO getEnvironmentVariablesListDTO() {
+        EnvironmentVariablesListDTO environmentVariablesListDTO = new EnvironmentVariablesListDTO();
 
         currWorld.getActiveEnvironmentVariables().getEnvironmentVariables().forEach(
-                (key, value) -> environmentVariablesSetDTO.addEnvironmentVariableInput(key, value.getValue())
+                (key, value) -> environmentVariablesListDTO.addEnvironmentVariableInput(key, value.getValue())
         );
-        return environmentVariablesSetDTO;
+        return environmentVariablesListDTO;
     }
 
 

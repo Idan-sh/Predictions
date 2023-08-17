@@ -1,7 +1,7 @@
 package com.idansh.ui.manager;
 
 import com.idansh.dto.entity.EntityDTO;
-import com.idansh.dto.environment.EnvironmentVariablesSetDTO;
+import com.idansh.dto.environment.EnvironmentVariablesListDTO;
 import com.idansh.dto.property.PropertyDTO;
 import com.idansh.dto.simulation.SimulationResultDTO;
 import com.idansh.engine.manager.EngineManager;
@@ -9,7 +9,6 @@ import com.idansh.ui.display.ConsoleIn;
 import com.idansh.ui.display.ConsoleOut;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Connects the UI with the engine components through the various DTOs.
@@ -120,8 +119,13 @@ public class EngineHandler {
      * Initiates the run process of the current loaded simulation.
      */
     public void runSimulation() {
-        EnvironmentVariablesSetDTO environmentVariablesSetDTO = engineManager.getEnvironmentVariablesSetDTO();
-        engineManager.runSimulation(environmentVariablesSetDTO);
+        EnvironmentVariablesListDTO environmentVariablesListDTO = engineManager.getEnvironmentVariablesListDTO();
+
+        ConsoleOut.printEnvironmentVariables(environmentVariablesListDTO);
+
+        //todo - let the user update env variables
+
+        engineManager.runSimulation(environmentVariablesListDTO);
     }
 
 

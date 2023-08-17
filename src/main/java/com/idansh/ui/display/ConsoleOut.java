@@ -1,6 +1,8 @@
 package com.idansh.ui.display;
 
 import com.idansh.dto.entity.EntityDTO;
+import com.idansh.dto.environment.EnvironmentVariableDTO;
+import com.idansh.dto.environment.EnvironmentVariablesListDTO;
 import com.idansh.dto.property.PropertyDTO;
 import com.idansh.dto.rule.RuleDTO;
 import com.idansh.dto.rule.TerminationRuleDTO;
@@ -68,6 +70,7 @@ public class ConsoleOut {
         currentSimulationDTO.getEntityDTOList().forEach(ConsoleOut::printFullDetailEntityDTO);                      // Print entities' details
         System.out.println("Rules: ");
         currentSimulationDTO.getRuleDTOList().forEach(ConsoleOut::printFullDetailRuleDTO);                          // Print rules' details
+        System.out.println();
         System.out.println("Termination Rules: ");
         currentSimulationDTO.getTerminationRuleDTOList().forEach(ConsoleOut::printFullDetailTerminationRuleDTO);    // Print termination rules' details
     }
@@ -140,7 +143,7 @@ public class ConsoleOut {
      * @param ruleDTO TDO containing information of the rule to display.
      */
     public static void printFullDetailRuleDTO(RuleDTO ruleDTO) {
-        System.out.print("    Name: " + ruleDTO.getName() + ", When activated: ticks- " + ruleDTO.getTicks() + " probability- " + ruleDTO.getProbability() + ", Number of actions: " + ruleDTO.getNofActions() + ", Action names: [");
+        System.out.print("    Name: " + ruleDTO.getName() + ", When activated: [ticks-" + ruleDTO.getTicks() + ", probability-" + ruleDTO.getProbability() + "], Number of actions: " + ruleDTO.getNofActions() + ", Action names: [");
 
         // Print action names
         List<String> namesList = ruleDTO.getActionNamesList();
@@ -182,6 +185,16 @@ public class ConsoleOut {
     public static void printMessage(String text) {
         System.out.println(text);
         System.out.println();
+    }
+
+
+    public static void printEnvironmentVariables(EnvironmentVariablesListDTO environmentVariablesListDTO) {
+        printTitle("Environment Variables");
+        environmentVariablesListDTO.getEnvironmentVariableInputDTOs().forEach(ConsoleOut::printSingleEnvironmentVariable);
+    }
+
+    public static void printSingleEnvironmentVariable(EnvironmentVariableDTO environmentVariableDTO) {
+        System.out.println("    Name: " + environmentVariableDTO.getName() + ", Value: " + environmentVariableDTO.getValue());
     }
 }
 
