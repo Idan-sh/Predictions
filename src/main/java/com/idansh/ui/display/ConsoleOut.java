@@ -29,7 +29,7 @@ public class ConsoleOut {
     }
 
     public static void printPastSimulationsMenu() {
-        System.out.println("Enter how to show the past simulation result:");
+        System.out.println("Choose how to show the past simulation result:");
         System.out.println("1. Number of entities of each type");
         System.out.println("2. Entity's property value");
         System.out.print("Please enter the number of command to run: ");
@@ -76,14 +76,13 @@ public class ConsoleOut {
     }
 
 
-    /**
-     * Receives a SimulationResultDTO with the data of a past simulation,
-     * formats it and prints it.
-     * @param simulationResultDTO a simulation result to print its details.
-     */
-    public static void printPastSimulationDetails(SimulationResultDTO simulationResultDTO) {
-        // todo- print simulation result DTO
-    }
+//    /**
+//     * Receives a SimulationResultDTO with the data of a past simulation,
+//     * formats it and prints it.
+//     * @param simulationResultDTO a simulation result to print its details.
+//     */
+//    public static void printPastSimulationDetails(SimulationResultDTO simulationResultDTO) {
+//    }
 
 
     /**
@@ -188,13 +187,13 @@ public class ConsoleOut {
     }
 
 
-    public static void printEnvironmentVariables(EnvironmentVariablesListDTO environmentVariablesListDTO) {
+    public static void printEnvironmentVariables(List<EnvironmentVariableDTO> environmentVariableDTOList) {
         printTitle("Environment Variables");
-        environmentVariablesListDTO.getEnvironmentVariableInputDTOs().forEach(ConsoleOut::printSingleEnvironmentVariable);
-    }
 
-    public static void printSingleEnvironmentVariable(EnvironmentVariableDTO environmentVariableDTO) {
-        System.out.println("    Name: " + environmentVariableDTO.getName() + ", Value: " + environmentVariableDTO.getValue());
+        int counter = 1;
+        for (EnvironmentVariableDTO environmentVariableDTO : environmentVariableDTOList) {
+            System.out.println("    " +counter++ + ". Name: " + environmentVariableDTO.getName() + " , Current Value: " + environmentVariableDTO.getValue());
+        }
     }
 }
 

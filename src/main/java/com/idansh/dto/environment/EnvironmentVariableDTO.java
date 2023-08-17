@@ -5,7 +5,7 @@ package com.idansh.dto.environment;
  * and sent into the engine manager for initial setup of the environment variables.
  */
 public class EnvironmentVariableDTO {
-    private String name;
+    private final String name;
     private Object value;
 
     public EnvironmentVariableDTO(String name, Object value) {
@@ -19,5 +19,9 @@ public class EnvironmentVariableDTO {
 
     public Object getValue() {
         return value;
+    }
+
+    public void setValue(Object value) {
+        this.value = value;
     }
 }
