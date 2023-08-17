@@ -117,7 +117,7 @@ public class EngineManager {
         List<SimulationResultDTO> retPastSimulations = new ArrayList<>();
 
         pastSimulations.forEach(
-                (id, simulationResult) -> retPastSimulations.add(new SimulationResultDTO(simulationResult.getDateTime(), simulationResult.getId())) // todo- add info to the DTO
+                (id, simulationResult) -> retPastSimulations.add(new SimulationResultDTO(simulationResult.getDateTime(), simulationResult.getDateTimeString(), simulationResult.getId()))
         );
 
         return retPastSimulations;
