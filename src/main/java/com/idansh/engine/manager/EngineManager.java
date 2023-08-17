@@ -1,11 +1,16 @@
 package com.idansh.engine.manager;
 
+import com.idansh.dto.entity.EntityDTO;
 import com.idansh.dto.environment.EnvironmentVariablesSetDTO;
+import com.idansh.dto.property.PropertyDTO;
+import com.idansh.dto.range.RangeDTO;
+import com.idansh.dto.rule.RuleDTO;
 import com.idansh.dto.simulation.CurrentSimulationDTO;
 import com.idansh.dto.simulation.SimulationResultDTO;
 import com.idansh.engine.manager.result.SimulationIdGenerator;
 import com.idansh.engine.manager.result.SimulationResult;
 import com.idansh.engine.property.creator.factory.PropertyFactory;
+import com.idansh.engine.property.instance.PropertyType;
 import com.idansh.engine.world.World;
 import com.idansh.jaxb.unmarshal.reader.Reader;
 
@@ -25,8 +30,66 @@ public class EngineManager {
     }
 
 
+    /**
+     * @return returns to the UI a DTO that contains information on the current loaded simulated world.
+     */
     public CurrentSimulationDTO getCurrentSimulationDetails() {
-        return new CurrentSimulationDTO(); // todo: add current simulation details to DTO
+        CurrentSimulationDTO currentSimulationDTO = new CurrentSimulationDTO();
+
+        // Add Entities:
+        currWorld.entityManager.getEntityFactories().forEach(
+
+                (entityFactoryName, entityFactory) -> {
+                    // Create entity DTO
+                    EntityDTO entityDTO = new EntityDTO(
+                            entityFactoryName,
+                            entityFactory.getPopulationCount(),
+                            entityFactory.getPopulationCount());
+
+                    // Create properties for the entity DTO
+                    entityFactory.getPropertiesToAssign().forEach(
+                            (propertyFactoryName, propertyFactory) -> {
+                                PropertyDTO propertyDTO = new PropertyDTO(
+                                        propertyFactoryName,
+                                        PropertyType.getTypeString(propertyFactory.getType()),
+                                        new RangeDTO(
+                                                propertyFactory.getRange().getBottom(),
+                                                propertyFactory.getRange().getTop()),
+                                        propertyFactory.isRandomGenerated(),
+                                        null);
+                                entityDTO.addPropertyDTOtoList(propertyDTO);
+                            }
+                    );
+                    currentSimulationDTO.addEntityDTO(entityDTO);
+                }
+        );
+
+        // Add Rules:
+        currWorld.getRulesMap().forEach(
+                (ruleName, rule) -> {
+                    // Create rule DTO
+                    RuleDTO ruleDTO = new RuleDTO(
+                            ruleName,
+                            rule.getActivation().getTicks(),
+                            rule.getActivation().getProbability(),
+                            rule.getActionsSet().size()
+                    );
+
+                    // Add actions' names to the DTO
+                    rule.getActionsSet().forEach(
+                            a -> ruleDTO.addActionName(a.getActionTypeString())
+                    );
+                }
+        );
+
+        // Add Termination Rules:
+        currWorld.getTerminationRulesMap().forEach(
+                (terminationRuleName, terminationRule) -> {
+
+                }
+        );
+
+        return currentSimulationDTO;
     }
 
 

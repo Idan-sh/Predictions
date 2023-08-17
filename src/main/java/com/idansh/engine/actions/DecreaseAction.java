@@ -47,4 +47,9 @@ public class DecreaseAction extends Action {
 
         throw new IllegalArgumentException("Error: invertValue can be preformed only on Integer or Float (non-primitive) values!");
     }
+
+    @Override
+    public String getActionTypeString() {
+        return "decrease";
+    }
 }

@@ -35,4 +35,8 @@ public class Rule {
 
         actionsSet.add(action);
     }
+
+    public Set<Action> getActionsSet() {
+        return actionsSet;
+    }
 }

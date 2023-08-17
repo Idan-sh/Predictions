@@ -31,4 +31,9 @@ public class SetAction extends Action {
         property.setValue(amount.getValue());
     }
 
+
+    @Override
+    public String getActionTypeString() {
+        return "set";
+    }
 }

@@ -31,4 +31,10 @@ public class IncreaseAction extends Action {
 
         property.addNumToValue(amount.getValue());
     }
+
+
+    @Override
+    public String getActionTypeString() {
+        return "increase";
+    }
 }

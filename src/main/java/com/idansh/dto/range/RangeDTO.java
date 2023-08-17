@@ -1,19 +1,19 @@
 package com.idansh.dto.range;
 
 public class RangeDTO {
-    private final int from;
-    private final int to;
+    private final double from;
+    private final double to;
 
-    public RangeDTO(int from, int to) {
+    public RangeDTO(double from, double to) {
         this.from = from;
         this.to = to;
     }
 
-    public int getFrom() {
+    public double getFrom() {
         return from;
     }
 
-    public int getTo() {
+    public double getTo() {
         return to;
     }
 }

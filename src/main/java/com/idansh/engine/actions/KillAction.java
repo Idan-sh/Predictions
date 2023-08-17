@@ -22,4 +22,9 @@ public class KillAction extends Action {
         worldContext.entityManager.killEntity(entityToKill);
     }
 
+
+    @Override
+    public String getActionTypeString() {
+        return "kill";
+    }
 }

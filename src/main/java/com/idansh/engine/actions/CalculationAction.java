@@ -69,4 +69,9 @@ public class CalculationAction extends Action {
         return (obj instanceof Integer) || (obj instanceof Float);
     }
 
+
+    @Override
+    public String getActionTypeString() {
+        return "calculation";
+    }
 }

@@ -70,4 +70,7 @@ public class EntityFactory {
         propertiesToAssign.put(propertyFactory.getName(), propertyFactory);
     }
 
+    public Map<String, PropertyFactory> getPropertiesToAssign() {
+        return propertiesToAssign;
+    }
 }

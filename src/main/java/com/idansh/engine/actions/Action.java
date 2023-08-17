@@ -8,7 +8,6 @@ public abstract class Action {
     public enum Type{
         CALCULATION, CONDITION, DECREASE, INCREASE, SET, KILL, REPLACE, PROXIMITY
     }
-
     private final String entityContext;
     private final World worldContext;
 
@@ -34,4 +33,10 @@ public abstract class Action {
      * Invokes the action, according to the action's type.
      */
     public abstract void invoke();
+
+
+    /**
+     * @return The type of action.
+     */
+    public abstract String getActionTypeString();
 }

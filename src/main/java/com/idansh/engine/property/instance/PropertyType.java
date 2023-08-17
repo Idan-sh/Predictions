@@ -32,4 +32,30 @@ public enum PropertyType {
                 throw new IllegalArgumentException("Error: invalid property type- \"" + s + "\"");
         }
     }
+
+    /**
+     * Converts a PropertyType of integer/float/boolean/string to
+     * its corresponding string format.
+     * @param type the property type.
+     * @return string that defines the property type received.
+     * @throws IllegalArgumentException if the property type received is in invalid format (not one of the specified types).
+     */
+    public static String getTypeString(PropertyType type) {
+        switch(type) {
+            case INTEGER:
+                return "decimal";
+
+            case FLOAT:
+                return "float";
+
+            case BOOLEAN:
+                return "boolean";
+
+            case STRING:
+                return "string";
+
+            default:
+                throw new IllegalArgumentException("Error: invalid property type- \"" + type + "\"");
+        }
+    }
 }

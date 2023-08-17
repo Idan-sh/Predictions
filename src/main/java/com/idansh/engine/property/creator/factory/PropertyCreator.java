@@ -85,4 +85,14 @@ public class PropertyCreator<T> implements PropertyFactory{
     public boolean isNumericProperty() {
         return PropertyType.INTEGER.equals(type) || PropertyType.FLOAT.equals(type);
     }
+
+    @Override
+    public Range getRange() {
+        return range;
+    }
+
+    @Override
+    public boolean isRandomGenerated() {
+        return !(valueGenerator instanceof FixedValueGenerator);
+    }
 }

@@ -78,4 +78,7 @@ public class EntityManager {
         population.remove(entityToKill);
     }
 
+    public Map<String, EntityFactory> getEntityFactories() {
+        return entityFactories;
+    }
 }

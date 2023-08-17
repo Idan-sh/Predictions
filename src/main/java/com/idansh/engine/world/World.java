@@ -86,5 +86,13 @@ public class World {
 
         return new SimulationResult();
     }
+
+    public Map<TerminationRule.Type, TerminationRule> getTerminationRulesMap() {
+        return terminationRulesMap;
+    }
+
+    public Map<String, Rule> getRulesMap() {
+        return rulesMap;
+    }
 }
 
