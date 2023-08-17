@@ -92,28 +92,43 @@ public class Converter {
     private static PropertyFactory propertyConvert(PRDProperty prdProperty) {
         PropertyFactory retPropertyFactory = null;
         boolean isRandom = prdProperty.getPRDValue().isRandomInitialize();
+        Range range = rangeConvert(prdProperty.getPRDRange());
 
         // Create the property according to its type:
         // PropertyType.getType handles errors with the prdProperty's type
         switch(PropertyType.getType(prdProperty.getType())) {
             case INTEGER:
-                retPropertyFactory = new PropertyCreator<>(prdProperty.getPRDName(), PropertyType.INTEGER,
-                        isRandom ? new RandomIntegerValueGenerator(new Range(prdProperty.getPRDRange().getFrom(), prdProperty.getPRDRange().getTo())) : new FixedValueGenerator<>(Integer.parseInt(prdProperty.getPRDValue().getInit())));
+                retPropertyFactory = new PropertyCreator<>(
+                        prdProperty.getPRDName(),
+                        PropertyType.INTEGER,
+                        isRandom ? new RandomIntegerValueGenerator(range) : new FixedValueGenerator<>(Integer.parseInt(prdProperty.getPRDValue().getInit())),
+                        range
+                );
                 break;
 
             case FLOAT:
-                retPropertyFactory = new PropertyCreator<>(prdProperty.getPRDName(), PropertyType.FLOAT,
-                        isRandom ? new RandomFloatValueGenerator(new Range(prdProperty.getPRDRange().getFrom(), prdProperty.getPRDRange().getTo())) : new FixedValueGenerator<>(Float.parseFloat(prdProperty.getPRDValue().getInit())));
+                retPropertyFactory = new PropertyCreator<>(
+                        prdProperty.getPRDName(),
+                        PropertyType.FLOAT,
+                        isRandom ? new RandomFloatValueGenerator(range) : new FixedValueGenerator<>(Float.parseFloat(prdProperty.getPRDValue().getInit())),
+                        range
+                );
                 break;
 
             case BOOLEAN:
-                retPropertyFactory = new PropertyCreator<>(prdProperty.getPRDName(), PropertyType.BOOLEAN,
-                        isRandom ? new RandomBooleanValueGenerator() : new FixedValueGenerator<>(Boolean.parseBoolean(prdProperty.getPRDValue().getInit())));
+                retPropertyFactory = new PropertyCreator<>(
+                        prdProperty.getPRDName(),
+                        PropertyType.BOOLEAN,
+                        isRandom ? new RandomBooleanValueGenerator() : new FixedValueGenerator<>(Boolean.parseBoolean(prdProperty.getPRDValue().getInit()))
+                );
                 break;
 
             case STRING:
-                retPropertyFactory = new PropertyCreator<>(prdProperty.getPRDName(), PropertyType.STRING,
-                        isRandom ? new RandomStringValueGenerator() : new FixedValueGenerator<>(prdProperty.getPRDValue().getInit()));
+                retPropertyFactory = new PropertyCreator<>(
+                        prdProperty.getPRDName(),
+                        PropertyType.STRING,
+                        isRandom ? new RandomStringValueGenerator() : new FixedValueGenerator<>(prdProperty.getPRDValue().getInit())
+                );
                 break;
         }
 
@@ -188,6 +203,9 @@ public class Converter {
      * @return Range object with the data of the PRDRange received.
      */
     private static Range rangeConvert(PRDRange prdRange) {
+        if(prdRange == null)
+            return null;
+
         return new Range(prdRange.getFrom(), prdRange.getTo());
     }
 
@@ -199,9 +217,18 @@ public class Converter {
      * @return Rule object with the data of the PRDRule received.
      */
     private static Rule ruleConvert(PRDRule prdRule, World worldContext) {
-        Rule retRule = new Rule(
-                prdRule.getName(),
-                activationConvert(prdRule.getPRDActivation()));
+        Rule retRule;
+
+        // Check if the PRDActivation field exists
+        if(prdRule.getPRDActivation() != null) {
+            retRule = new Rule(
+                    prdRule.getName(),
+                    activationConvert(prdRule.getPRDActivation()));
+        } else {
+            retRule = new Rule(
+                    prdRule.getName(),
+                    new RuleActivation());
+        }
 
         // Iterates over all prdActions, converts them to actions and adds them to the rule
         prdRule.getPRDActions().getPRDAction().forEach(
@@ -219,6 +246,15 @@ public class Converter {
      * @return RuleActivation object with the data of the PRDActivation received.
      */
     private static RuleActivation activationConvert(PRDActivation prdActivation) {
+        // Only ticks available
+        if(prdActivation.getProbability() == null)
+            return new RuleActivation(prdActivation.getTicks());
+
+        // Only probability available
+        if(prdActivation.getTicks() == null)
+            return new RuleActivation(prdActivation.getProbability());
+
+        // both ticks and probability available
         return new RuleActivation(prdActivation.getTicks(), prdActivation.getProbability());
     }
 
@@ -273,7 +309,7 @@ public class Converter {
                         worldContext,
                         prdAction.getEntity(),
                         prdAction.getProperty(),
-                        expressionConverter.convertExpression(prdAction, prdAction.getBy())
+                        expressionConverter.convertExpression(prdAction, prdAction.getValue())
                 );
                 break;
 

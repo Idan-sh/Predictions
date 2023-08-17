@@ -115,8 +115,8 @@ public class ConsoleOut {
      */
     public static void printFullDetailEntityDTO(EntityDTO entityDTO) {
         System.out.println("Printing entity with name " + entityDTO.getName() + ":");
-        System.out.println("Amount in population: " + entityDTO.getInitAmountInPopulation());
-        System.out.println("Properties:");
+        System.out.println("    Amount in population: " + entityDTO.getInitAmountInPopulation());
+        System.out.println("    Properties:");
         entityDTO.getPropertyDTOList().forEach(ConsoleOut::printFullDetailPropertyDTO);
         System.out.println();
 
@@ -129,9 +129,9 @@ public class ConsoleOut {
      */
     public static void printFullDetailPropertyDTO(PropertyDTO propertyDTO) {
         if(propertyDTO.getRangeDTO() != null)
-            System.out.println("    Name: " + propertyDTO.getName() + ", Type: " + propertyDTO.getType() + ", Range: from- " + propertyDTO.getRangeDTO().getFrom() + " to- " + propertyDTO.getRangeDTO().getTo() + ", Is Randomly Generated: " + propertyDTO.isRandomGenerated());
+            System.out.println("        Name: " + propertyDTO.getName() + ", Type: " + propertyDTO.getType() + ", Range: from- " + propertyDTO.getRangeDTO().getFrom() + " to- " + propertyDTO.getRangeDTO().getTo() + ", Is Randomly Generated: " + propertyDTO.isRandomGenerated());
         else
-            System.out.println("    Name: " + propertyDTO.getName() + ", Type: " + propertyDTO.getType() + ", Is Randomly Generated: " + propertyDTO.isRandomGenerated());
+            System.out.println("        Name: " + propertyDTO.getName() + ", Type: " + propertyDTO.getType() + ", Is Randomly Generated: " + propertyDTO.isRandomGenerated());
 
     }
 
@@ -177,6 +177,11 @@ public class ConsoleOut {
      */
     public static void printProperty(PropertyDTO propertyDTO) {
         System.out.println(propertyDTO.getName() + ": " + propertyDTO.getValue());
+    }
+
+    public static void printMessage(String text) {
+        System.out.println(text);
+        System.out.println();
     }
 }
 

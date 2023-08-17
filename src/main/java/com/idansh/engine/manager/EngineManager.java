@@ -7,6 +7,7 @@ import com.idansh.dto.range.RangeDTO;
 import com.idansh.dto.rule.RuleDTO;
 import com.idansh.dto.simulation.CurrentSimulationDTO;
 import com.idansh.dto.simulation.SimulationResultDTO;
+import com.idansh.engine.helpers.Range;
 import com.idansh.engine.manager.result.SimulationIdGenerator;
 import com.idansh.engine.manager.result.SimulationResult;
 import com.idansh.engine.property.creator.factory.PropertyFactory;
@@ -49,12 +50,21 @@ public class EngineManager {
                     // Create properties for the entity DTO
                     entityFactory.getPropertiesToAssign().forEach(
                             (propertyFactoryName, propertyFactory) -> {
+                                Range range = propertyFactory.getRange();
+                                RangeDTO rangeDTO;
+
+                                // Check if range exists
+                                if(range != null)
+                                {
+                                    rangeDTO = new RangeDTO(range.getBottom(), range.getTop());
+                                    System.out.println("Creating range DTO: " + range.getBottom() + ", " + range.getTop());
+                                }
+                                else rangeDTO = null;
+
                                 PropertyDTO propertyDTO = new PropertyDTO(
                                         propertyFactoryName,
                                         PropertyType.getTypeString(propertyFactory.getType()),
-                                        new RangeDTO(
-                                                propertyFactory.getRange().getBottom(),
-                                                propertyFactory.getRange().getTop()),
+                                        rangeDTO,
                                         propertyFactory.isRandomGenerated(),
                                         null);
                                 entityDTO.addPropertyDTOtoList(propertyDTO);

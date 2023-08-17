@@ -72,7 +72,7 @@ public class ExpressionConverter {
         String functionName = getFunctionName(prdStr);
 
         if (functionName != null) {
-            switch (FunctionActivationExpression.Type.valueOf(functionName)) {
+            switch (FunctionActivationExpression.Type.getType(functionName)) {
                 case ENVIRONMENT:
                     retFunctionExpression = new EnvironmentFunctionExpression(environmentVariables, getFunctionArgument(prdStr));
                     break;

@@ -9,8 +9,7 @@ public abstract class Action {
         CALCULATION, CONDITION, DECREASE, INCREASE, SET, KILL, REPLACE, PROXIMITY;
 
         /**
-         * Converts a string of an action to
-         * its corresponding Action Type.
+         * Converts a string of an action to its corresponding Action Type.
          * @param s the action type in string format.
          * @return Action.Type that defines the string received.
          * @throws IllegalArgumentException if the string received is in invalid format (not one of the specified strings).

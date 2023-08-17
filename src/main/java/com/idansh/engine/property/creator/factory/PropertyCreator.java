@@ -37,12 +37,14 @@ public class PropertyCreator<T> implements PropertyFactory{
      * @param valueGenerator Value generator (assigns fixed/random value),
      * @param range range for the numeric property's value.
      */
-    public PropertyCreator(String name, PropertyType type, ValueGenerator<T> valueGenerator, @NotNull Range range) {
+    public PropertyCreator(String name, PropertyType type, ValueGenerator<T> valueGenerator, Range range) {
+        this.type = type;
+
         if(!this.isNumericProperty())
-            throw new IllegalArgumentException("Error: range can be set only for numeric properties!");
+            throw new IllegalArgumentException("Error: range can be set only for numeric properties! the type of this property creator is- " + type.toString());
+
         this.range = range;
         this.name = name;
-        this.type = type;
         this.valueGenerator = valueGenerator;
     }
 
