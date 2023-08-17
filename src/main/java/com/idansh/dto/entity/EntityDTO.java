@@ -10,12 +10,14 @@ import java.util.List;
  */
 public class EntityDTO {
     private final String name;
-    private final int amountInPopulation;
+    private final int currAmountInPopulation;
+    private final int initAmountInPopulation;
     private final List<PropertyDTO> propertyDTOList;
 
-    public EntityDTO(String name, int amountInPopulation) {
+    public EntityDTO(String name, int currAmountInPopulation, int initAmountInPopulation) {
         this.name = name;
-        this.amountInPopulation = amountInPopulation;
+        this.currAmountInPopulation = currAmountInPopulation;
+        this.initAmountInPopulation = initAmountInPopulation;
         this.propertyDTOList = new ArrayList<>();
     }
 
@@ -27,8 +29,12 @@ public class EntityDTO {
         return name;
     }
 
-    public int getAmountInPopulation() {
-        return amountInPopulation;
+    public int getCurrAmountInPopulation() {
+        return currAmountInPopulation;
+    }
+
+    public int getInitAmountInPopulation() {
+        return initAmountInPopulation;
     }
 
     public List<PropertyDTO> getPropertyDTOList() {

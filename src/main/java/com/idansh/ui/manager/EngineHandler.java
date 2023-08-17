@@ -1,56 +1,169 @@
 package com.idansh.ui.manager;
 
+import com.idansh.dto.entity.EntityDTO;
+import com.idansh.dto.environment.EnvironmentVariablesSetDTO;
+import com.idansh.dto.property.PropertyDTO;
+import com.idansh.dto.simulation.SimulationResultDTO;
 import com.idansh.engine.manager.EngineManager;
+import com.idansh.ui.display.ConsoleIn;
+import com.idansh.ui.display.ConsoleOut;
+
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Connects the UI with the engine components through the various DTOs.
  */
 public class EngineHandler {
     private final EngineManager engineManager;
+    private final ConsoleIn consoleIn;
 
     public EngineHandler() {
         engineManager = new EngineManager();
+        consoleIn = new ConsoleIn();
     }
 
 
-   // ------------------------------------------------------------------------------------------------------------------------------
-
     /**
-     * Gets the current simulation details from the engine and prints it.
-     */
-    private void showSimulationDetails(int simId) {
-        Console.showSimulationDetails(engine.getSimulationDetailsById(simId));
-    }
-
-    /**
-     * Asks the engine to create a String describing the Current simulation details and returns it.
-     */
-    public void showCurrentSimulationDetails() {
-        Console.showSimulationDetails(engine.getCurrentSimulationDetails());
-    }
-
-    /**
-     * prompts the user to input a path to a simulation XML config file and loads it
-     * into the system.
+     * Gets a path of a simulation XML file, loads the file into the engine.
+     * If the path entered is not valid, prints a message to the user and returns.
      */
     public void loadSimulationFromFile() {
         System.out.print("Please enter path to the XML world config file: ");
-        Scanner scanner = new Scanner(System.in);
-        String path = scanner.nextLine();
+        String path = consoleIn.getInput();
 
-        engine.loadSimulationFromFile(new DTOFirstFunction(path));
+        try {
+            engineManager.loadSimulationFromFile(path);
+        } catch (IllegalArgumentException e) {
+            ConsoleOut.printError(e.getMessage());
+        }
     }
 
 
     /**
-     * Starts a run of the currently loaded simulation.
+     * Gets CurrentSimulationDTO from the engine with details of the current simulation,
+     * prints the simulation details to the screen.
+     */
+    public void showCurrentSimulationDetails() {
+        ConsoleOut.printCurrentSimulationDetails(engineManager.getCurrentSimulationDetails());
+    }
+
+
+    /**
+     * Gets SimulationResultDTO from the engine with details of a past simulation with the given simulation ID,
+     * prints the simulation details to the screen.
+     */
+    private void showPastSimulationDetails(int simulationId) {
+        ConsoleOut.printPastSimulationDetails(engineManager.getPastSimulationDetailsById(simulationId));
+    }
+
+
+    /**
+     * Gets past simulations' results from the engine, prints simple information of each result,
+     * and allows the user to choose which simulation to show full details of.
+     * Prints the chosen simulation result.
+     */
+    public void showPastSimulations() {
+        List<SimulationResultDTO> pastSimulationsResults = engineManager.getPastSimulationsResults();
+        SimulationResultDTO simulationResultDTO;
+        int userInput;
+
+        ConsoleOut.printPastSimulationsShortDetails(pastSimulationsResults);
+
+        System.out.print("\nPlease choose number of a past simulation result to view the details of: ");
+
+        userInput = consoleIn.getIntInput();
+
+        if(userInput >= 1 && userInput <= pastSimulationsResults.size()) {
+            simulationResultDTO = pastSimulationsResults.get(userInput -1);
+            ConsoleOut.printPastSimulationDetails(simulationResultDTO);
+        }
+        else {
+            ConsoleOut.printError("invalid past simulation number!");
+            return;
+        }
+
+        ConsoleOut.printPastSimulationsMenu();
+        userInput = consoleIn.getIntInput();
+
+        switch(userInput) {
+            case 1:
+                showNumberOfEntities(simulationResultDTO);
+                break;
+
+            case 2:
+                showPropertyInformation(simulationResultDTO);
+                break;
+
+            default:
+                ConsoleOut.printError("invalid past simulation menu choice!");
+        }
+    }
+
+
+    /**
+     * Initiates the run process of the current loaded simulation.
      */
     public void runSimulation() {
-        StartData startData = engine.getSimulationStartData();
-        DTOThirdFunction dtoThirdFunction = createDTOThirdFunctionObject(startData);
-
-        engine.runSimulation(dtoThirdFunction);
+        EnvironmentVariablesSetDTO environmentVariablesSetDTO = engineManager.getEnvironmentVariablesSetDTO();
+        engineManager.runSimulation(environmentVariablesSetDTO);
     }
+
+
+    /**
+     * Prints the simulation result's entities with their initial amount and final amount in the population.
+     * @param simulationResultDTO DTO containing information about the entities of the simulation.
+     */
+    private void showNumberOfEntities(SimulationResultDTO simulationResultDTO) {
+        simulationResultDTO.getEntityDTOList().forEach(ConsoleOut::printNofEntityDTO);
+    }
+
+    private void showPropertyInformation(SimulationResultDTO simulationResultDTO) {
+        List<EntityDTO> entityDTOList = simulationResultDTO.getEntityDTOList();
+
+        AtomicInteger counter = new AtomicInteger(1);
+        entityDTOList.forEach(
+                entityDTO -> {
+
+                    System.out.print(counter.getAndIncrement() + ". ");
+                    ConsoleOut.printEntity(entityDTO);
+                }
+        );
+
+        int userInput = consoleIn.getIntInput();
+
+        if(userInput >= 1 && userInput < entityDTOList.size()) {
+            List<PropertyDTO> propertyDTOList = entityDTOList.get(userInput - 1).getPropertyDTOList();
+
+            counter = new AtomicInteger(1);
+            propertyDTOList.forEach(
+                    propertyDTO -> {
+
+                        System.out.print(counter.getAndIncrement() + ". ");
+                        ConsoleOut.printProperty(propertyDTO);
+                    }
+            );
+
+            userInput = consoleIn.getIntInput();
+            if (userInput >= 1 && userInput < propertyDTOList.size()) {
+                ConsoleOut.printProperty(propertyDTOList.get(userInput));
+            } else
+                ConsoleOut.printError("wrong input choice for property number!");
+        } else
+            ConsoleOut.printError("wrong input choice for entity number!");
+
+    }
+
+   // ------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
 
     /**
      * This method gets from the user input for each environment property given from the 'StartData'.
@@ -75,19 +188,6 @@ public class EngineHandler {
                 valueToSend = tryToParse(input, dtoEnvironmentVariable);
                 ret.updateEnvPropertyUserInputs(dtoEnvironmentVariable.getName(), getIsRandomInit(valueToSend), valueToSend);
             }
-        }
-
-        return ret;
-    }
-
-    /**
-     * Return true if the value is null, that's how the engine would know to random a value for a specific environment property.
-     */
-    private boolean getIsRandomInit(Object value){
-        boolean ret = false;
-
-        if(value == null){
-            ret = true;
         }
 
         return ret;
@@ -153,29 +253,5 @@ public class EngineHandler {
         }
 
         return ret;
-    }
-
-
-    /**
-     * Shows the user all past simulation (brief and simple representation: ID, Date, name).
-     * Prompts the user to choose a simulation he wants to see the full details of (Based on ID).
-     * Shows the user's chosen simulation details.
-     */
-    public void showPastSimulations() {
-        ResultData[] pastSimulationsResultData = engine.getPastSimulationResultData();
-        Console.showShortDetailsOfAllPastSimulations(pastSimulationsResultData);
-
-        System.out.print("\nChoose the no. of a past run you would like to view: ");
-
-        //TODO: PLACEHOLDER INPUT GETTER FROM USER
-        Scanner scanner = new Scanner(System.in);
-        int userInput = Integer.parseInt(scanner.nextLine());
-
-        if(userInput >= 1 && userInput <= pastSimulationsResultData.length)
-        {
-            Console.printResultData(pastSimulationsResultData[userInput -1]);
-        }
-
-        //TODO: PLACEHOLDER INPUT GETTER FROM USER
     }
 }

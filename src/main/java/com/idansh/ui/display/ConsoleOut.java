@@ -1,5 +1,12 @@
 package com.idansh.ui.display;
 
+import com.idansh.dto.entity.EntityDTO;
+import com.idansh.dto.property.PropertyDTO;
+import com.idansh.dto.simulation.CurrentSimulationDTO;
+import com.idansh.dto.simulation.SimulationResultDTO;
+
+import java.util.*;
+
 /**
  * Prints relevant menus and text to the console for the user.
  */
@@ -14,6 +21,13 @@ public class ConsoleOut {
         System.out.println("3. Run simulation");
         System.out.println("4. Show details of past simulation run");
         System.out.println("5. Exit");
+        System.out.print("Please enter the number of command to run: ");
+    }
+
+    public static void printPastSimulationsMenu() {
+        System.out.println("Enter how to show the past simulation result:");
+        System.out.println("1. Number of entities of each type");
+        System.out.println("2. Entity's property value");
         System.out.print("Please enter the number of command to run: ");
     }
 
@@ -41,53 +55,73 @@ public class ConsoleOut {
     public static void printGoodbye() {
         System.out.println("Exiting the program, Goodbye...");
     }
+
+    /**
+     * Receives a CurrentSimulationDTO with the data of the current simulation,
+     * formats it and prints it.
+     * @param currentSimulationDTO the current loaded simulation in the engine to print its details.
+     */
+    public static void printCurrentSimulationDetails(CurrentSimulationDTO currentSimulationDTO) {
+        // TODO: Implement this
+    }
+
+
+    /**
+     * Receives a SimulationResultDTO with the data of a past simulation,
+     * formats it and prints it.
+     * @param simulationResultDTO a simulation result to print its details.
+     */
+    public static void printPastSimulationDetails(SimulationResultDTO simulationResultDTO) {
+        // todo- print simulation result DTO
+    }
+
+
+    /**
+     * Prints out the basic details of past simulation received from the engine.
+     * @param pastSimulationsResults - an array of SimulationResultDTO containing simulations results.
+     */
+    public static void printPastSimulationsShortDetails(List<SimulationResultDTO> pastSimulationsResults) {
+        // Sort the simulations results by their date time
+        pastSimulationsResults.sort(Comparator.comparing(SimulationResultDTO::getDateTime));
+
+        printTitle("past simulations results");
+        System.out.printf("%-22s%-22s%-22s\n", "no.", "ID", "Date & Time");
+
+        int counter = 1;
+        for (SimulationResultDTO r : pastSimulationsResults) {
+            System.out.printf("#%-21s%-22s%-22s\n", counter++, r.getId(), r.getDateTimeString());
+        }
+    }
+
+
+    /**
+     * Prints the initial and final numbers of entities in the population of the given entity.
+     * @param entityDTO TDO containing information of the entity to display its amount in the population.
+     */
+    public static void printNofEntityDTO(EntityDTO entityDTO) {
+        System.out.println(entityDTO.getName() + ": initial amount- " + entityDTO.getInitAmountInPopulation() + ", final amount- " + entityDTO.getCurrAmountInPopulation());
+    }
+
+    /**
+     * Prints entity's name.
+     * @param entityDTO DTO containing entity's details.
+     */
+    public static void printEntity(EntityDTO entityDTO) {
+        System.out.println(entityDTO.getName());
+    }
+
+
+    /**
+     * Prints property's name.
+     * @param propertyDTO DTO containing property's details.
+     */
+    public static void printProperty(PropertyDTO propertyDTO) {
+        System.out.println(propertyDTO.getName() + ": " + propertyDTO.getValue());
+    }
 }
 
-//
-//    /**
-//     * Receives a string of simulation's details, formats it and prints it.
-//     */
-//    public static void showSimulationDetails(String simDetails) {
-//        // TODO: Implement this
-//    }
-//
-//
-//    /**
-//     * Prints out the basic details of all past simulation saved in the system.
-//     *
-//     * @param pastSimulationsData - an array containing all result data from the currently loaded simulation
-//     *                            up to this point.
-//     */
-//    public static void showShortDetailsOfAllPastSimulations(ResultData[] pastSimulationsData) {
-//
-//        // Sort the Result data by date time
-//        Arrays.sort(pastSimulationsData, (r1, r2)-> {
-//            return r1.getDateTime().compareTo(r2.getDateTime());
-//        });
-//
-//        printTitle("PREVIOUS SIMULATION RUNS");
-//        System.out.println();
-//        System.out.printf("%-22s%-22s%-22s\n", "no.", "ID", "Date & Time");
-//        int counter = 1;
-//        for (ResultData r : pastSimulationsData
-//        ) {
-//            System.out.printf("#%-21s%-22s%-22s\n", counter++, r.getId(), r.getDateTimeString());
-//        }
-//    }
-//
-//
-//
-//    /**
-//     * Shows a short representation of a simulation.
-//     * Short representation includes: id, name, date.
-//     *
-//     * @param simDetails
-//     */
-//    public static void printSimulationDetailsShort(String simDetails) {
-//        // TODO: Implement this
-//    }
-//
-//    //TODO: Implement this after we have the structure of a simulation's result data
-//    public static void printResultData(ResultData resultData)
-//    {
-//    }
+
+
+
+
+

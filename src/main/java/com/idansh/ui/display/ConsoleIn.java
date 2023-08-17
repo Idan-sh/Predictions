@@ -15,6 +15,14 @@ public class ConsoleIn {
         return scanner.nextLine();
     }
 
+    public int getIntInput() {
+        try {
+            return Integer.parseInt(getInput());
+        } catch(NumberFormatException e) {
+            ConsoleOut.printError("invalid input, not a number!");
+        }
+    }
+
     /**
      * Receives user input from the menu options.
      * @return MenuOptions enum which defines the user choice.

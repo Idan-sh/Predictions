@@ -1,6 +1,5 @@
 package com.idansh.engine.manager;
 
-import com.idansh.dto.environment.EnvironmentVariableDTO;
 import com.idansh.dto.environment.EnvironmentVariablesSetDTO;
 import com.idansh.dto.simulation.CurrentSimulationDTO;
 import com.idansh.dto.simulation.SimulationResultDTO;
@@ -10,8 +9,7 @@ import com.idansh.engine.property.creator.factory.PropertyFactory;
 import com.idansh.engine.world.World;
 import com.idansh.jaxb.unmarshal.reader.Reader;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The UI will handle the engine through this class.
@@ -37,13 +35,9 @@ public class EngineManager {
      * @param simulationId the ID of the simulation to get.
      * @return DTO containing its information/details.
      */
-    public SimulationResultDTO getSimulationDetailsById(int simulationId) {
+    public SimulationResultDTO getPastSimulationDetailsById(int simulationId) {
         SimulationResult simulationResult = pastSimulations.get(simulationId);
-        return new SimulationResultDTO(); // todo: add simulation details to constructor
-    }
-
-        private SimulationResult getResultDataById(int id) {
-        return pastSimulations.get(id);
+        return new SimulationResultDTO(simulationResult.getDateTime(), simulationResult.getId());
     }
 
 
@@ -61,9 +55,10 @@ public class EngineManager {
      * @param path path to the XML file location in the machine.
      */
     public void loadSimulationFromFile(String path) {
-        if (Reader.isValidPath(path)) {
+        if (Reader.isValidPath(path))
             currWorld = Reader.readWorld(path);
-        }
+        else
+            throw new IllegalArgumentException("path \"" + path + "\" is not a valid path!");
     }
 
 
@@ -115,45 +110,25 @@ public class EngineManager {
     }
 
 
-    // ------------------------------------------------------------------------------------------------------------------------------
-
-
     /**
-     * Create and return the DTO start data which contains information about the simulation's environment variables.
-     *
-     * @return a StartData DTO
+     * Get SimulationResultDTOs containing information on past simulations' results.
      */
-    @Override
-    public StartData getSimulationStartData() {
-        List<DTOEnvironmentVariable> environmentVariables = new ArrayList<>();
-        Map<String, Property> environmentProperties = this.world.getEnvironmentProperties();
-        Property valueFromTheMap;
+    public List<SimulationResultDTO> getPastSimulationsResults() {
+        List<SimulationResultDTO> retPastSimulations = new ArrayList<>();
 
-        for (Map.Entry<String, Property> entry : environmentProperties.entrySet()) {
-            valueFromTheMap = entry.getValue();
-            environmentVariables.add(getDTOEnvironmentVariable(valueFromTheMap));
-        }
+        pastSimulations.forEach(
+                (id, simulationResult) -> retPastSimulations.add(new SimulationResultDTO(simulationResult.getDateTime(), simulationResult.getId())) // todo- add info to the DTO
+        );
 
-        return new StartData(environmentVariables);
+        return retPastSimulations;
     }
 
+
     /**
-     * Create a 'DTOEnvironmentVariable' which contain the given environment variable's data and return it.
+     * Checks whether of not a simulation is currently loaded into the program.
+     * @return true if a simulation is loaded, false otherwise.
      */
-    private DTOEnvironmentVariable getDTOEnvironmentVariable(Property valueFromTheMap){
-        String name = valueFromTheMap.getName(), type = valueFromTheMap.getType().toString().toLowerCase();
-        Double from = null, to = null;
-
-        if(valueFromTheMap.getType() == PropertyType.DOUBLE){
-            DoubleProperty doubleProperty = (DoubleProperty)valueFromTheMap;
-            from = doubleProperty.getFrom();
-            to = doubleProperty.getTo();
-        } else if (valueFromTheMap.getType() == PropertyType.INT) {
-            IntProperty intProperty = (IntProperty)valueFromTheMap;
-            from = (double)intProperty.getFrom();
-            to = (double)intProperty.getTo();
-        }
-
-        return new DTOEnvironmentVariable(name,type,from,to);
+    public boolean isSimulationLoaded() {
+        return currWorld == null;
     }
 }

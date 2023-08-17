@@ -10,20 +10,23 @@ public class PropertyDTO {
     private final String name;
     private final String type;
     private final RangeDTO rangeDTO; // optional
+    private final Object value;
     private final boolean isRandomGenerated;
 
-    public PropertyDTO(String name, String type, RangeDTO rangeDTO, boolean isRandomGenerated) {
+    public PropertyDTO(String name, String type, RangeDTO rangeDTO, boolean isRandomGenerated, Object value) {
         this.name = name;
         this.type = type;
         this.rangeDTO = rangeDTO;
         this.isRandomGenerated = isRandomGenerated;
+        this.value = value;
     }
 
-    public PropertyDTO(String name, String type, boolean isRandomGenerated) {
+    public PropertyDTO(String name, String type, boolean isRandomGenerated, Object value) {
         this.rangeDTO = null;
         this.name = name;
         this.type = type;
         this.isRandomGenerated = isRandomGenerated;
+        this.value = value;
     }
 
     public String getName() {
@@ -40,5 +43,9 @@ public class PropertyDTO {
 
     public boolean isRandomGenerated() {
         return isRandomGenerated;
+    }
+
+    public Object getValue() {
+        return value;
     }
 }
