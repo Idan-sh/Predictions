@@ -37,7 +37,7 @@ public class EngineManager {
      */
     public SimulationResultDTO getPastSimulationDetailsById(int simulationId) {
         SimulationResult simulationResult = pastSimulations.get(simulationId);
-        return new SimulationResultDTO(simulationResult.getDateTime(), simulationResult.getId());
+        return new SimulationResultDTO(simulationResult.getDateTime(), simulationResult.getDateTimeString(), simulationResult.getId());
     }
 
 
@@ -74,10 +74,10 @@ public class EngineManager {
         SimulationResult simulationResult = currWorld.run();
 
         // Save the simulation result
-        pastSimulations.put(SimulationIdGenerator.getID(), simulationResult);
+        pastSimulations.put(simulationResult.getId(), simulationResult);
 
         // TODO : return to the UI the simulation result. digest simulationResult...
-        return new SimulationResultDTO();
+        return new SimulationResultDTO(simulationResult.getDateTime(), simulationResult.getDateTimeString(), simulationResult.getId());
     }
 
 

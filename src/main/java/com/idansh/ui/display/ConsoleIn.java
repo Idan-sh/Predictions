@@ -15,11 +15,17 @@ public class ConsoleIn {
         return scanner.nextLine();
     }
 
+    /**
+     * Tries to get an int input from user.
+     * if fails throws exception
+     * @throws NumberFormatException if user failed to enter a valid number.
+     */
     public int getIntInput() {
         try {
             return Integer.parseInt(getInput());
         } catch(NumberFormatException e) {
             ConsoleOut.printError("invalid input, not a number!");
+            throw new NumberFormatException();
         }
     }
 

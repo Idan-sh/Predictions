@@ -84,7 +84,7 @@ public class World {
     public SimulationResult run() {
         // todo- run simulation and return result;
 
-        return null;
+        return new SimulationResult();
     }
 }
 
