@@ -2,6 +2,8 @@ package com.idansh.ui.display;
 
 import com.idansh.dto.entity.EntityDTO;
 import com.idansh.dto.property.PropertyDTO;
+import com.idansh.dto.rule.RuleDTO;
+import com.idansh.dto.rule.TerminationRuleDTO;
 import com.idansh.dto.simulation.CurrentSimulationDTO;
 import com.idansh.dto.simulation.SimulationResultDTO;
 
@@ -62,7 +64,12 @@ public class ConsoleOut {
      * @param currentSimulationDTO the current loaded simulation in the engine to print its details.
      */
     public static void printCurrentSimulationDetails(CurrentSimulationDTO currentSimulationDTO) {
-        // TODO: Implement this
+        printTitle("simulation details");
+        currentSimulationDTO.getEntityDTOList().forEach(ConsoleOut::printFullDetailEntityDTO);                      // Print entities' details
+        System.out.println("Rules: ");
+        currentSimulationDTO.getRuleDTOList().forEach(ConsoleOut::printFullDetailRuleDTO);                          // Print rules' details
+        System.out.println("Termination Rules: ");
+        currentSimulationDTO.getTerminationRuleDTOList().forEach(ConsoleOut::printFullDetailTerminationRuleDTO);    // Print termination rules' details
     }
 
 
@@ -101,6 +108,59 @@ public class ConsoleOut {
     public static void printNofEntityDTO(EntityDTO entityDTO) {
         System.out.println(entityDTO.getName() + ": initial amount- " + entityDTO.getInitAmountInPopulation() + ", final amount- " + entityDTO.getCurrAmountInPopulation());
     }
+
+    /**
+     * Prints the full detail of an entity.
+     * @param entityDTO TDO containing information of the entity to display.
+     */
+    public static void printFullDetailEntityDTO(EntityDTO entityDTO) {
+        System.out.println("Printing entity with name " + entityDTO.getName() + ":");
+        System.out.println("Amount in population: " + entityDTO.getInitAmountInPopulation());
+        System.out.println("Properties:");
+        entityDTO.getPropertyDTOList().forEach(ConsoleOut::printFullDetailPropertyDTO);
+        System.out.println();
+
+    }
+
+
+    /**
+     * Prints the full detail of a property.
+     * @param propertyDTO TDO containing information of the property to display.
+     */
+    public static void printFullDetailPropertyDTO(PropertyDTO propertyDTO) {
+        if(propertyDTO.getRangeDTO() != null)
+            System.out.println("    Name: " + propertyDTO.getName() + ", Type: " + propertyDTO.getType() + ", Range: from- " + propertyDTO.getRangeDTO().getFrom() + " to- " + propertyDTO.getRangeDTO().getTo() + ", Is Randomly Generated: " + propertyDTO.isRandomGenerated());
+        else
+            System.out.println("    Name: " + propertyDTO.getName() + ", Type: " + propertyDTO.getType() + ", Is Randomly Generated: " + propertyDTO.isRandomGenerated());
+
+    }
+
+    /**
+     * Prints the full detail of a rule.
+     * @param ruleDTO TDO containing information of the rule to display.
+     */
+    public static void printFullDetailRuleDTO(RuleDTO ruleDTO) {
+        System.out.print("    Name: " + ruleDTO.getName() + ", When activated: ticks- " + ruleDTO.getTicks() + " probability- " + ruleDTO.getProbability() + ", Number of actions: " + ruleDTO.getNofActions() + ", Action names: [");
+
+        // Print action names
+        List<String> namesList = ruleDTO.getActionNamesList();
+        for (int i = 0; i < namesList.size(); i++) {
+            System.out.print(namesList.get(i));
+            if(i < namesList.size() - 1)
+                System.out.print(", ");
+        }
+
+        System.out.println("]");
+    }
+
+    /**
+     * Prints the full detail of a termination rule.
+     * @param terminationRuleDTO TDO containing information of the termination rule to display.
+     */
+    public static void printFullDetailTerminationRuleDTO(TerminationRuleDTO terminationRuleDTO) {
+        System.out.println("    Type: " + terminationRuleDTO.getType() + ", Value: " + terminationRuleDTO.getValue());
+    }
+
 
     /**
      * Prints entity's name.

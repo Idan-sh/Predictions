@@ -56,6 +56,10 @@ public class SimulationManager {
                 return true;
 
             case SHOW_SIMULATION_DETAILS:
+                if(!engineHandler.isSimulationLoaded()) {
+                    ConsoleOut.printError("no simulation loaded! please load before trying to show details!");
+                    return true;
+                }
                 engineHandler.showCurrentSimulationDetails();
                 return true;
 

@@ -233,7 +233,7 @@ public class Converter {
         Action retAction = null;
         ExpressionConverter expressionConverter = new ExpressionConverter(worldContext);
 
-        switch (Action.Type.valueOf(prdAction.getType())) {
+        switch (Action.Type.getType(prdAction.getType())) {
             case INCREASE:
                 retAction = new IncreaseAction(
                         worldContext,

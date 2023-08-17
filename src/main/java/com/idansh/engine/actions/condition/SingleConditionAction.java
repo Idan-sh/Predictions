@@ -24,4 +24,9 @@ public class SingleConditionAction extends ConditionAction{
         this.operator = operator;
         this.value = value;
     }
+
+    @Override
+    public String getActionTypeString() {
+        return "condition";
+    }
 }

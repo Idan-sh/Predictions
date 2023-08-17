@@ -17,4 +17,9 @@ public class MultiConditionAction extends ConditionAction{
         super(worldContext, entityContext, Type.MULTI, thenActions, elseActions);
         this.logicOp = logicOp;
     }
+
+    @Override
+    public String getActionTypeString() {
+        return "condition";
+    }
 }

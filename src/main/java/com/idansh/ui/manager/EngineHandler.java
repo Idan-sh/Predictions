@@ -32,11 +32,22 @@ public class EngineHandler {
         System.out.print("Please enter path to the XML world config file: ");
         String path = consoleIn.getInput();
 
-        try {
-            engineManager.loadSimulationFromFile(path);
-        } catch (IllegalArgumentException e) {
-            ConsoleOut.printError(e.getMessage());
-        }
+        engineManager.loadSimulationFromFile(path);
+
+//        try {
+//            engineManager.loadSimulationFromFile(path);
+//        } catch (RuntimeException e) {
+//            ConsoleOut.printError(e.getMessage());
+//        }
+    }
+
+
+    /**
+     * Checks if there is currently a simulation loaded.
+     * @return true if there is, false otherwise.
+     */
+    public boolean isSimulationLoaded() {
+        return engineManager.isSimulationLoaded();
     }
 
 

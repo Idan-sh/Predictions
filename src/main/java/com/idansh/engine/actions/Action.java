@@ -6,7 +6,45 @@ import com.idansh.engine.world.World;
 
 public abstract class Action {
     public enum Type{
-        CALCULATION, CONDITION, DECREASE, INCREASE, SET, KILL, REPLACE, PROXIMITY
+        CALCULATION, CONDITION, DECREASE, INCREASE, SET, KILL, REPLACE, PROXIMITY;
+
+        /**
+         * Converts a string of an action to
+         * its corresponding Action Type.
+         * @param s the action type in string format.
+         * @return Action.Type that defines the string received.
+         * @throws IllegalArgumentException if the string received is in invalid format (not one of the specified strings).
+         */
+        public static Action.Type getType(String s) {
+            switch(s) {
+                case "increase":
+                    return Type.INCREASE;
+
+                case "decrease":
+                    return Type.DECREASE;
+
+                case "calculation":
+                    return Type.CALCULATION;
+
+                case "condition":
+                    return Type.CONDITION;
+
+                case "set":
+                    return Type.SET;
+
+                case "kill":
+                    return Type.KILL;
+
+                case "replace":
+                    return Type.REPLACE;
+
+                case "proximity":
+                    return Type.PROXIMITY;
+
+                default:
+                    throw new IllegalArgumentException("Error: invalid property type- \"" + s + "\"");
+            }
+        }
     }
     private final String entityContext;
     private final World worldContext;

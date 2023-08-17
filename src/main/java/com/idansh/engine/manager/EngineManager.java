@@ -118,8 +118,9 @@ public class EngineManager {
      * @param path path to the XML file location in the machine.
      */
     public void loadSimulationFromFile(String path) {
-        if (Reader.isValidPath(path))
+        if (Reader.isValidPath(path)) {
             currWorld = Reader.readWorld(path);
+        }
         else
             throw new IllegalArgumentException("path \"" + path + "\" is not a valid path!");
     }
@@ -192,6 +193,6 @@ public class EngineManager {
      * @return true if a simulation is loaded, false otherwise.
      */
     public boolean isSimulationLoaded() {
-        return currWorld == null;
+        return currWorld != null;
     }
 }
