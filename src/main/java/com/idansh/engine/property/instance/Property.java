@@ -61,12 +61,14 @@ public class Property {
      * @param newValue the number to set as the property's value.
      */
     public void setValue(Object newValue) {
+        // Check that the type of the new value is of the property
+        if(!isNewValueOfPropertyType(newValue))
+            throw new IllegalArgumentException("Error: newValue received in setValue is not in the property's type!");
+
         // Checks if the newValue is a number, and if so, checks if it's in the range.
         if((newValue instanceof Integer || newValue instanceof Float) && isRangeOverflow(newValue))
             throw new IllegalArgumentException("Error: newValue received in setValue is not in the property's range!");
 
-        if(!isNewValueOfPropertyType(newValue))
-            throw new IllegalArgumentException("Error: newValue received in setValue is not in the property's type!");
 
         // Update the value
         this.value = newValue;
@@ -116,25 +118,17 @@ public class Property {
             throw new IllegalArgumentException("Error: can only add a number (non-primitive) to the property's value!");
 
         // Check if exceeded the range, if so then continue without updating (without throwing en exception)
-        if(range != null ) {
-            if(value instanceof Integer) {
-                int newVal = (Integer) value + (int) toAdd;
-                if (newVal > range.getTop() || newVal < range.getBottom())
-                    return;
-            }
-            else if(value instanceof Float) {
-                float newVal = (Float) value + (float) toAdd;
-                if (newVal > range.getTop() || newVal < range.getBottom())
-                    return;
-            }
-        }
+        if(isRangeOverflow(toAdd))
+            return;
 
         // Perform the addition
-        if(type.equals(PropertyType.INTEGER))
-        value = (Integer) value + (int) toAdd;
-        else
+        if(type.equals(PropertyType.INTEGER)) {
+            value = (Integer) value + (int) toAdd;
+        }
+        else {
             if(type.equals(PropertyType.FLOAT))
                 value = (Float) value + (float) toAdd;
+        }
     }
 
 
@@ -148,10 +142,12 @@ public class Property {
             return false;
 
         if(type.equals(PropertyType.INTEGER)) {
-            return (int) value + (int) toAdd > range.getTop() || (int) value + (int) toAdd < range.getBottom();
+            int newVal = (int) value + (int) toAdd;
+            return newVal > range.getTop() || newVal < range.getBottom();
         }
         else if(type.equals(PropertyType.FLOAT)) {
-            return (float) value + (float) toAdd > range.getTop() || (float) value + (float) toAdd < range.getBottom();
+            float newVal = (float) value + (float) toAdd;
+            return newVal > range.getTop() || newVal < range.getBottom();
         }
 
         throw new IllegalArgumentException("Error: can only perform checkRange on numeric properties!");
