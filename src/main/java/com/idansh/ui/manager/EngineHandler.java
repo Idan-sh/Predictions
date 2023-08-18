@@ -134,7 +134,7 @@ public class EngineHandler {
             } catch (NumberFormatException e) { return; }
 
             // Check if user requested to finish setup process
-            if(userInput == environmentVariableDTOList.size() + 1)
+            if(userInput == environmentVariableDTOList.size())
                 break;
 
             // Check if user input was outside the valid range

@@ -115,28 +115,26 @@ public class Property {
         if(!(toAdd instanceof Integer) && !(toAdd instanceof Float))
             throw new IllegalArgumentException("Error: can only add a number (non-primitive) to the property's value!");
 
+        // Check if exceeded the range, if so then continue without updating (without throwing en exception)
+        if(range != null ) {
+            if(value instanceof Integer) {
+                int newVal = (Integer) value + (int) toAdd;
+                if (newVal > range.getTop() || newVal < range.getBottom())
+                    return;
+            }
+            else if(value instanceof Float) {
+                float newVal = (Float) value + (float) toAdd;
+                if (newVal > range.getTop() || newVal < range.getBottom())
+                    return;
+            }
+        }
+
         // Perform the addition
         if(type.equals(PropertyType.INTEGER))
         value = (Integer) value + (int) toAdd;
         else
             if(type.equals(PropertyType.FLOAT))
                 value = (Float) value + (float) toAdd;
-
-        // Check if exceeded the range, if so then set the bound exceeded as the new value
-        if(range != null) {
-            if(value instanceof Integer) {
-                if ((Integer) value > range.getTop())
-                    value = (int) range.getTop();
-                else if((Integer) value < range.getBottom())
-                    value = (int) range.getBottom();
-            }
-            else if(value instanceof Float) {
-                if ((Float) value > range.getTop())
-                    value = (float) range.getTop();
-                else if((Float) value < range.getBottom())
-                    value = (float) range.getBottom();
-            }
-        }
     }
 
 
