@@ -3,27 +3,29 @@ package com.idansh.engine.world;
 import com.idansh.engine.entity.EntityManager;
 import com.idansh.engine.environment.ActiveEnvironmentVariables;
 import com.idansh.engine.environment.EnvironmentVariablesManager;
+import com.idansh.engine.helpers.Countdown;
+import com.idansh.engine.helpers.Counter;
 import com.idansh.engine.manager.result.SimulationResult;
 import com.idansh.engine.property.creator.factory.PropertyFactory;
 import com.idansh.engine.rule.Rule;
 import com.idansh.engine.rule.RuleActivation;
 import com.idansh.engine.rule.TerminationRule;
+import com.idansh.ui.display.ConsoleOut;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Main engine component that in charge of a single simulation,
  * and the various functions of the simulation.
  */
 public class World {
-    private final Map<TerminationRule.Type, TerminationRule> terminationRules;  // Rules on when to end the simulation
-    private final Map<String, Rule> rulesMap;                                    // Rules that can activate during the simulation
-    private ActiveEnvironmentVariables activeEnvironmentVariables;              // Contains all the activated environment variables
-    public final EnvironmentVariablesManager environmentVariablesManager;      // Contains all the environment variables factories
-    public final EntityManager entityManager;                                   // Contains all the entities (population) of the simulation
-    private int currTick;                                                       // The current iteration of the simulation
+    public final EntityManager entityManager;                                       // Contains all the entities (population) of the simulation
+    private final Map<TerminationRule.Type, TerminationRule> terminationRules;      // Rules on when to end the simulation
+    private final Map<String, Rule> rulesMap;                                       // Rules that can activate during the simulation
+    private ActiveEnvironmentVariables activeEnvironmentVariables;                  // Contains all the activated environment variables
+    public final EnvironmentVariablesManager environmentVariablesManager;           // Contains all the environment variables factories
+    private final Counter tickCounter;                                              // The current iteration of the simulation
+    private final Timer timer;                                                      // Timer for the termination rule SECONDS
 
 
     /**
@@ -35,7 +37,8 @@ public class World {
         this.environmentVariablesManager = new EnvironmentVariablesManager();
         this.activeEnvironmentVariables = null;
         this.entityManager = new EntityManager();
-        this.currTick = 0;
+        this.tickCounter = new Counter(0);
+        this.timer = new Timer();
     }
 
     public ActiveEnvironmentVariables getActiveEnvironmentVariables() {
@@ -83,28 +86,34 @@ public class World {
         rulesMap.put(rule.getName(), rule);
     }
 
-    public SimulationResult run() {        // todo- run simulation and return result;
-        // Check if the current tick has reached the termination rule tick defined, if one does not exist keeps going until reached the timer defined
-        while((!terminationRules.containsKey(TerminationRule.Type.TICKS)) || (terminationRules.containsKey(TerminationRule.Type.TICKS) && currTick < terminationRules.get(TerminationRule.Type.TICKS).getValue())) {
-            // Generate probabilities for all rules
-            rulesMap.forEach(
-                    (ruleName, rule) -> rule.getActivation().generateProbability()
-            );
+    public SimulationResult run() {
+        // Timer countdown for the termination rule SECONDS
+        Countdown countdown = new Countdown();
 
-            // Go through the population, for each entity try to activate rules on it
-            entityManager.getPopulation().forEach(
-                    entity -> {
-                        rulesMap.forEach(
-                                (ruleName, rule) -> {
-                                    rule.invoke()
-                                }
-                        );
+        // If a termination rule of SECONDS was set, starts a timer.
+        if(terminationRules.containsKey(TerminationRule.Type.SECONDS))
+            timer.schedule(countdown, terminationRules.get(TerminationRule.Type.SECONDS).getValue() * 1000L); // Get the amount of seconds and multiply by 1000 to get in milliseconds
+
+        // Check if the current tick has reached the termination rule tick defined, if one does not exist keeps going until reached the timer defined
+        while((!terminationRules.containsKey(TerminationRule.Type.TICKS)) || (terminationRules.containsKey(TerminationRule.Type.TICKS) && tickCounter.getCount() < terminationRules.get(TerminationRule.Type.TICKS).getValue())) {
+//            tickCounter.addCount();
+
+            // Checks if the timer expired
+            if(countdown.isFinished()) {
+                return new SimulationResult("Timer Expired"); // todo- add data to simulation result
+            }
+
+            // Generate probabilities for all rules, then invoke them
+            rulesMap.forEach(
+                    (ruleName, rule) -> {
+                        rule.getActivation().generateProbability();
+                        rule.invoke();
                     }
             );
         }
 
-        return new SimulationResult();
-]    }
+        return new SimulationResult("Ticks Reached");
+    }
 
     public Map<TerminationRule.Type, TerminationRule> getTerminationRules() {
         return terminationRules;

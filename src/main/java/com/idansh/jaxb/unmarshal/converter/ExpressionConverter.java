@@ -43,7 +43,7 @@ public class ExpressionConverter {
 
         // Try to convert to PropertyExpression
         if(retExpression == null) {
-            retExpression = getPropertyExpression(prdAction);
+            retExpression = getPropertyExpression(prdAction, prdStr);
         }
 
         // Convert to FixedExpression
@@ -138,18 +138,17 @@ public class ExpressionConverter {
      * If it is then returns a new property expression with its name, otherwise returns null.
      * @param prdAction PRDAction received from the XML file.
      */
-    private Expression getPropertyExpression(PRDAction prdAction) {
+    private Expression getPropertyExpression(PRDAction prdAction, String prdStr) {
         try{
             String entityName = prdAction.getEntity();
-            String propertyName = prdAction.getBy();
 
             // Try to get an entity with the given name, if one does not exist continue
             Entity entity = entityManager.getEntityInPopulation(entityName);
 
             // Try to get the entity's property with the given name, if one does not exist continue
-            entity.getPropertyByName(propertyName);
+            entity.getPropertyByName(prdStr);
 
-            return new PropertyExpression(worldContext, entityName, propertyName);
+            return new PropertyExpression(worldContext, entityName, prdStr);
         } catch (IllegalArgumentException ignored) { }
         return null;
     }

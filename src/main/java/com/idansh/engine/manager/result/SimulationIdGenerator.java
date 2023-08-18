@@ -11,6 +11,6 @@ public class SimulationIdGenerator {
      * @return int ID generated.
      */
     public static int getID() {
-        return ++counter;
+        return counter++;
     }
 }

@@ -200,7 +200,7 @@ public abstract class ConsoleOut {
 
         int counter = 1;
         for (EnvironmentVariableDTO environmentVariableDTO : environmentVariableDTOList) {
-            System.out.println("    " +counter++ + ". Name: " + environmentVariableDTO.getName() + " , Current Value: " + environmentVariableDTO.getValue());
+            System.out.println(counter++ + ". Name: " + environmentVariableDTO.getName() + " , Current Value: " + environmentVariableDTO.getValue());
         }
     }
 
@@ -212,7 +212,7 @@ public abstract class ConsoleOut {
     public static void printSimulationEnd(SimulationEndTDO simulationEndTDO) {
         printTitle("Simulation End Results");
 
-        printMessage("Simulation with ID (" + simulationEndTDO.getSimulationId() + ")");
+        printMessage("Simulation with ID \"" + simulationEndTDO.getSimulationId() + "\"");
         printMessage("Ended with termination rule of (" + simulationEndTDO.getEndReason() + ")");
     }
 }

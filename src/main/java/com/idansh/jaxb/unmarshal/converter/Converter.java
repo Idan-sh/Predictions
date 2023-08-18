@@ -345,7 +345,7 @@ public class Converter {
             retCalculationAction = new CalculationAction(
                     worldContext,
                     prdAction.getEntity(),
-                    prdAction.getProperty(),
+                    prdAction.getResultProp(),
                     expressionConverter.convertExpression(prdAction, prdMultiply.getArg1()),
                     expressionConverter.convertExpression(prdAction, prdMultiply.getArg2()),
                     CalculationAction.Type.MULTIPLY);
@@ -353,7 +353,7 @@ public class Converter {
             retCalculationAction = new CalculationAction(
                     worldContext,
                     prdAction.getEntity(),
-                    prdAction.getProperty(),
+                    prdAction.getResultProp(),
                     expressionConverter.convertExpression(prdAction, prdDivide.getArg1()),
                     expressionConverter.convertExpression(prdAction, prdDivide.getArg2()),
                     CalculationAction.Type.DIVIDE);
