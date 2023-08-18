@@ -14,7 +14,7 @@ import java.util.*;
 /**
  * Prints relevant menus and text to the console for the user.
  */
-public class ConsoleOut {
+public abstract class ConsoleOut {
     /**
      * Print the main menu of the program.
      */
@@ -40,7 +40,7 @@ public class ConsoleOut {
      * ####### TITLE #######
      * @param text string to print in the title.
      */
-    private static void printTitle(String text) {
+    public static void printTitle(String text) {
         System.out.println("\n####### " + text.toUpperCase() + " #######");
     }
 
@@ -183,7 +183,6 @@ public class ConsoleOut {
 
     public static void printMessage(String text) {
         System.out.println(text);
-        System.out.println();
     }
 
 

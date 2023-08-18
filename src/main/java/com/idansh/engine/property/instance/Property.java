@@ -43,6 +43,9 @@ public class Property {
         return value;
     }
 
+    public Range getRange() {
+        return range;
+    }
 
     /**
      * Checks if the property is of the type FLOAT or INTEGER.

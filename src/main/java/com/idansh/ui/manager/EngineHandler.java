@@ -4,6 +4,7 @@ import com.idansh.dto.entity.EntityDTO;
 import com.idansh.dto.environment.EnvironmentVariableDTO;
 import com.idansh.dto.environment.EnvironmentVariablesListDTO;
 import com.idansh.dto.property.PropertyDTO;
+import com.idansh.dto.range.RangeDTO;
 import com.idansh.dto.simulation.SimulationResultDTO;
 import com.idansh.engine.manager.EngineManager;
 import com.idansh.ui.display.ConsoleIn;
@@ -129,7 +130,7 @@ public class EngineHandler {
             System.out.print("Please choose the number of environment variable to set its value manually, or enter " + (environmentVariableDTOList.size() + 1) + " to skip: ");
 
             try {
-                userInput = consoleIn.getIntInput();
+                userInput = consoleIn.getIntInput() - 1;
             } catch (NumberFormatException e) { return; }
 
             // Check if user requested to finish setup process
@@ -137,13 +138,14 @@ public class EngineHandler {
                 break;
 
             // Check if user input was outside the valid range
-            if(userInput < 1 || userInput > environmentVariableDTOList.size() + 1) {
+            if(userInput < 0 || userInput > environmentVariableDTOList.size() + 1) {
                 ConsoleOut.printError("invalid environment variable number chosen!");
                 return;
             }
 
             // Update the environment variable requested
             EnvironmentVariableDTO environmentVariableDTOtoSet = environmentVariableDTOList.get(userInput);
+            ConsoleOut.printTitle("You chose to update: " + environmentVariableDTOtoSet.getName());
             environmentVariableDTOtoSet.setValue(getEnvironmentVariableValueInput(environmentVariableDTOtoSet));
         }
 
@@ -159,57 +161,58 @@ public class EngineHandler {
      * @return an Object value to be set into the environment variable.
      */
     private Object getEnvironmentVariableValueInput(EnvironmentVariableDTO environmentVariableDTO) {
-        InputValidator inputValidator = new InputValidator();
-        boolean valueIsNotValid = true;
-        Object ret = null;
+        // Keeps iterating until user enters the correct format
+        while (true) {
+            try {
+                RangeDTO rangeDTO = environmentVariableDTO.getRange();
 
-        while (valueIsNotValid) {
-            // If after an error the user decide to random initialize the value.
-            if(value.equals("\n")) {
-                break;
-            }
+                System.out.print("Please enter a value of the type \"" + environmentVariableDTO.getType() + "\": ");
 
-            try{
-                switch (dtoEnvironmentVariable.getType()){
-                    case "int":
-                        int integerValue = Integer.parseInt(value);
-                        inputValidator.isIntegerInRange(integerValue, (int)dtoEnvironmentVariable.getFrom(), (int)dtoEnvironmentVariable.getTo());
-                        ret = integerValue;
-                        break;
-                    case "double":
-                        double doubleValue = Double.parseDouble(value);
-                        inputValidator.isDoubleInRange(doubleValue, dtoEnvironmentVariable.getFrom(), dtoEnvironmentVariable.getTo());
-                        ret = doubleValue;
-                        break;
+                switch (environmentVariableDTO.getType()) {
+                    case "decimal":
+                        System.out.println("GOT AN INTEGER");
+                        int integerValue = consoleIn.getIntInput();
+
+                        if(rangeDTO != null) {
+                            if (InputValidator.isIntegerInRange(integerValue, rangeDTO)) {
+                                return integerValue;
+                            } else {
+                                ConsoleOut.printError("integer number received is not within the environment variable's range (" + rangeDTO.getFrom() + ", " + rangeDTO.getTo() + ")!");
+                                break;
+                            }
+                        } else
+                            return integerValue;
+
+                    case "float":
+                        System.out.println("GOT AN FLOAT");
+                        float floatValue = consoleIn.getFloatInput();
+
+                        if(rangeDTO != null) {
+                            if (InputValidator.isFloatInRange(floatValue, rangeDTO)) {
+                                return floatValue;
+                            } else {
+                                ConsoleOut.printError("float number received is not within the environment variable's range (" + rangeDTO.getFrom() + ", " + rangeDTO.getTo() + ")!");
+                                break;
+                            }
+                        } else
+                            return floatValue;
+
                     case "boolean":
-                        inputValidator.validateBoolean(value);
-                        ret = Boolean.parseBoolean(value);
-                        break;
+                        System.out.println("GOT AN BOOLEAN");
+                        return consoleIn.getBooleanInput();
+
                     case "string":
-                        inputValidator.validateStringValue(value);
-                        ret = value;
+                        System.out.println("GOT AN STRING");
+                        String stringValue = consoleIn.getInput();
+
+                        if(InputValidator.isStringValid(stringValue))
+                            return stringValue;
+
+                        ConsoleOut.printError("string received is not within the correct format!");
                         break;
                 }
-
-                valueIsNotValid = false;
-
-            } catch (IllegalStringValueException e) {
-                Console.printGivenMessage(e.getMessage());
-            } catch (OutOfRangeException e) {
-                Console.printGivenMessage("The number is out of the property range! Please try again.");
-            } catch (NumberFormatException e){
-                Console.printGivenMessage("The number type doesn't match the property's value type! Please try again.");
-            } catch (IllegalBooleanValueException e) {
-                Console.printGivenMessage("Thr property's value type is boolean! Please try again.");
-            }
-            finally { // If an error occurred, the user will enter a new input.
-                if(valueIsNotValid){
-                    value = Input.getInput();
-                }
-            }
+            } catch (IllegalArgumentException ignored) { } // Continue to receive another input
         }
-
-        return ret;
     }
 
 

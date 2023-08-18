@@ -186,7 +186,13 @@ public class EngineManager {
         EnvironmentVariablesListDTO environmentVariablesListDTO = new EnvironmentVariablesListDTO();
 
         currWorld.getActiveEnvironmentVariables().getEnvironmentVariables().forEach(
-                (key, value) -> environmentVariablesListDTO.addEnvironmentVariableInput(key, value.getValue())
+                (name, envVar) -> {
+                    Range range = envVar.getRange();
+                    environmentVariablesListDTO.addEnvironmentVariableInput(
+                            name, envVar.getValue(),
+                            PropertyType.getTypeString(envVar.getType()),
+                            range == null ? null : new RangeDTO(range.getBottom(), range.getTop()));
+                }
         );
         return environmentVariablesListDTO;
     }

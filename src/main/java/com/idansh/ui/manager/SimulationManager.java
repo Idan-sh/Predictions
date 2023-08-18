@@ -47,7 +47,7 @@ public class SimulationManager {
      * @throws NumberFormatException in case the input string cannot be converted to int.
      * @throws IllegalReceiveException in case the option number received is not a valid choice.
      */
-    public boolean handleMenuChoice() {
+    public boolean handleMenuChoice() throws NumberFormatException, IllegalReceiveException {
         MenuOptions menuOption = consoleIn.getMenuInput();
 
         switch (menuOption) {
