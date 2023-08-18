@@ -55,13 +55,11 @@ public class EngineManager {
                                 Range range = propertyFactory.getRange();
                                 RangeDTO rangeDTO;
 
-                                // Check if range exists
+                                // Check if range exists, if so then create DTO from it
                                 if(range != null)
-                                {
                                     rangeDTO = new RangeDTO(range.getBottom(), range.getTop());
-                                    System.out.println("Creating range DTO: " + range.getBottom() + ", " + range.getTop());
-                                }
-                                else rangeDTO = null;
+                                else
+                                    rangeDTO = null;
 
                                 PropertyDTO propertyDTO = new PropertyDTO(
                                         propertyFactoryName,
@@ -149,6 +147,7 @@ public class EngineManager {
      * Start running the current simulation that was loaded.
      * Loads user received input for environment variables.
      * @param environmentVariablesListDTO contains data of environment variables to update in the simulation.
+     * @throws
      */
     public SimulationEndTDO runSimulation(EnvironmentVariablesListDTO environmentVariablesListDTO) {
         updateEnvironmentVariablesFromInput(environmentVariablesListDTO);
@@ -199,13 +198,26 @@ public class EngineManager {
 
 
     /**
-     * Get SimulationResultDTOs containing information on past simulations' results.
+     * Get SimulationResultDTO list containing information on past simulations' results.
      */
     public List<SimulationResultDTO> getPastSimulationsResults() {
         List<SimulationResultDTO> retPastSimulations = new ArrayList<>();
 
         pastSimulations.forEach(
-                (id, simulationResult) -> retPastSimulations.add(new SimulationResultDTO(simulationResult.getDateTime(), simulationResult.getDateTimeString(), simulationResult.getId()))
+                (id, simulationResult) -> {
+                    // Create simulation result DTO
+                    SimulationResultDTO simulationResultDTO = new SimulationResultDTO(simulationResult.getDateTime(), simulationResult.getDateTimeString(), simulationResult.getId());
+                    currWorld.entityManager.getEntityFactories().forEach(
+                            (entityName, entityFactory) ->
+                                simulationResultDTO.addEntityDTO(
+                                        new EntityDTO(
+                                                entityName,
+                                                entityFactory.getPopulationCount(),
+                                                entityFactory.getInitPopulation()))
+                    );
+                    // Add simulation result DTO to the return list
+                    retPastSimulations.add(simulationResultDTO);
+                }
         );
 
         return retPastSimulations;

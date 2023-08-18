@@ -77,41 +77,63 @@ public class EngineHandler {
      */
     public void showPastSimulations() {
         List<SimulationResultDTO> pastSimulationsResults = engineManager.getPastSimulationsResults();
-        SimulationResultDTO simulationResultDTO;
-        int userInput;
 
-        ConsoleOut.printPastSimulationsShortDetails(pastSimulationsResults);
-
-        System.out.print("\nPlease choose number of a past simulation result to view the details of: ");
-
-        try {
-            userInput = consoleIn.getIntInput();
-        } catch (NumberFormatException e) { return; }
-
-        if(userInput >= 1 && userInput <= pastSimulationsResults.size()) {
-            simulationResultDTO = pastSimulationsResults.get(userInput -1);
-        }
-        else {
-            ConsoleOut.printError("invalid past simulation number!");
+        if(pastSimulationsResults.size() == 0) {
+            ConsoleOut.printError("please run a simulation before trying to shot past simulations!");
             return;
         }
 
-        ConsoleOut.printPastSimulationsMenu();
-        try {
-            userInput = consoleIn.getIntInput();
-        } catch (NumberFormatException e) { return; }
+        SimulationResultDTO simulationResultDTO;
+        int userInput;
 
-        switch(userInput) {
-            case 1:
-                showNumberOfEntities(simulationResultDTO);
+        // Try until user enters correct input
+        while(true) {
+            ConsoleOut.printPastSimulationsShortDetails(pastSimulationsResults);
+            System.out.println();
+            System.out.print("Please choose number of a past simulation result to view the details of,\nor " + (pastSimulationsResults.size() + 1) + " to return to the main menu: ");
+
+            try {
+                userInput = consoleIn.getIntInput();
+            } catch (NumberFormatException e) {
+                return;
+            }
+
+            if (userInput >= 1 && userInput <= pastSimulationsResults.size()) {
+                simulationResultDTO = pastSimulationsResults.get(userInput - 1);
                 break;
+            } else {
+                // Check if user requested to return the to main menu
+                if(userInput == pastSimulationsResults.size() + 1)
+                    return;
 
-            case 2:
-                showPropertyInformation(simulationResultDTO);
-                break;
+                ConsoleOut.printError("invalid past simulation number! Try again...");
+            }
+        }
 
-            default:
-                ConsoleOut.printError("invalid past simulation menu choice!");
+        // Try until user enters correct input
+        while(true) {
+            ConsoleOut.printPastSimulationsMenu();
+
+            try {
+                userInput = consoleIn.getIntInput();
+            } catch (NumberFormatException e) { return; }
+
+            switch(userInput) {
+                case 1:
+                    showNumberOfEntities(simulationResultDTO);
+                    return;
+
+                case 2:
+                    showPropertyInformation(simulationResultDTO);
+                    return;
+
+                case 3:
+                    return; // User chose to return to the main menu
+
+                default:
+                    ConsoleOut.printError("invalid past simulation menu choice! try again...");
+                    System.out.println();
+            }
         }
     }
 
@@ -155,8 +177,12 @@ public class EngineHandler {
         ConsoleOut.printEnvironmentVariables(environmentVariableDTOList);
 
         // Finished setting up the environment variables, run the simulation using them
-        SimulationEndTDO simulationEndTDO = engineManager.runSimulation(environmentVariablesDTO);
-        ConsoleOut.printSimulationEnd(simulationEndTDO);
+        try{
+            SimulationEndTDO simulationEndTDO = engineManager.runSimulation(environmentVariablesDTO);
+            ConsoleOut.printSimulationEnd(simulationEndTDO);
+        } catch (RuntimeException e) {
+            ConsoleOut.printError("Simulation Stopped. Cause was: " + e.getMessage());
+        }
     }
 
 
@@ -176,7 +202,6 @@ public class EngineHandler {
 
                 switch (environmentVariableDTO.getType()) {
                     case "decimal":
-                        System.out.println("GOT AN INTEGER");
                         int integerValue = consoleIn.getIntInput();
 
                         if(rangeDTO != null) {
@@ -190,7 +215,6 @@ public class EngineHandler {
                             return integerValue;
 
                     case "float":
-                        System.out.println("GOT AN FLOAT");
                         float floatValue = consoleIn.getFloatInput();
 
                         if(rangeDTO != null) {
@@ -204,11 +228,9 @@ public class EngineHandler {
                             return floatValue;
 
                     case "boolean":
-                        System.out.println("GOT AN BOOLEAN");
                         return consoleIn.getBooleanInput();
 
                     case "string":
-                        System.out.println("GOT AN STRING");
                         String stringValue = consoleIn.getInput();
 
                         if(InputValidator.isStringValid(stringValue))
@@ -230,6 +252,11 @@ public class EngineHandler {
         simulationResultDTO.getEntityDTOList().forEach(ConsoleOut::printNofEntityDTO);
     }
 
+
+    /**
+     * Prints all entities' properties information received from a simulation result DTO.
+     * @param simulationResultDTO the simulation result DTO that contains the entities and their properties.
+     */
     private void showPropertyInformation(SimulationResultDTO simulationResultDTO) {
         List<EntityDTO> entityDTOList = simulationResultDTO.getEntityDTOList();
         int userInput;

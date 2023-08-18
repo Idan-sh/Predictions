@@ -15,6 +15,7 @@ import java.util.Map;
 public class EntityFactory {
     private final String name;        // Unique name for this type of entity creation, e.g. "Smoker"
     private final Counter populationCounter;     // Amount of entities of this type in the environment
+    private final int initPopulation;
     private final Map<String, PropertyFactory> propertiesToAssign;   // Properties that define this entity, the value of which will be assigned on instance creation
 
 
@@ -27,17 +28,26 @@ public class EntityFactory {
         this.name = name;
         this.propertiesToAssign = new HashMap<>();
         this.populationCounter = new Counter(initPopulation);
+        this.initPopulation = initPopulation;
     }
 
     public String getName() {
         return name;
     }
 
+
+    /**
+     * @return the current amount of entity instances of this entity factory.
+     */
     public int getPopulationCount() {
         return populationCounter.getCount();
     }
 
 
+    /**
+     * @param name name of a property factory to get.
+     * @return a property factory that defines this entity factory.
+     */
     public PropertyFactory getPropertyFactory(String name) {
         if(!propertiesToAssign.containsKey(name))
             throw new IllegalArgumentException("Error: the property factory with the given name does not exist!");
@@ -70,7 +80,24 @@ public class EntityFactory {
         propertiesToAssign.put(propertyFactory.getName(), propertyFactory);
     }
 
+
     public Map<String, PropertyFactory> getPropertiesToAssign() {
         return propertiesToAssign;
+    }
+
+
+    /**
+     * Decreases the counter for the amount of entity instances in the population of this entity factory.
+     */
+    public void decreasePopulationCounter() {
+        populationCounter.decreaseCount();
+    }
+
+
+    /**
+     * @return the initial amount of entity instances created in the population of this entity factory.
+     */
+    public int getInitPopulation() {
+        return initPopulation;
     }
 }

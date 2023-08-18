@@ -8,9 +8,7 @@ import com.idansh.engine.helpers.Counter;
 import com.idansh.engine.manager.result.SimulationResult;
 import com.idansh.engine.property.creator.factory.PropertyFactory;
 import com.idansh.engine.rule.Rule;
-import com.idansh.engine.rule.RuleActivation;
 import com.idansh.engine.rule.TerminationRule;
-import com.idansh.ui.display.ConsoleOut;
 
 import java.util.*;
 
@@ -96,11 +94,11 @@ public class World {
 
         // Check if the current tick has reached the termination rule tick defined, if one does not exist keeps going until reached the timer defined
         while((!terminationRules.containsKey(TerminationRule.Type.TICKS)) || (terminationRules.containsKey(TerminationRule.Type.TICKS) && tickCounter.getCount() < terminationRules.get(TerminationRule.Type.TICKS).getValue())) {
-//            tickCounter.addCount();
+            tickCounter.increaseCount();
 
             // Checks if the timer expired
             if(countdown.isFinished()) {
-                return new SimulationResult("Timer Expired"); // todo- add data to simulation result
+                return new SimulationResult("Timer Expired", this);
             }
 
             // Generate probabilities for all rules, then invoke them
@@ -112,7 +110,7 @@ public class World {
             );
         }
 
-        return new SimulationResult("Ticks Reached");
+        return new SimulationResult("Ticks Reached", this);
     }
 
     public Map<TerminationRule.Type, TerminationRule> getTerminationRules() {

@@ -2,11 +2,8 @@ package com.idansh.engine.rule;
 
 import com.idansh.engine.actions.Action;
 import com.idansh.engine.helpers.Counter;
-import com.idansh.engine.helpers.RandomValue;
 
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 public class Rule {
@@ -52,7 +49,7 @@ public class Rule {
      * The rule will be activated if both the defined amount of ticks has passed and the probability was achieved.
      */
     public void invoke() {
-        tickCounter.addCount();
+        tickCounter.increaseCount();
 
         // Check if the amount of ticks in the simulation have passed, and check if the probability was activated
         if(activation.getTicks() == tickCounter.getCount() && activation.isProbabilityActivated()) {

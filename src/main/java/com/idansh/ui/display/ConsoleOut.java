@@ -20,19 +20,21 @@ public abstract class ConsoleOut {
      * Print the main menu of the program.
      */
     public static void printMenu() {
-        printTitle("MAIN MENU");
+        printTitle("Main Menu");
         System.out.println("1. Load simulation from XML file");
-        System.out.println("2. Show simulation details");
-        System.out.println("3. Run simulation");
-        System.out.println("4. Show details of past simulation run");
+        System.out.println("2. Show loaded simulation details");
+        System.out.println("3. Run loaded simulation");
+        System.out.println("4. Show details of a past simulation run");
         System.out.println("5. Exit");
         System.out.print("Please enter the number of command to run: ");
     }
 
     public static void printPastSimulationsMenu() {
+        printTitle("Past Simulations");
         System.out.println("Choose how to show the past simulation result:");
         System.out.println("1. Number of entities of each type");
         System.out.println("2. Entity's property value");
+        System.out.println("3. Return to main menu");
         System.out.print("Please enter the number of command to run: ");
     }
 
@@ -213,7 +215,7 @@ public abstract class ConsoleOut {
         printTitle("Simulation End Results");
 
         printMessage("Simulation with ID \"" + simulationEndTDO.getSimulationId() + "\"");
-        printMessage("Ended with termination rule of (" + simulationEndTDO.getEndReason() + ")");
+        printMessage("Ended with termination rule of \"" + simulationEndTDO.getEndReason() + "\"");
     }
 }
 

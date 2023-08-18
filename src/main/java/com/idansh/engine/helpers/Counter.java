@@ -7,12 +7,20 @@ public class Counter {
         this.count = init;
     }
 
-    public void addCount() {
+    public void increaseCount() {
         count++;
     }
+
+    public void decreaseCount() {
+        System.out.println("PREVIOUS COUNTER: " + count);
+        count--;
+        System.out.println("NEW COUNTER: " + count);
+    }
+
     public int getCount() {
         return count;
     }
+
     public void resetCount() {
         count = 0;
     }

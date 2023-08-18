@@ -1,5 +1,7 @@
 package com.idansh.engine.manager.result;
 
+import com.idansh.engine.world.World;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -11,7 +13,7 @@ public class SimulationResult {
     private final LocalDateTime dateTime;   // The date and time of the time the simulation ran
     private final String endReason;
 
-    public SimulationResult(String endReason) {
+    public SimulationResult(String endReason, World simulation) {
         this.dateTime = LocalDateTime.now();
         this.id = SimulationIdGenerator.getID();
         this.endReason = endReason;
