@@ -6,9 +6,11 @@ import com.idansh.engine.environment.EnvironmentVariablesManager;
 import com.idansh.engine.manager.result.SimulationResult;
 import com.idansh.engine.property.creator.factory.PropertyFactory;
 import com.idansh.engine.rule.Rule;
+import com.idansh.engine.rule.RuleActivation;
 import com.idansh.engine.rule.TerminationRule;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -29,7 +31,7 @@ public class World {
      */
     public World() {
         this.terminationRules = new HashMap<>();
-        this.rulesMap = new HashMap<>();
+        this.rulesMap = new LinkedHashMap<>();
         this.environmentVariablesManager = new EnvironmentVariablesManager();
         this.activeEnvironmentVariables = null;
         this.entityManager = new EntityManager();
@@ -84,11 +86,25 @@ public class World {
     public SimulationResult run() {        // todo- run simulation and return result;
         // Check if the current tick has reached the termination rule tick defined, if one does not exist keeps going until reached the timer defined
         while((!terminationRules.containsKey(TerminationRule.Type.TICKS)) || (terminationRules.containsKey(TerminationRule.Type.TICKS) && currTick < terminationRules.get(TerminationRule.Type.TICKS).getValue())) {
+            // Generate probabilities for all rules
+            rulesMap.forEach(
+                    (ruleName, rule) -> rule.getActivation().generateProbability()
+            );
 
+            // Go through the population, for each entity try to activate rules on it
+            entityManager.getPopulation().forEach(
+                    entity -> {
+                        rulesMap.forEach(
+                                (ruleName, rule) -> {
+                                    rule.invoke()
+                                }
+                        );
+                    }
+            );
         }
 
         return new SimulationResult();
-    }
+]    }
 
     public Map<TerminationRule.Type, TerminationRule> getTerminationRules() {
         return terminationRules;

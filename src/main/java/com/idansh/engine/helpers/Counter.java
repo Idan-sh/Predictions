@@ -13,4 +13,7 @@ public class Counter {
     public int getCount() {
         return count;
     }
+    public void resetCount() {
+        count = 0;
+    }
 }

@@ -78,6 +78,10 @@ public class EntityManager {
         population.remove(entityToKill);
     }
 
+    public List<Entity> getPopulation() {
+        return population;
+    }
+
     public Map<String, EntityFactory> getEntityFactories() {
         return entityFactories;
     }

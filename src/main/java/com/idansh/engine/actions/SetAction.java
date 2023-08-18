@@ -26,9 +26,16 @@ public class SetAction extends Action {
 
 
     public void invoke() {
-        Property property = super.getWorldContext().entityManager.getEntityInPopulation(getEntityContext()).getPropertyByName(propertyName);
+        super.getWorldContext().entityManager.getPopulation().forEach(
+                entity -> {
+                    // Preform action only on the entities instances of the entity context
+                    if (entity.getName().equals(super.getEntityContext())) {
+                        Property property = entity.getPropertyByName(propertyName);
 
-        property.setValue(amount.getValue());
+                        property.setValue(amount.getValue());
+                    }
+                }
+        );
     }
 
 

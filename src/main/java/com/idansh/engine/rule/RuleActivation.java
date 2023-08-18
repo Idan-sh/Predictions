@@ -1,11 +1,14 @@
 package com.idansh.engine.rule;
 
+import com.idansh.engine.helpers.RandomValue;
+
 /**
  * Controls when a rule will be activated
  */
 public class RuleActivation {
     private final int ticks;          // In every how many clock ticks will the rule try to activate
     private final double probability; // number between 0 (never happens) and 1 (always happens)
+    private double generatedProbability;
 
 
     /**
@@ -46,5 +49,20 @@ public class RuleActivation {
 
     public double getProbability() {
         return probability;
+    }
+
+    /**
+     * Generate a random probability between 0 and 1 (included).
+     */
+    public void generateProbability() {
+        generatedProbability = RandomValue.getRandomDouble();
+    }
+
+    /**
+     * @return true if the probability of the activation is larger or equal to the generated probability,
+     * false otherwise.
+     */
+    public boolean isProbabilityActivated() {
+        return probability >= generatedProbability;
     }
 }

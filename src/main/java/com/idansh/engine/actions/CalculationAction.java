@@ -36,32 +36,39 @@ public class CalculationAction extends Action {
 
 
     public void invoke() {
-        Property propertyToSave = super.getWorldContext().entityManager.getEntityInPopulation(getEntityContext()).getPropertyByName(propertyName);
+        super.getWorldContext().entityManager.getPopulation().forEach(
+                entity -> {
+                    // Preform action only on the entities instances of the entity context
+                    if (entity.getName().equals(super.getEntityContext())) {
+                        Property propertyToSave = entity.getPropertyByName(propertyName);
 
-        Object val1 = arg1.getValue();
-        Object val2 = arg2.getValue();
+                        Object val1 = arg1.getValue();
+                        Object val2 = arg2.getValue();
 
-        if(!propertyToSave.isNumericProperty())
-            throw new IllegalArgumentException("Error: can preform calculation only on numeric properties!");
+                        if(!propertyToSave.isNumericProperty())
+                            throw new IllegalArgumentException("Error: can preform calculation only on numeric properties!");
 
-        if(!isNumber(val1) || !isNumber(val2))
-            throw new IllegalArgumentException("Error: can preform calculation only on numeric arguments!");
+                        if(!isNumber(val1) || !isNumber(val2))
+                            throw new IllegalArgumentException("Error: can preform calculation only on numeric arguments!");
 
-        // Perform action according to the type
-        switch(type) {
-            case MULTIPLY:
-                if((val1 instanceof Float) || (val2 instanceof Float))
-                    propertyToSave.setValue((Float) val1 * (Float) val2);
-                else
-                    propertyToSave.setValue((Integer) val1 * (Integer) val2);
-                break;
-            case DIVIDE:
-                if((val1 instanceof Float) || (val2 instanceof Float))
-                    propertyToSave.setValue((Float) val1 / (Float) val2);
-                else
-                    propertyToSave.setValue((Integer) val1 / (Integer) val2);
-                break;
-        }
+                        // Perform action according to the type
+                        switch(type) {
+                            case MULTIPLY:
+                                if((val1 instanceof Float) || (val2 instanceof Float))
+                                    propertyToSave.setValue((Float) val1 * (Float) val2);
+                                else
+                                    propertyToSave.setValue((Integer) val1 * (Integer) val2);
+                                break;
+                            case DIVIDE:
+                                if((val1 instanceof Float) || (val2 instanceof Float))
+                                    propertyToSave.setValue((Float) val1 / (Float) val2);
+                                else
+                                    propertyToSave.setValue((Integer) val1 / (Integer) val2);
+                                break;
+                        }
+                    }
+                }
+        );
     }
 
 

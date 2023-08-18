@@ -1,6 +1,8 @@
 package com.idansh.engine.rule;
 
 import com.idansh.engine.actions.Action;
+import com.idansh.engine.helpers.Counter;
+import com.idansh.engine.helpers.RandomValue;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -11,11 +13,13 @@ public class Rule {
     private final String name;
     private final RuleActivation activation;    // Determines when to activate the rule
     private final Set<Action> actionsSet;             // Set of actions to be preformed when the rule is activated
+    private Counter tickCounter;
 
     public Rule(String name, RuleActivation activation) {
         this.name = name;
         this.activation = activation;
         this.actionsSet = new HashSet<>();
+        this.tickCounter = new Counter(0);
     }
 
     public String getName() {
@@ -40,5 +44,24 @@ public class Rule {
 
     public Set<Action> getActionsSet() {
         return actionsSet;
+    }
+
+
+    /**
+     * Tries to activate the rule by invoking all actions defined in this rule.
+     * The rule will be activated if both the defined amount of ticks has passed and the probability was achieved.
+     */
+    public void invoke() {
+        tickCounter.addCount();
+
+        // Check if the amount of ticks in the simulation have passed, and check if the probability was activated
+        if(activation.getTicks() == tickCounter.getCount() && activation.isProbabilityActivated()) {
+            tickCounter.resetCount();
+            actionsSet.forEach(Action::invoke); // Activate the actions of the rule
+        }
+
+        // Reset counter every tick amount set.
+        if(activation.getTicks() == tickCounter.getCount())
+            tickCounter.resetCount();
     }
 }

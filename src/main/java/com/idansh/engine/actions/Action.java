@@ -68,6 +68,7 @@ public abstract class Action {
 
     /**
      * Invokes the action, according to the action's type.
+     * The action will be invoked on every instance of the defined entity in the population of the simulation.
      */
     public abstract void invoke();
 

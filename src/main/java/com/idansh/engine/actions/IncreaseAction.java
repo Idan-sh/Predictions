@@ -24,12 +24,19 @@ public class IncreaseAction extends Action {
     }
 
     public void invoke() {
-        Property property = super.getWorldContext().entityManager.getEntityInPopulation(getEntityContext()).getPropertyByName(propertyName);
+        super.getWorldContext().entityManager.getPopulation().forEach(
+            entity -> {
+                // Preform action only on the entities instances of the entity context
+                if (entity.getName().equals(super.getEntityContext())) {
+                    Property property = entity.getPropertyByName(propertyName);
 
-        if(!property.isNumericProperty())
-            throw new IllegalArgumentException("Error: can preform increase only on numeric properties!");
+                    if (!property.isNumericProperty())
+                        throw new IllegalArgumentException("Error: can preform increase only on numeric properties!");
 
-        property.addNumToValue(amount.getValue());
+                    property.addNumToValue(amount.getValue());
+                }
+            }
+        );
     }
 
 
