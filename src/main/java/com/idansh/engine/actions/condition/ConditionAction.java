@@ -23,7 +23,6 @@ public abstract class ConditionAction extends Action {
     }
 
     public void invoke() {
-        // todo- complete condition action
-        // todo- maybe check if the new value is within a range for numeric properties?
+        // todo- complete condition action, maybe check if the new value is within a range for numeric properties?
     }
 }

@@ -35,6 +35,7 @@ public class EngineHandler {
 
         try {
             engineManager.loadSimulationFromFile(path);
+            ConsoleOut.printMessage("Successfully loaded simulation data from file!");
         } catch (RuntimeException e) {
             ConsoleOut.printError(e.getMessage());
         }
@@ -148,6 +149,9 @@ public class EngineHandler {
             ConsoleOut.printTitle("You chose to update: " + environmentVariableDTOtoSet.getName());
             environmentVariableDTOtoSet.setValue(getEnvironmentVariableValueInput(environmentVariableDTOtoSet));
         }
+
+        // Show updated environment variables
+        ConsoleOut.printEnvironmentVariables(environmentVariableDTOList);
 
         // Finished setting up the environment variables, run the simulation using them
         engineManager.runSimulation(environmentVariablesDTO);

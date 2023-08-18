@@ -181,11 +181,19 @@ public abstract class ConsoleOut {
         System.out.println(propertyDTO.getName() + ": " + propertyDTO.getValue());
     }
 
+
+    /**
+     * Print a simple message.
+     */
     public static void printMessage(String text) {
         System.out.println(text);
     }
 
 
+    /**
+     * Prints the current values of the environment variables
+     * @param environmentVariableDTOList list of all environment variables in the program
+     */
     public static void printEnvironmentVariables(List<EnvironmentVariableDTO> environmentVariableDTOList) {
         printTitle("Environment Variables");
 

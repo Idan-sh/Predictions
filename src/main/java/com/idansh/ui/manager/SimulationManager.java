@@ -53,7 +53,6 @@ public class SimulationManager {
         switch (menuOption) {
             case LOAD_FILE:
                 engineHandler.loadSimulationFromFile();
-                ConsoleOut.printMessage("Successfully loaded simulation data from file!");
                 return true;
 
             case SHOW_SIMULATION_DETAILS:
@@ -65,7 +64,7 @@ public class SimulationManager {
                 return true;
 
             case RUN_SIMULATION:
-                engineHandler.runSimulation();
+                engineHandler.runSimulation(); // todo- finish running simulation
                 return true;
 
             case SHOW_PAST_SIMULATION_DETAILS:
