@@ -7,6 +7,7 @@ import com.idansh.dto.range.RangeDTO;
 import com.idansh.dto.rule.RuleDTO;
 import com.idansh.dto.rule.TerminationRuleDTO;
 import com.idansh.dto.simulation.CurrentSimulationDTO;
+import com.idansh.dto.simulation.SimulationEndTDO;
 import com.idansh.dto.simulation.SimulationResultDTO;
 import com.idansh.engine.helpers.Range;
 import com.idansh.engine.manager.result.SimulationResult;
@@ -96,7 +97,7 @@ public class EngineManager {
         );
 
         // Add Termination Rules:
-        currWorld.getTerminationRulesMap().forEach(
+        currWorld.getTerminationRules().forEach(
                 (terminationRuleType, terminationRule) -> {
                     TerminationRuleDTO terminationRuleDTO = new TerminationRuleDTO(
                             TerminationRule.Type.getTypeString(terminationRuleType),
@@ -149,7 +150,7 @@ public class EngineManager {
      * Loads user received input for environment variables.
      * @param environmentVariablesListDTO contains data of environment variables to update in the simulation.
      */
-    public SimulationResultDTO runSimulation(EnvironmentVariablesListDTO environmentVariablesListDTO) {
+    public SimulationEndTDO runSimulation(EnvironmentVariablesListDTO environmentVariablesListDTO) {
         updateEnvironmentVariablesFromInput(environmentVariablesListDTO);
 
         // Run the simulation
@@ -158,8 +159,7 @@ public class EngineManager {
         // Save the simulation result
         pastSimulations.put(simulationResult.getId(), simulationResult);
 
-        // TODO : return to the UI the simulation result. digest simulationResult...
-        return new SimulationResultDTO(simulationResult.getDateTime(), simulationResult.getDateTimeString(), simulationResult.getId());
+        return new SimulationEndTDO(simulationResult.getId(), simulationResult.getEndReason());
     }
 
 

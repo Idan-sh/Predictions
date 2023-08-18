@@ -16,7 +16,7 @@ import java.util.Map;
  * and the various functions of the simulation.
  */
 public class World {
-    private final Map<TerminationRule.Type, TerminationRule> terminationRulesMap;  // Rules on when to end the simulation
+    private final Map<TerminationRule.Type, TerminationRule> terminationRules;  // Rules on when to end the simulation
     private final Map<String, Rule> rulesMap;                                    // Rules that can activate during the simulation
     private ActiveEnvironmentVariables activeEnvironmentVariables;              // Contains all the activated environment variables
     public final EnvironmentVariablesManager environmentVariablesManager;      // Contains all the environment variables factories
@@ -28,7 +28,7 @@ public class World {
      * Initialize the simulated world.
      */
     public World() {
-        this.terminationRulesMap = new HashMap<>();
+        this.terminationRules = new HashMap<>();
         this.rulesMap = new HashMap<>();
         this.environmentVariablesManager = new EnvironmentVariablesManager();
         this.activeEnvironmentVariables = null;
@@ -63,10 +63,10 @@ public class World {
      * There can only be one termination rule of each type - seconds or ticks.
      */
     public void addTerminationRule(TerminationRule terminationRule) {
-        if(terminationRulesMap.containsKey(terminationRule.getType()))
+        if(terminationRules.containsKey(terminationRule.getType()))
             throw new IllegalArgumentException("Error: received terminationRule's type - " + terminationRule.getType() + " already exists!");
 
-        terminationRulesMap.put(terminationRule.getType(), terminationRule);
+        terminationRules.put(terminationRule.getType(), terminationRule);
     }
 
 
@@ -81,14 +81,17 @@ public class World {
         rulesMap.put(rule.getName(), rule);
     }
 
-    public SimulationResult run() {
-        // todo- run simulation and return result;
+    public SimulationResult run() {        // todo- run simulation and return result;
+        // Check if the current tick has reached the termination rule tick defined, if one does not exist keeps going until reached the timer defined
+        while((!terminationRules.containsKey(TerminationRule.Type.TICKS)) || (terminationRules.containsKey(TerminationRule.Type.TICKS) && currTick < terminationRules.get(TerminationRule.Type.TICKS).getValue())) {
+
+        }
 
         return new SimulationResult();
     }
 
-    public Map<TerminationRule.Type, TerminationRule> getTerminationRulesMap() {
-        return terminationRulesMap;
+    public Map<TerminationRule.Type, TerminationRule> getTerminationRules() {
+        return terminationRules;
     }
 
     public Map<String, Rule> getRulesMap() {

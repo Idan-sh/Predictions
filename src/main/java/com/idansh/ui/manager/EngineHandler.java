@@ -5,6 +5,7 @@ import com.idansh.dto.environment.EnvironmentVariableDTO;
 import com.idansh.dto.environment.EnvironmentVariablesListDTO;
 import com.idansh.dto.property.PropertyDTO;
 import com.idansh.dto.range.RangeDTO;
+import com.idansh.dto.simulation.SimulationEndTDO;
 import com.idansh.dto.simulation.SimulationResultDTO;
 import com.idansh.engine.manager.EngineManager;
 import com.idansh.ui.display.ConsoleIn;
@@ -154,7 +155,8 @@ public class EngineHandler {
         ConsoleOut.printEnvironmentVariables(environmentVariableDTOList);
 
         // Finished setting up the environment variables, run the simulation using them
-        engineManager.runSimulation(environmentVariablesDTO);
+        SimulationEndTDO simulationEndTDO = engineManager.runSimulation(environmentVariablesDTO);
+        ConsoleOut.printSimulationEnd(simulationEndTDO);
     }
 
 

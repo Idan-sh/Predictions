@@ -64,7 +64,7 @@ public class SimulationManager {
                 return true;
 
             case RUN_SIMULATION:
-                engineHandler.runSimulation(); // todo- finish running simulation
+                engineHandler.runSimulation();
                 return true;
 
             case SHOW_PAST_SIMULATION_DETAILS:

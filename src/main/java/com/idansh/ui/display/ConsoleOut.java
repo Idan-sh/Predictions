@@ -7,6 +7,7 @@ import com.idansh.dto.property.PropertyDTO;
 import com.idansh.dto.rule.RuleDTO;
 import com.idansh.dto.rule.TerminationRuleDTO;
 import com.idansh.dto.simulation.CurrentSimulationDTO;
+import com.idansh.dto.simulation.SimulationEndTDO;
 import com.idansh.dto.simulation.SimulationResultDTO;
 
 import java.util.*;
@@ -201,6 +202,18 @@ public abstract class ConsoleOut {
         for (EnvironmentVariableDTO environmentVariableDTO : environmentVariableDTOList) {
             System.out.println("    " +counter++ + ". Name: " + environmentVariableDTO.getName() + " , Current Value: " + environmentVariableDTO.getValue());
         }
+    }
+
+
+    /**
+     * Prints simulation end message.
+     * @param simulationEndTDO TDO that contains ID and reason of the simulation ended.
+     */
+    public static void printSimulationEnd(SimulationEndTDO simulationEndTDO) {
+        printTitle("Simulation End Results");
+
+        printMessage("Simulation with ID (" + simulationEndTDO.getSimulationId() + ")");
+        printMessage("Ended with termination rule of (" + simulationEndTDO.getEndReason() + ")");
     }
 }
 
