@@ -97,7 +97,7 @@ public abstract class ConsoleOut {
         pastSimulationsResults.sort(Comparator.comparing(SimulationResultDTO::getDateTime));
 
         printTitle("past simulations results");
-        System.out.printf("%-22s%-22s%-22s\n", "no.", "ID", "Date & Time");
+        System.out.printf("%-22s%-22s%-22s\n", "No.", "Simulation ID", "Date & Time");
 
         int counter = 1;
         for (SimulationResultDTO r : pastSimulationsResults) {
@@ -111,7 +111,8 @@ public abstract class ConsoleOut {
      * @param entityDTO TDO containing information of the entity to display its amount in the population.
      */
     public static void printNofEntityDTO(EntityDTO entityDTO) {
-        System.out.println(entityDTO.getName() + ": initial amount- " + entityDTO.getInitAmountInPopulation() + ", final amount- " + entityDTO.getCurrAmountInPopulation());
+        ConsoleOut.printTitle("Entities Instances Amounts");
+        ConsoleOut.printMessage(entityDTO.getName() + ": initial amount- " + entityDTO.getInitAmountInPopulation() + ", final amount- " + entityDTO.getCurrAmountInPopulation());
     }
 
     /**

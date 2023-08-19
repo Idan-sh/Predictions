@@ -296,7 +296,7 @@ public abstract class Converter {
                         worldContext,
                         prdAction.getEntity(),
                         prdAction.getProperty(),
-                        expressionConverter.convertExpression(prdAction, prdAction.getBy())
+                        expressionConverter.convertExpression("increase", prdAction.getEntity(), prdAction.getProperty(), prdAction.getBy())
                 );
                 break;
 
@@ -305,7 +305,7 @@ public abstract class Converter {
                         worldContext,
                         prdAction.getEntity(),
                         prdAction.getProperty(),
-                        expressionConverter.convertExpression(prdAction, prdAction.getBy())
+                        expressionConverter.convertExpression("decrease", prdAction.getEntity(), prdAction.getProperty(), prdAction.getBy())
                 );
                 break;
 
@@ -330,7 +330,7 @@ public abstract class Converter {
                         worldContext,
                         prdAction.getEntity(),
                         prdAction.getProperty(),
-                        expressionConverter.convertExpression(prdAction, prdAction.getValue())
+                        expressionConverter.convertExpression("set", prdAction.getEntity(), prdAction.getProperty(), prdAction.getValue())
                 );
                 break;
 
@@ -367,16 +367,16 @@ public abstract class Converter {
                     worldContext,
                     prdAction.getEntity(),
                     prdAction.getResultProp(),
-                    expressionConverter.convertExpression(prdAction, prdMultiply.getArg1()),
-                    expressionConverter.convertExpression(prdAction, prdMultiply.getArg2()),
+                    expressionConverter.convertExpression("calculation", prdAction.getEntity(), prdAction.getResultProp(), prdMultiply.getArg1()),
+                    expressionConverter.convertExpression("calculation", prdAction.getEntity(), prdAction.getResultProp(), prdMultiply.getArg2()),
                     CalculationAction.Type.MULTIPLY);
         } else if (prdDivide != null) {
             retCalculationAction = new CalculationAction(
                     worldContext,
                     prdAction.getEntity(),
                     prdAction.getResultProp(),
-                    expressionConverter.convertExpression(prdAction, prdDivide.getArg1()),
-                    expressionConverter.convertExpression(prdAction, prdDivide.getArg2()),
+                    expressionConverter.convertExpression("calculation", prdAction.getEntity(), prdAction.getResultProp(), prdDivide.getArg1()),
+                    expressionConverter.convertExpression("calculation", prdAction.getEntity(), prdAction.getResultProp(), prdDivide.getArg2()),
                     CalculationAction.Type.DIVIDE);
         }
         else {
@@ -407,9 +407,9 @@ public abstract class Converter {
             return new SingleConditionAction(
                     worldContext,
                     prdAction.getEntity(),
-                    prdAction.getPRDCondition().getProperty(),
+                    prdCondition.getProperty(),
                     prdCondition.getOperator(),
-                    expressionConverter.convertExpression(prdAction, prdCondition.getValue()),
+                    expressionConverter.convertExpression("condition", prdAction.getEntity(), prdCondition.getProperty(), prdCondition.getValue()),
                     thenActions,
                     elseActions,
                     true
@@ -424,7 +424,7 @@ public abstract class Converter {
                     true
             );
             // Only in case of multiple conditions, convert the inner conditions and add them to the main condition action "retMultiConditionAction"
-            convertInnerConditions(prdAction, worldContext, expressionConverter, retMultiConditionAction);
+            convertInnerConditions(prdAction, prdAction.getPRDCondition().getPRDCondition(), worldContext, expressionConverter, retMultiConditionAction);
 
             return retMultiConditionAction;
         } else {
@@ -436,13 +436,12 @@ public abstract class Converter {
     /**
      * Converts recursively all inner multi-conditions of a multi-condition.
      * @param prdAction the main action in which the conditions are set.
+     * @param prdConditionList list of all inner conditions to convert.
      * @param worldContext the simulated world in which the conditions are set.
      * @param expressionConverter used for converting expressions into values.
      * @param mainConditionAction the main multi-action in which we search for inner conditions. these inner conditions will be added to the main condition action's list.
      */
-    private static void convertInnerConditions(PRDAction prdAction, World worldContext, ExpressionConverter expressionConverter, MultiConditionAction mainConditionAction) {
-        List<PRDCondition> prdConditionList = prdAction.getPRDCondition().getPRDCondition();
-
+    private static void convertInnerConditions(PRDAction prdAction, List<PRDCondition> prdConditionList, World worldContext, ExpressionConverter expressionConverter, MultiConditionAction mainConditionAction) {
         // Convert each condition action in the list of the main condition action
         prdConditionList.forEach(
                 prdCondition -> {
@@ -453,7 +452,7 @@ public abstract class Converter {
                                 prdCondition.getEntity(),
                                 prdCondition.getProperty(),
                                 prdCondition.getOperator(),
-                                expressionConverter.convertExpression(prdAction, prdCondition.getValue()),
+                                expressionConverter.convertExpression("condition", prdCondition.getEntity(), prdCondition.getProperty(), prdCondition.getValue()),
                                 null,
                                 null,
                                 false
@@ -468,7 +467,7 @@ public abstract class Converter {
                                 false
                         );
                         // Find and convert all inner conditions of the multi-condition action
-                        convertInnerConditions(prdAction, worldContext, expressionConverter, multiConditionAction);
+                        convertInnerConditions(prdAction, prdCondition.getPRDCondition(), worldContext, expressionConverter, multiConditionAction);
                         mainConditionAction.addInnerCondition(multiConditionAction);    // Add finished multi-condition action with inner conditions to the main condition action.
                     } else {
                         throw new RuntimeException("Error: invalid condition action received from XML!");

@@ -63,7 +63,7 @@ public class EngineManager {
 
                                 PropertyDTO propertyDTO = new PropertyDTO(
                                         propertyFactoryName,
-                                        PropertyType.getTypeString(propertyFactory.getType()),
+                                        propertyFactory.getType().getTypeString(),
                                         rangeDTO,
                                         propertyFactory.isRandomGenerated(),
                                         null);
@@ -188,7 +188,7 @@ public class EngineManager {
                     Range range = envVar.getRange();
                     environmentVariablesListDTO.addEnvironmentVariableInput(
                             name, envVar.getValue(),
-                            PropertyType.getTypeString(envVar.getType()),
+                            envVar.getType().getTypeString(),
                             range == null ? null : new RangeDTO(range.getBottom(), range.getTop()));
                 }
         );
@@ -229,7 +229,7 @@ public class EngineManager {
                                             entityDTO.addPropertyDTOtoList(
                                                     new PropertyDTO(
                                                             propertyFactoryName,
-                                                            PropertyType.getTypeString(propertyFactory.getType()),
+                                                            propertyFactory.getType().getTypeString(),
                                                             rangeDTO,
                                                             propertyFactory.isRandomGenerated(),
                                                             propertyFactory.getValue())

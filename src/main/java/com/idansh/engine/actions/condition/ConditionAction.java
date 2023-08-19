@@ -25,18 +25,20 @@ public abstract class ConditionAction extends Action {
         this.isActivated = false;
     }
 
+
     /**
      * Invokes "then" actions set if condition is true,
      * or invokes "else" actions set if condition is false.
      * @param isCondition the value of the condition defined in the action.
      */
     public void invokeActionsSet(boolean isCondition) {
-        if(isCondition)
+        if(thenActions != null && isCondition)
             thenActions.invoke();
         else
-            if(!elseActions.isEmpty())
+            if(elseActions != null && !elseActions.isEmpty())
                 elseActions.invoke();
     }
+
 
     public boolean isMainCondition() {
         return isMainCondition;

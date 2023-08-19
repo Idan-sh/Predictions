@@ -1,6 +1,7 @@
 package com.idansh.engine.entity;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class EntityManager {
     private final Map<String, EntityFactory> entityFactories;   // Each entity factory will define instructions on how to instantiate a single entity with a unique name
@@ -9,7 +10,7 @@ public class EntityManager {
 
     public EntityManager() {
         this.entityFactories = new HashMap<>();
-        this.population = new ArrayList<>();
+        this.population = new CopyOnWriteArrayList<>(); // Note: using a thread-safe collection that can handle concurrent modifications and iterations (we try to kill entity instances while iterating on the population list)
     }
 
 

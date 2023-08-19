@@ -1,7 +1,10 @@
 package com.idansh.engine.actions.condition;
 
+import com.idansh.engine.entity.Entity;
 import com.idansh.engine.expression.api.Expression;
 import com.idansh.engine.world.World;
+
+import java.util.List;
 
 public class SingleConditionAction extends ConditionAction{
     private final String propertyName;
@@ -25,48 +28,67 @@ public class SingleConditionAction extends ConditionAction{
         this.operator = ConditionOperator.getConditionOperator(operator); // Try to convert to ConditionOperator, if fails throw exception
     }
 
+
     @Override
     public String getActionTypeString() {
         return "condition";
     }
 
+
     @Override
     public void invoke() {
-        Object propertyValue = getWorldContext().entityManager.getEntityFactory(getEntityContext()).getPropertyFactory(propertyName).getValue();
-        boolean res;
+        List<Entity> population = getWorldContext().entityManager.getPopulation();
 
-        switch (operator) {
-            case EQUAL:
-                res = isEqual(propertyValue, expression.getValue());
-                if (res) setActivated(true);
-                if(isMainCondition())
-                    super.invokeActionsSet(res);
-                break;
+        // Check if the condition is activated on every entity instance of the main entity defined
+        for (Entity entity : population) {
+            // Only perform condition on entity instances of the main entity defined
+            if (!entity.getName().equals(getEntityContext()))
+                continue;
 
-            case NOT_EQUAL:
-                res = !isEqual(propertyValue, expression.getValue());
-                if (res) setActivated(true);
-                if(isMainCondition())
-                    super.invokeActionsSet(res);
-                break;
+            Object propertyValue = entity.getPropertyByName(propertyName).getValue();
+            boolean res;
 
-            case LESS_THAN:
-                // Check if the property's value is less than the expression's value
-                res = isLessThan(propertyValue, expression.getValue());
-                if (res) setActivated(true);
-                if(isMainCondition())
-                    super.invokeActionsSet(res);
-                break;
+            switch (operator) {
+                case EQUAL:
+                    res = isEqual(propertyValue, expression.getValue());
+                    if (res) setActivated(true);
+                    if(isMainCondition())
+                        invokeActionsSet(res);
+                    break;
 
-            case MORE_THAN:
-                // Check if the property's value is more than the expression's value
-                res = isLessThan(expression.getValue(), propertyValue);
-                if (res) setActivated(true);
-                if(isMainCondition())
-                    super.invokeActionsSet(res);
-                break;
+                case NOT_EQUAL:
+                    res = !isEqual(propertyValue, expression.getValue());
+                    if (res) setActivated(true);
+                    if(isMainCondition())
+                        invokeActionsSet(res);
+                    break;
+
+                case LESS_THAN:
+                    // Check if the property's value is less than the expression's value
+                    res = isLessThan(propertyValue, expression.getValue());
+
+                    if (res)
+                        setActivated(true);
+
+                    if(isMainCondition())
+                        invokeActionsSet(res);
+
+                    break;
+
+                case MORE_THAN:
+                    // Check if the property's value is more than the expression's value
+                    res = isLessThan(expression.getValue(), propertyValue);
+                    if (res)
+                        setActivated(true);
+
+                    if(isMainCondition())
+                        invokeActionsSet(res);
+
+                    break;
+            }
         }
     }
+
 
     /**
      * Checks if the left numeric object is less than the right numeric object.
@@ -74,11 +96,19 @@ public class SingleConditionAction extends ConditionAction{
      * @return true if the left number is less than the right number, false otherwise.
      */
     private boolean isLessThan(Object left, Object right) {
-        if(left instanceof Integer && right instanceof Integer ) {
+        if(left instanceof Integer && right instanceof Integer)
             return (int) left < (int) right;
-        } else if(left instanceof Float && right instanceof Float) {
+
+        if(left instanceof Integer && right instanceof Float )
+            return (int) left < (float) right;
+
+        if(left instanceof Float && right instanceof Integer )
+            return (float) left < (int) right;
+
+        if(left instanceof Float && right instanceof Float)
             return (float) left < (float) right;
-        } else throw new IllegalArgumentException("can only perform less than on numeric values" +
+
+        throw new IllegalArgumentException("can only perform less than on numeric values" +
                 " of the same type! got types \"" + left.getClass() + "\" and \"" + right.getClass() + "\"");
     }
 
@@ -98,7 +128,7 @@ public class SingleConditionAction extends ConditionAction{
         } else if(obj1 instanceof String && obj2 instanceof String) {
             return ((String) obj1).equals((String) obj2);
         } else
-            throw new IllegalArgumentException("can only perform less than on numeric values" +
+            throw new IllegalArgumentException("can only check if values are equal on values" +
                 " of the same type! got types \"" + obj1.getClass() + "\" and \"" + obj2.getClass() + "\"");
     }
 }

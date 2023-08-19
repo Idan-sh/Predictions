@@ -40,8 +40,8 @@ public enum PropertyType {
      * @return string that defines the property type received.
      * @throws IllegalArgumentException if the property type received is in invalid format (not one of the specified types).
      */
-    public static String getTypeString(PropertyType type) {
-        switch(type) {
+    public String getTypeString() {
+        switch(this) {
             case INTEGER:
                 return "decimal";
 
@@ -55,7 +55,16 @@ public enum PropertyType {
                 return "string";
 
             default:
-                throw new IllegalArgumentException("Error: invalid property type- \"" + type + "\"");
+                throw new IllegalArgumentException("Error: invalid property type- \"" + this + "\"");
         }
+    }
+
+
+    /**
+     * Check if a given property type is of type FLOAT or INTEGER (numeric type).
+     * @return true if the property given is of type FLOAT or INTEGER, false otherwise.
+     */
+    public boolean isNumeric() {
+        return this.equals(PropertyType.FLOAT) || this.equals(PropertyType.INTEGER);
     }
 }

@@ -34,11 +34,9 @@ public class ExpressionConverter {
      * into an Expression Object.
      * Checks if the expression's value's typ matches the action's type.
      * If the type matches, returns the Expression object, otherwise throws exception.
-     * @param prdAction PRDAction object that was read from the XML file.
      * @return Action object with the data of the PRDAction received.
      */
-    public Expression convertExpression(PRDAction prdAction, String prdStr) {
-        System.out.println("trying to convert expression with- prdStr " + prdStr + " and prdAction " + prdAction.getType());
+    public Expression convertExpression(String actionType, String entityName, String propertyName, String prdStr) {
         Expression retExpression;
 
         // Try to convert to FunctionExpression
@@ -46,7 +44,7 @@ public class ExpressionConverter {
 
         // Try to convert to PropertyExpression
         if(retExpression == null) {
-            retExpression = getPropertyExpression(prdAction, prdStr);
+            retExpression = getPropertyExpression(entityName, prdStr);
         }
 
         // Convert to FixedExpression
@@ -55,7 +53,7 @@ public class ExpressionConverter {
         }
 
         // Check for type error
-        validateValueType(prdAction, retExpression);
+        validateValueType(actionType, entityName, propertyName, retExpression);
 
         return retExpression;
     }
@@ -63,29 +61,32 @@ public class ExpressionConverter {
 
     /**
      * Validates that an expression created by expressionConvert is compatible with the action's type.
-     * @param prdAction the action received from the XML file.
+     * @param actionType type action in which the expression is set.
+     * @param entityName name of the entity defined in the action.
+     * @param propertyName name of the property defined in the action.
+     * @param expression expression that was defined in the action.
      */
-    private void validateValueType(PRDAction prdAction, Expression expression) {
-        System.out.println("Validating value type with prdAction " + prdAction.getType());
+    private void validateValueType(String actionType, String entityName, String propertyName, Expression expression) {
         PropertyType expressionType = expression.getType();
-        String actionType = prdAction.getType();
 
         // Check if the action is of type condition
-        if(prdAction.getPRDCondition() != null) {
-            PropertyType propertyType = entityManager.getEntityFactory(prdAction.getEntity()).getPropertyFactory(prdAction.getPRDCondition().getProperty()).getType();
+        if(actionType.equals("condition")) {
+            PropertyType propertyType = entityManager.getEntityFactory(entityName).getPropertyFactory(propertyName).getType();
 
-            if(!propertyType.equals(expressionType))
+            // Check if types are not equal and if at least one of them is not numeric (if both are numeric it is possible to convert between the types)
+            if(!propertyType.equals(expressionType) && ((!propertyType.isNumeric()) || (!expressionType.isNumeric()))) {
                 throw new RuntimeException("cannot check condition on expression of type \"" + expressionType + "\" with the property of type \"" + propertyType + "\"");
+            }
 
         } else {
             // Check if action is of type increase/decrease/set
             if(actionType.equals("increase") || actionType.equals("decrease") || actionType.equals("set")) {
-                PropertyType propertyType = entityManager.getEntityFactory(prdAction.getEntity()).getPropertyFactory(prdAction.getProperty()).getType();
+                PropertyType propertyType = entityManager.getEntityFactory(entityName).getPropertyFactory(propertyName).getType();
                 if(!propertyType.equals(expressionType))
                     throw new RuntimeException("cannot save expression of type \"" + expressionType + "\" in the action \"" + actionType + "\" to the property of type \"" + propertyType + "\"");
             } // Action type is of calculation
             else if (actionType.equals("calculation")) {
-                PropertyType propertyType = entityManager.getEntityFactory(prdAction.getEntity()).getPropertyFactory(prdAction.getResultProp()).getType();
+                PropertyType propertyType = entityManager.getEntityFactory(entityName).getPropertyFactory(propertyName).getType();
                 if(!propertyType.equals(expressionType))
                     throw new RuntimeException("cannot save expression of type \"" + expressionType + "\" in the action \"" + actionType + "\" to the property of type \"" + propertyType + "\"");
             } // Illegal action type
@@ -169,14 +170,12 @@ public class ExpressionConverter {
     // -------------------------- Property --------------------------
 
     /**
-     * Checks if the PRDAction is a property expression.
-     * If it is then returns a new property expression with its name, otherwise returns null.
-     * @param prdAction PRDAction received from the XML file.
+     * Checks if the expression is a property expression.
+     * If it is then returns a new property expression with its data, otherwise returns null.
+     * @param entityName name of the entity in which the property will be searched.
      */
-    private Expression getPropertyExpression(PRDAction prdAction, String prdStr) {
+    private Expression getPropertyExpression(String entityName, String prdStr) {
         try{
-            String entityName = prdAction.getEntity();
-
             // Try to get an entity with the given name, if one does not exist continue
             Entity entity = entityManager.getEntityInPopulation(entityName);
             if(entity == null)
