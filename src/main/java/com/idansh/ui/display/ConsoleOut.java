@@ -233,6 +233,9 @@ public abstract class ConsoleOut {
             System.out.print(counter++ + ". ");
             ConsoleOut.printEntity(entityDTO);
         }
+
+        if(entityDTOList.isEmpty())
+            ConsoleOut.printMessage("No entities to display...");
     }
 
 
@@ -248,10 +251,12 @@ public abstract class ConsoleOut {
             System.out.print(counter++ + ". ");
             ConsoleOut.printMessage(propertyDTO.getName());
         }
+
+        if(propertyDTOList.isEmpty())
+            ConsoleOut.printMessage("No properties to display...");
     }
 
     public static void printRuntimeException(RuntimeException e) {
-        ConsoleOut.printError("Simulation load failed!");
         ConsoleOut.printMessage("Cause: " + e.getMessage());
         ConsoleOut.printMessage("Exception's Class: " + e.getClass().toString());
         ConsoleOut.printMessage("Trace: ");

@@ -24,7 +24,7 @@ public class SimulationManager {
     /**
      * Starts the main loop of the program.
      */
-    public void run() {
+    public void startProgram() {
         try {
             // Run until user chooses to exit
             do {
@@ -34,6 +34,7 @@ public class SimulationManager {
             ConsoleOut.printGoodbye();
             exit(0);
         } catch (RuntimeException e) { // Catch all unhandled exceptions, display their details and finish the program
+            ConsoleOut.printError("Program Stopped.");
             ConsoleOut.printRuntimeException(e);
         }
     }

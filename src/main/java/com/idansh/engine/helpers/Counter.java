@@ -12,9 +12,7 @@ public class Counter {
     }
 
     public void decreaseCount() {
-        System.out.println("PREVIOUS COUNTER: " + count);
         count--;
-        System.out.println("NEW COUNTER: " + count);
     }
 
     public int getCount() {

@@ -179,6 +179,8 @@ public class ExpressionConverter {
 
             // Try to get an entity with the given name, if one does not exist continue
             Entity entity = entityManager.getEntityInPopulation(entityName);
+            if(entity == null)
+                return null;
 
             // Try to get the entity's property with the given name, if one does not exist continue
             entity.getPropertyByName(prdStr);

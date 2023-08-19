@@ -401,7 +401,7 @@ public abstract class Converter {
         thenOrElseConvert(prdAction, worldContext, thenActions, elseActions);
 
 
-        //---------------------------------- todo - convert inner conditions recursively
+        //----------------------------------todo - convert inner conditions recursively
         // Create condition action depending on its type
         if(prdCondition.getSingularity().equals("single")){
             retConditionAction = new SingleConditionAction(

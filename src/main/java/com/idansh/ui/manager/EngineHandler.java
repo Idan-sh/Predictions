@@ -39,6 +39,7 @@ public class EngineHandler {
             engineManager.loadSimulationFromFile(path);
             ConsoleOut.printMessage("Successfully loaded simulation data from file!");
         } catch (RuntimeException e) {
+            ConsoleOut.printError("Simulation load failed!");
             ConsoleOut.printRuntimeException(e);
         }
     }
@@ -189,7 +190,8 @@ public class EngineHandler {
             SimulationEndTDO simulationEndTDO = engineManager.runSimulation(environmentVariablesDTO);
             ConsoleOut.printSimulationEnd(simulationEndTDO);
         } catch (RuntimeException e) {
-            ConsoleOut.printError("Simulation Stopped. Cause was: " + e.getMessage());
+            ConsoleOut.printError("Simulation Stopped.");
+            ConsoleOut.printRuntimeException(e);
         }
     }
 
@@ -308,6 +310,8 @@ public class EngineHandler {
                 Map<Object, Integer> propertyValues = engineManager.getPropertyValues(simulationResultDTO.getId(), propertyDTOList.get(userInput));
                 ConsoleOut.printTitle("Property " + propertyDTOList.get(userInput).getName() + " Values");
                 ConsoleOut.printPropertyValues(propertyValues);
+                if(propertyValues.isEmpty())
+                    ConsoleOut.printMessage("No values to display, entity with this property does not exist in the population, maybe all of its instances died :(");
             } else
                 ConsoleOut.printError("wrong input choice for property number!");
         } else

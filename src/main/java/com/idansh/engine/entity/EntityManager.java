@@ -59,10 +59,7 @@ public class EntityManager {
         Optional<Entity> retEntity =
                 population.stream().filter(e -> e.getName().equals(name)).findAny();
 
-        if(!retEntity.isPresent())
-            throw new IllegalArgumentException("Error: entity name \"" + name + "\" does not exist in the population!");
-
-        return retEntity.get();
+        return retEntity.orElse(null);
     }
 
 
@@ -72,7 +69,7 @@ public class EntityManager {
      */
     public void killEntity(Entity entityToKill) {
         if(!population.contains(entityToKill))
-            throw new IllegalArgumentException("Error: cannot kill entity with name " + entityToKill.getName() + ", this entity does not exist in the population!");
+            throw new IllegalArgumentException("cannot kill entity with name " + entityToKill.getName() + ", this entity does not exist in the population!");
 
         // Remove the entity from the population and decrease the population counter for the main entity
         entityFactories.get(entityToKill.getName()).decreasePopulationCounter();
