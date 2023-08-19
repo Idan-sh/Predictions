@@ -22,7 +22,11 @@ public abstract class ConditionAction extends Action {
         this.elseActions = elseActions;
     }
 
-    public void invoke() {
-        // todo- complete condition action, maybe check if the new value is within a range for numeric properties?
+    public void invoke(boolean isCondition) {
+        if(isCondition)
+            thenActions.invoke();
+        else
+            if(!elseActions.isEmpty())
+                elseActions.invoke();
     }
 }

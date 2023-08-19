@@ -22,4 +22,9 @@ public class MultiConditionAction extends ConditionAction{
     public String getActionTypeString() {
         return "condition";
     }
+
+    @Override
+    public void invoke() {
+
+    }
 }
