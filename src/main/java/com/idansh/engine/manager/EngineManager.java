@@ -208,12 +208,33 @@ public class EngineManager {
                     // Create simulation result DTO
                     SimulationResultDTO simulationResultDTO = new SimulationResultDTO(simulationResult.getDateTime(), simulationResult.getDateTimeString(), simulationResult.getId());
                     currWorld.entityManager.getEntityFactories().forEach(
-                            (entityName, entityFactory) ->
-                                simulationResultDTO.addEntityDTO(
-                                        new EntityDTO(
-                                                entityName,
-                                                entityFactory.getPopulationCount(),
-                                                entityFactory.getInitPopulation()))
+                            (entityName, entityFactory) -> {
+                                EntityDTO entityDTO = new EntityDTO(
+                                        entityName,
+                                        entityFactory.getPopulationCount(),
+                                        entityFactory.getInitPopulation());
+
+                                // Add properties DTOs to the entity DTO
+                                entityFactory.getPropertiesToAssign().forEach(
+                                        (propertyFactoryName, propertyFactory) -> {
+                                            Range range = propertyFactory.getRange();
+                                            RangeDTO rangeDTO = null;
+
+                                            if(range != null)
+                                                rangeDTO = new RangeDTO(range.getBottom(), range.getTop());
+
+                                            entityDTO.addPropertyDTOtoList(
+                                                    new PropertyDTO(
+                                                            propertyFactoryName,
+                                                            PropertyType.getTypeString(propertyFactory.getType()),
+                                                            rangeDTO,
+                                                            propertyFactory.isRandomGenerated(),
+                                                            propertyFactory.getValue())
+                                            );
+                                        }
+                                );
+                                simulationResultDTO.addEntityDTO(entityDTO);
+                            }
                     );
                     // Add simulation result DTO to the return list
                     retPastSimulations.add(simulationResultDTO);

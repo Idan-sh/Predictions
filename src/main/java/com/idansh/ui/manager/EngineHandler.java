@@ -167,9 +167,9 @@ public class EngineHandler {
                 break;
 
             // Check if user input was outside the valid range
-            if(userInput < 0 || userInput > environmentVariableDTOList.size() + 1) {
+            if(userInput < 0 || userInput > environmentVariableDTOList.size()) {
                 ConsoleOut.printError("invalid environment variable number chosen!");
-                return;
+                continue;
             }
 
             // Update the environment variable requested
@@ -268,17 +268,22 @@ public class EngineHandler {
 
         int counter = 1;
 
+        ConsoleOut.printTitle("Entities List");
         for(EntityDTO entityDTO : entityDTOList) {
             System.out.print(counter++ + ". ");
             ConsoleOut.printEntity(entityDTO);
         }
 
         try {
-            userInput = consoleIn.getIntInput();
+            System.out.print("Please enter a number of an entity from the list: ");
+            userInput = consoleIn.getIntInput() - 1;
         } catch (NumberFormatException e) { return; }
 
-        if(userInput >= 1 && userInput < entityDTOList.size()) {
-            List<PropertyDTO> propertyDTOList = entityDTOList.get(userInput - 1).getPropertyDTOList();
+        if(userInput >= 0 && userInput < entityDTOList.size()) {
+            List<PropertyDTO> propertyDTOList = entityDTOList.get(userInput).getPropertyDTOList();
+
+            ConsoleOut.printMessage("You chose entity \"" + entityDTOList.get(userInput).getName() + "\".");
+            ConsoleOut.printTitle("Properties List");
 
             counter = 1;
             for(PropertyDTO propertyDTO : propertyDTOList) {
@@ -287,7 +292,8 @@ public class EngineHandler {
             }
 
             try {
-                userInput = consoleIn.getIntInput();
+                System.out.print("Please enter a number of a property from the list: ");
+                userInput = consoleIn.getIntInput() - 1;
             } catch (NumberFormatException e) { return; }
 
             if (userInput >= 1 && userInput < propertyDTOList.size()) {

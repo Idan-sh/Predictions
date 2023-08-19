@@ -50,7 +50,7 @@ public class EntityFactory {
      */
     public PropertyFactory getPropertyFactory(String name) {
         if(!propertiesToAssign.containsKey(name))
-            throw new IllegalArgumentException("Error: the property factory with the given name does not exist!");
+            throw new IllegalArgumentException("the property factory with the given name \"" + name + "\" does not exist!");
 
         return propertiesToAssign.get(name);
     }

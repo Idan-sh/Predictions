@@ -74,9 +74,11 @@ public class ExpressionConverter {
 
         // Check if the action is of type condition
         if(prdAction.getPRDCondition() != null) {
-            PropertyType propertyType = entityManager.getEntityFactory(prdAction.getEntity()).getPropertyFactory(prdAction.getProperty()).getType();
+            PropertyType propertyType = entityManager.getEntityFactory(prdAction.getEntity()).getPropertyFactory(prdAction.getPRDCondition().getProperty()).getType();
+
             if(!propertyType.equals(expressionType))
                 throw new RuntimeException("cannot check condition on expression of type \"" + expressionType + "\" with the property of type \"" + propertyType + "\"");
+
         } else {
             // Check if action is of type increase/decrease/set
             if(actionType.equals("increase") || actionType.equals("decrease") || actionType.equals("set")) {

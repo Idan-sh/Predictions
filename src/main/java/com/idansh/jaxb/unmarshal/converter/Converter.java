@@ -381,14 +381,14 @@ public class Converter {
         // Convert Then/Else action sets
         thenOrElseConvert(prdAction, worldContext, thenActions, elseActions);
 
-        //
+        // Create condition action depending on its type
         if(prdCondition.getSingularity().equals("single")){
             retConditionAction = new SingleConditionAction(
                     worldContext,
                     prdAction.getEntity(),
                     prdAction.getProperty(),
                     prdCondition.getOperator(),
-                    expressionConverter.convertExpression(prdAction, prdAction.getValue()),
+                    expressionConverter.convertExpression(prdAction, prdCondition.getValue()),
                     thenActions,
                     elseActions
             );
