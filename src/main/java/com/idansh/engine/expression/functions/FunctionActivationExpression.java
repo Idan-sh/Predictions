@@ -1,7 +1,7 @@
 package com.idansh.engine.expression.functions;
 
-import com.idansh.engine.actions.Action;
 import com.idansh.engine.expression.api.Expression;
+import com.idansh.engine.property.instance.PropertyType;
 
 /**
  * An expression that activates an helper function.
@@ -49,9 +49,12 @@ public abstract class FunctionActivationExpression implements Expression {
     /**
      * @return The type of the expression.
      */
-    public Type getType() {
+    public Type getFunctionType() {
         return type;
     }
+
+    @Override
+    public abstract PropertyType getType();
 
     @Override
     public abstract Object getValue();

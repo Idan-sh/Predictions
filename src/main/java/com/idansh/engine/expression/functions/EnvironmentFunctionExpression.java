@@ -2,6 +2,7 @@ package com.idansh.engine.expression.functions;
 
 import com.idansh.engine.environment.ActiveEnvironmentVariables;
 import com.idansh.engine.property.instance.Property;
+import com.idansh.engine.property.instance.PropertyType;
 
 public class EnvironmentFunctionExpression extends FunctionActivationExpression {
     private final String environmentVariableName;
@@ -22,5 +23,14 @@ public class EnvironmentFunctionExpression extends FunctionActivationExpression 
     @Override
     public Object getValue() {
         return activeEnvironmentVariables.getActiveEnvironmentVariable(environmentVariableName).getValue();
+    }
+
+    /**
+     * Finds and returns the type of an environment variable.
+     * @return The type of the environment variable with the given name.
+     */
+    @Override
+    public PropertyType getType() {
+        return activeEnvironmentVariables.getActiveEnvironmentVariable(environmentVariableName).getType();
     }
 }

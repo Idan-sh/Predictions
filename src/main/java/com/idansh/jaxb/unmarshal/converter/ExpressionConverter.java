@@ -9,8 +9,11 @@ import com.idansh.engine.expression.functions.EnvironmentFunctionExpression;
 import com.idansh.engine.expression.functions.FunctionActivationExpression;
 import com.idansh.engine.expression.functions.RandomFunctionExpression;
 import com.idansh.engine.expression.property.PropertyExpression;
+import com.idansh.engine.property.instance.PropertyType;
 import com.idansh.engine.world.World;
 import com.idansh.jaxb.schema.generated.PRDAction;
+
+import java.util.IllegalFormatConversionException;
 
 /**
  * Class that converts expressions from generated XML file classes to Expression object,
@@ -26,6 +29,7 @@ public class ExpressionConverter {
         this.entityManager = world.entityManager;
         this.worldContext = world;
     }
+
 
     /**
      * Converts a PRDAction object that was read from the XML file
@@ -51,12 +55,43 @@ public class ExpressionConverter {
             retExpression = getFixedValue(prdStr);
         }
 
-//        // Check for type error
-//        if(!compareActionValueToGivenPropertyValue(prdAction, value)){
-//            throw new RuntimeException("Error: the created expression's type does not match the action's type!");
-//        }
+        // Check for type error
+        validateValueType(prdAction, retExpression);
 
         return retExpression;
+    }
+
+
+    /**
+     * Validates that an expression created by expressionConvert is compatible with the action's type.
+     * @param prdAction the action received from the XML file.
+     */
+    private void validateValueType(PRDAction prdAction, Expression expression) {
+        //throw new RuntimeException("Error: the created expression's type does not match the action's type!");
+
+        PropertyType expressionType = expression.getType();
+        String actionType = prdAction.getType();
+
+        // Check if the action is of type condition
+        if(prdAction.getPRDCondition() != null) {
+            PropertyType propertyType = entityManager.getEntityFactory(prdAction.getEntity()).getPropertyFactory(prdAction.getProperty()).getType();
+            if(!propertyType.equals(expressionType))
+                throw new RuntimeException("cannot check condition on expression of type \"" + expressionType + "\" with the property of type \"" + propertyType + "\"");
+        } else {
+            // Check if action is of type increase/decrease/set
+            if(actionType.equals("increase") || actionType.equals("decrease") || actionType.equals("set")) {
+                PropertyType propertyType = entityManager.getEntityFactory(prdAction.getEntity()).getPropertyFactory(prdAction.getProperty()).getType();
+                if(!propertyType.equals(expressionType))
+                    throw new RuntimeException("cannot save expression of type \"" + expressionType + "\" in the action \"" + actionType + "\" to the property of type \"" + propertyType + "\"");
+            } // Action type is of calculation
+            else if (actionType.equals("calculation")) {
+                PropertyType propertyType = entityManager.getEntityFactory(prdAction.getEntity()).getPropertyFactory(prdAction.getResultProp()).getType();
+                if(!propertyType.equals(expressionType))
+                    throw new RuntimeException("cannot save expression of type \"" + expressionType + "\" in the action \"" + actionType + "\" to the property of type \"" + propertyType + "\"");
+            } // Illegal action type
+            else
+                throw new RuntimeException("cannot validate expression's value type, action type \"" + actionType + "\" is invalid!");
+        }
     }
 
 
@@ -168,27 +203,34 @@ public class ExpressionConverter {
      */
     private Expression getFixedValue(String prdStr){
         Object retValue;
+        PropertyType retType;
 
         try {
             // Try to convert to integer
             retValue = Integer.parseInt(prdStr);
+            retType = PropertyType.INTEGER;
         } catch (NumberFormatException notInt) {
             try {
                 // Try to convert to float
                 retValue = Float.parseFloat(prdStr);
+                retType = PropertyType.FLOAT;
             } catch (NumberFormatException notFloat) {
                 // Try to convert to boolean
-                if(prdStr.equalsIgnoreCase("true"))
+                if(prdStr.equalsIgnoreCase("true")) {
                     retValue = true;
-                else if (prdStr.equalsIgnoreCase("false"))
+                    retType = PropertyType.BOOLEAN;
+                }
+                else if (prdStr.equalsIgnoreCase("false")) {
                     retValue = false;
-                else // Keep as string
+                    retType = PropertyType.BOOLEAN;
+                }
+                else { // Keep as string
                     retValue = prdStr;
+                    retType = PropertyType.STRING;
+                }
             }
         }
 
-        // todo- check value for type error
-
-        return new FixedValueExpression(retValue);
+        return new FixedValueExpression(retValue, retType);
     }
 }

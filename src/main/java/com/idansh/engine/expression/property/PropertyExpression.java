@@ -1,6 +1,7 @@
 package com.idansh.engine.expression.property;
 
 import com.idansh.engine.expression.api.Expression;
+import com.idansh.engine.property.instance.PropertyType;
 import com.idansh.engine.world.World;
 
 /**
@@ -20,5 +21,10 @@ public class PropertyExpression implements Expression {
     @Override
     public Object getValue() {
         return worldContext.entityManager.getEntityFactory(entityName).getPropertyFactory(propertyName).getValue();
+    }
+
+    @Override
+    public PropertyType getType() {
+        return worldContext.entityManager.getEntityFactory(entityName).getPropertyFactory(propertyName).getType();
     }
 }
