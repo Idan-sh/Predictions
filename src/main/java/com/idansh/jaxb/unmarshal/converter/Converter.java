@@ -420,10 +420,13 @@ public class Converter {
                 a -> thenActions.addAction(actionConvert(a, worldContext))
         );
 
+        // Check if the then actions block contains no actions
         if(thenActions.isEmpty())
-            throw new RuntimeException("Error: Then actions set received from XML is empty!");
+            throw new RuntimeException("then actions set received from XML is empty!");
 
-        prdAction.getPRDElse().getPRDAction().forEach(
+        // Check if there is an else actions block
+        if(prdAction.getPRDElse() != null)
+            prdAction.getPRDElse().getPRDAction().forEach(
                 a -> elseActions.addAction(actionConvert(a, worldContext))
         );
     }

@@ -52,6 +52,7 @@ public abstract class ConsoleOut {
      * @param text the error message to print.
      */
     public static void printError(String text) {
+        System.out.println();
         System.out.println("Error: " + text);
     }
 

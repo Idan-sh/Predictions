@@ -11,6 +11,7 @@ import com.idansh.engine.manager.EngineManager;
 import com.idansh.ui.display.ConsoleIn;
 import com.idansh.ui.display.ConsoleOut;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -39,6 +40,10 @@ public class EngineHandler {
             ConsoleOut.printMessage("Successfully loaded simulation data from file!");
         } catch (RuntimeException e) {
             ConsoleOut.printError(e.getMessage());
+            ConsoleOut.printMessage("Exception's Class: " + e.getClass().toString());
+            ConsoleOut.printMessage("Trace: ");
+            for (StackTraceElement stackTraceElement : e.getStackTrace())
+                ConsoleOut.printMessage("   " + stackTraceElement.toString());
         }
     }
 
