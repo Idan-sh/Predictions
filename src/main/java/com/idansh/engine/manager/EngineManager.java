@@ -262,10 +262,10 @@ public class EngineManager {
      * 1. key: the property's value
      * 2. value: the amount of entities in the population with this value
      */
-    public Map<Object, Integer> getPropertyValues(PropertyDTO propertyDTO) {
+    public Map<Object, Integer> getPropertyValues(int simulationResultID, PropertyDTO propertyDTO) {
         Map<Object, Integer> retValuesMap = new LinkedHashMap<>();
 
-        currWorld.entityManager.getPopulation().forEach(
+        pastSimulations.get(simulationResultID).getEntityManager().getPopulation().forEach(
                 entity -> {
                     Object entityValue = entity.getPropertyByName(propertyDTO.getName()).getValue();
 

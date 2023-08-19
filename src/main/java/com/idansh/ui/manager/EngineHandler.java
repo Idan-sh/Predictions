@@ -286,13 +286,12 @@ public class EngineHandler {
             } catch (NumberFormatException e) { return; }
 
             if (userInput >= 0 && userInput < propertyDTOList.size()) {
-                Map<Object, Integer> propertyValues = engineManager.getPropertyValues(propertyDTOList.get(userInput));
+                Map<Object, Integer> propertyValues = engineManager.getPropertyValues(simulationResultDTO.getId(), propertyDTOList.get(userInput));
                 ConsoleOut.printTitle("Property " + propertyDTOList.get(userInput).getName() + " Values");
                 ConsoleOut.printPropertyValues(propertyValues);
             } else
                 ConsoleOut.printError("wrong input choice for property number!");
         } else
             ConsoleOut.printError("wrong input choice for entity number!");
-
     }
 }
