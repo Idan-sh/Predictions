@@ -12,7 +12,7 @@ public abstract class ConditionAction extends Action {
     private final Type type;
     private final ThenOrElseActions thenActions;
     private final ThenOrElseActions elseActions;
-    private final boolean isMainCondition;
+    private final boolean isMainCondition;      // Whether this condition action has "then" and "else" actions blocks, which are set only on the outermost condition action.
     private boolean isActivated;
 
 

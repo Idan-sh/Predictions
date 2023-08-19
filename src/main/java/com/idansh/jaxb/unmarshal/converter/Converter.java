@@ -23,6 +23,8 @@ import com.idansh.engine.world.World;
 import com.idansh.jaxb.schema.generated.*;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 /**
  * An abstract class with static methods to convert generated data from the XML scheme to the simulation's objects.
  */
@@ -389,22 +391,20 @@ public abstract class Converter {
      * Converts a PRDAction of single or multiple condition that was read from the XML file
      * into a ConditionAction Object.
      * @param prdAction PRDAction object that was read from the XML file.
+     * @param worldContext the simulated world in which the conditions are set.
+     * @param expressionConverter used for converting expressions into values.
      * @return ConditionAction object with the data of the PRDAction received.
      */
     private static ConditionAction conditionActionConvert(PRDAction prdAction, World worldContext, ExpressionConverter expressionConverter){
-        ConditionAction retConditionAction;
         PRDCondition prdCondition = prdAction.getPRDCondition();
-
         final ThenOrElseActions thenActions = new ThenOrElseActions(), elseActions = new ThenOrElseActions();
 
         // Convert Then/Else action sets
         thenOrElseConvert(prdAction, worldContext, thenActions, elseActions);
 
-
-        //----------------------------------todo - convert inner conditions recursively
-        // Create condition action depending on its type
-        if(prdCondition.getSingularity().equals("single")){
-            retConditionAction = new SingleConditionAction(
+        // Create main condition action depending on its type
+        if (prdCondition.getSingularity().equals("single")) {
+            return new SingleConditionAction(
                     worldContext,
                     prdAction.getEntity(),
                     prdAction.getPRDCondition().getProperty(),
@@ -415,7 +415,7 @@ public abstract class Converter {
                     true
             );
         } else if (prdCondition.getSingularity().equals("multiple")) {
-            retConditionAction = new MultiConditionAction(
+            MultiConditionAction retMultiConditionAction = new MultiConditionAction(
                     worldContext,
                     prdAction.getEntity(),
                     prdCondition.getLogical(),
@@ -423,14 +423,58 @@ public abstract class Converter {
                     elseActions,
                     true
             );
+            // Only in case of multiple conditions, convert the inner conditions and add them to the main condition action "retMultiConditionAction"
+            convertInnerConditions(prdAction, worldContext, expressionConverter, retMultiConditionAction);
 
-            // ---------------------------------- todo - move this block into a recursive function !!!
-        }
-        else {
+            return retMultiConditionAction;
+        } else {
             throw new RuntimeException("Error: invalid condition action received from XML!");
         }
+    }
 
-        return retConditionAction;
+
+    /**
+     * Converts recursively all inner multi-conditions of a multi-condition.
+     * @param prdAction the main action in which the conditions are set.
+     * @param worldContext the simulated world in which the conditions are set.
+     * @param expressionConverter used for converting expressions into values.
+     * @param mainConditionAction the main multi-action in which we search for inner conditions. these inner conditions will be added to the main condition action's list.
+     */
+    private static void convertInnerConditions(PRDAction prdAction, World worldContext, ExpressionConverter expressionConverter, MultiConditionAction mainConditionAction) {
+        List<PRDCondition> prdConditionList = prdAction.getPRDCondition().getPRDCondition();
+
+        // Convert each condition action in the list of the main condition action
+        prdConditionList.forEach(
+                prdCondition -> {
+                    // Create condition action depending on its type
+                    if (prdCondition.getSingularity().equals("single")) {
+                        mainConditionAction.addInnerCondition(new SingleConditionAction(
+                                worldContext,
+                                prdCondition.getEntity(),
+                                prdCondition.getProperty(),
+                                prdCondition.getOperator(),
+                                expressionConverter.convertExpression(prdAction, prdCondition.getValue()),
+                                null,
+                                null,
+                                false
+                        ));
+                    } else if (prdCondition.getSingularity().equals("multiple")) {
+                        MultiConditionAction multiConditionAction = new MultiConditionAction(
+                                worldContext,
+                                prdAction.getEntity(),
+                                prdCondition.getLogical(),
+                                null,
+                                null,
+                                false
+                        );
+                        // Find and convert all inner conditions of the multi-condition action
+                        convertInnerConditions(prdAction, worldContext, expressionConverter, multiConditionAction);
+                        mainConditionAction.addInnerCondition(multiConditionAction);    // Add finished multi-condition action with inner conditions to the main condition action.
+                    } else {
+                        throw new RuntimeException("Error: invalid condition action received from XML!");
+                    }
+                }
+        );
     }
 
 

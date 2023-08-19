@@ -38,6 +38,7 @@ public class ExpressionConverter {
      * @return Action object with the data of the PRDAction received.
      */
     public Expression convertExpression(PRDAction prdAction, String prdStr) {
+        System.out.println("trying to convert expression with- prdStr " + prdStr + " and prdAction " + prdAction.getType());
         Expression retExpression;
 
         // Try to convert to FunctionExpression
@@ -65,8 +66,7 @@ public class ExpressionConverter {
      * @param prdAction the action received from the XML file.
      */
     private void validateValueType(PRDAction prdAction, Expression expression) {
-        //throw new RuntimeException("Error: the created expression's type does not match the action's type!");
-
+        System.out.println("Validating value type with prdAction " + prdAction.getType());
         PropertyType expressionType = expression.getType();
         String actionType = prdAction.getType();
 
