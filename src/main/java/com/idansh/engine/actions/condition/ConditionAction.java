@@ -12,7 +12,8 @@ public abstract class ConditionAction extends Action {
     private final Type type;
     private final ThenOrElseActions thenActions;
     private final ThenOrElseActions elseActions;
-    private boolean isMainCondition, isActivated;
+    private final boolean isMainCondition;
+    private boolean isActivated;
 
 
     public ConditionAction(World worldContext, String entityContext, Type type, ThenOrElseActions thenActions, ThenOrElseActions elseActions, boolean isMainCondition) {
