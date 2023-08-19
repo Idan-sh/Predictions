@@ -5,6 +5,8 @@ import com.idansh.ui.display.ConsoleIn;
 import com.idansh.ui.display.ConsoleOut;
 import com.sun.nio.sctp.IllegalReceiveException;
 
+import static java.lang.System.exit;
+
 /**
  * Handles the simulations.
  * The main loop of the simulation will run through this class.
@@ -30,6 +32,7 @@ public class SimulationManager {
             } while (handleMenuChoice());   // Handle the user's choice and check if chose to exit.
 
             ConsoleOut.printGoodbye();
+            exit(0);
         } catch (RuntimeException e) { // Catch all unhandled exceptions, display their details and finish the program
             ConsoleOut.printRuntimeException(e);
         }
@@ -76,8 +79,7 @@ public class SimulationManager {
                 return false;
 
             default:
-                ConsoleOut.printError("menu option received is invalid!"); // This error should not happen on wrong user input, consoleIn.getMenuInput() throws that error
-                return true;
+                throw new RuntimeException("menuOption type is invalid!"); // This error should not happen on wrong user input, consoleIn.getMenuInput() throws that error
         }
     }
 }

@@ -96,7 +96,8 @@ public class EngineHandler {
 
             try {
                 userInput = consoleIn.getIntInput();
-            } catch (NumberFormatException e) {
+            } catch (IllegalArgumentException e) {
+                ConsoleOut.printError(e.getMessage());
                 return;
             }
 
@@ -118,7 +119,10 @@ public class EngineHandler {
 
             try {
                 userInput = consoleIn.getIntInput();
-            } catch (NumberFormatException e) { return; }
+            } catch (IllegalArgumentException e) {
+                ConsoleOut.printError(e.getMessage());
+                return;
+            }
 
             switch(userInput) {
                 case 1:
@@ -157,7 +161,10 @@ public class EngineHandler {
 
             try {
                 userInput = consoleIn.getIntInput() - 1;
-            } catch (NumberFormatException e) { return; }
+            } catch (IllegalArgumentException e) {
+                ConsoleOut.printError(e.getMessage());
+                return;
+            }
 
             // Check if user requested to finish setup process
             if(userInput == environmentVariableDTOList.size())
@@ -204,7 +211,13 @@ public class EngineHandler {
 
                 switch (environmentVariableDTO.getType()) {
                     case "decimal":
-                        int integerValue = consoleIn.getIntInput();
+                        int integerValue;
+                        try {
+                            integerValue = consoleIn.getIntInput();
+                        } catch (IllegalArgumentException e) {
+                            ConsoleOut.printError(e.getMessage());
+                            continue;
+                        }
 
                         if(rangeDTO != null) {
                             if (InputValidator.isIntegerInRange(integerValue, rangeDTO)) {
@@ -264,22 +277,28 @@ public class EngineHandler {
         int userInput;
 
         ConsoleOut.printEntitiesList(entityDTOList);
+        System.out.print("Please enter a number of an entity from the list: ");
 
         try {
-            System.out.print("Please enter a number of an entity from the list: ");
             userInput = consoleIn.getIntInput() - 1;
-        } catch (NumberFormatException e) { return; }
+        } catch (IllegalArgumentException e) {
+            ConsoleOut.printError(e.getMessage());
+            return;
+        }
 
         if(userInput >= 0 && userInput < entityDTOList.size()) {
             List<PropertyDTO> propertyDTOList = entityDTOList.get(userInput).getPropertyDTOList();
 
             ConsoleOut.printMessage("You chose entity \"" + entityDTOList.get(userInput).getName() + "\".");
             ConsoleOut.printPropertiesList(propertyDTOList);
+            System.out.print("Please enter a number of a property from the list: ");
 
             try {
-                System.out.print("Please enter a number of a property from the list: ");
                 userInput = consoleIn.getIntInput() - 1;
-            } catch (NumberFormatException e) { return; }
+            } catch (IllegalArgumentException e) {
+                ConsoleOut.printError(e.getMessage());
+                return;
+            }
 
             if (userInput >= 0 && userInput < propertyDTOList.size()) {
                 Map<Object, Integer> propertyValues = engineManager.getPropertyValues(simulationResultDTO.getId(), propertyDTOList.get(userInput));
