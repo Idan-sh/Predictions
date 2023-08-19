@@ -398,8 +398,11 @@ public abstract class Converter {
                     prdAction.getEntity(),
                     prdCondition.getLogical(),
                     thenActions,
-                    elseActions
+                    elseActions,
+                    true
             );
+
+            // todo - convert inner conditions recursively
         }
         else {
             throw new RuntimeException("Error: invalid condition action received from XML!");
