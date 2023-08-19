@@ -23,21 +23,16 @@ public class SimulationManager {
      * Starts the main loop of the program.
      */
     public void run() {
-        while(true) {
-            ConsoleOut.printMenu();
+        try {
+            // Run until user chooses to exit
+            do {
+                ConsoleOut.printMenu();
+            } while (handleMenuChoice());   // Handle the user's choice and check if chose to exit.
 
-            try {
-                // Handle the user's choice and check if chose to exit.
-                if(!handleMenuChoice())
-                    break;
-            } catch (NumberFormatException e) {
-                ConsoleOut.printError("input entered is not a valid number!");
-            } catch (IllegalReceiveException e) {
-                ConsoleOut.printError("number entered is not a valid option number!");
-            }
+            ConsoleOut.printGoodbye();
+        } catch (RuntimeException e) { // Catch all unhandled exceptions, display their details and finish the program
+            ConsoleOut.printRuntimeException(e);
         }
-
-        ConsoleOut.printGoodbye();
     }
 
 
@@ -47,8 +42,14 @@ public class SimulationManager {
      * @throws NumberFormatException in case the input string cannot be converted to int.
      * @throws IllegalReceiveException in case the option number received is not a valid choice.
      */
-    public boolean handleMenuChoice() throws NumberFormatException, IllegalReceiveException {
-        MenuOptions menuOption = consoleIn.getMenuInput();
+    public boolean handleMenuChoice() {
+        MenuOptions menuOption;
+        try{
+            menuOption = consoleIn.getMenuInput();
+        } catch (IllegalArgumentException e) {
+            ConsoleOut.printError(e.getMessage());
+            return true;
+        }
 
         switch (menuOption) {
             case LOAD_FILE:
@@ -75,7 +76,8 @@ public class SimulationManager {
                 return false;
 
             default:
-                throw new RuntimeException("menuOption is invalid!"); // This error should not happen on wrong user input, consoleIn.getMenuInput() throws that error
+                ConsoleOut.printError("menu option received is invalid!"); // This error should not happen on wrong user input, consoleIn.getMenuInput() throws that error
+                return true;
         }
     }
 }

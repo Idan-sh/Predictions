@@ -259,6 +259,15 @@ public abstract class ConsoleOut {
             ConsoleOut.printMessage(propertyDTO.getName());
         }
     }
+
+    public static void printRuntimeException(RuntimeException e) {
+        ConsoleOut.printError("Simulation load failed!");
+        ConsoleOut.printMessage("Cause: " + e.getMessage());
+        ConsoleOut.printMessage("Exception's Class: " + e.getClass().toString());
+        ConsoleOut.printMessage("Trace: ");
+        for (StackTraceElement stackTraceElement : e.getStackTrace())
+            ConsoleOut.printMessage("   " + stackTraceElement.toString());
+    }
 }
 
 

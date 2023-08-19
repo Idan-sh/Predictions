@@ -67,7 +67,7 @@ public class World {
      */
     public void addTerminationRule(TerminationRule terminationRule) {
         if(terminationRules.containsKey(terminationRule.getType()))
-            throw new IllegalArgumentException("Error: received terminationRule's type - " + terminationRule.getType() + " already exists!");
+            throw new IllegalArgumentException("received terminationRule's type - " + terminationRule.getType() + " already exists!");
 
         terminationRules.put(terminationRule.getType(), terminationRule);
     }
@@ -101,13 +101,8 @@ public class World {
                 return new SimulationResult("Timer Expired", entityManager);
             }
 
-            // Generate probabilities for all rules, then invoke them
-            rulesMap.forEach(
-                    (ruleName, rule) -> {
-                        rule.getActivation().generateProbability();
-                        rule.invoke();
-                    }
-            );
+            // Invoke all rules
+            rulesMap.forEach((ruleName, rule) -> rule.invoke());
         }
 
         return new SimulationResult("Ticks Reached", entityManager);

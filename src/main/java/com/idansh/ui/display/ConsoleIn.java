@@ -69,16 +69,21 @@ public class ConsoleIn {
      * @throws NumberFormatException in case the input string cannot be converted to int.
      * @throws IllegalReceiveException in case the option number received is not a valid choice.
      */
-    public MenuOptions getMenuInput()
+    public MenuOptions getMenuInput() throws IllegalArgumentException
     {
         MenuOptions userInput;
+        int optionNum;
 
         // Try to parse the input to int, if fails throws exception
-        int optionNum = Integer.parseInt(getInput()) - 1;
+        try {
+            optionNum = Integer.parseInt(getInput()) - 1;
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("invalid input, enter a number for menu choice!");
+        }
 
         // Check if the option chosen is within the menu's range
         if(optionNum < 0 || optionNum > MenuOptions.values().length)
-            throw new IllegalReceiveException();
+            throw new IllegalArgumentException("invalid menu choice received! try again...");
 
         userInput = MenuOptions.values()[optionNum];
 

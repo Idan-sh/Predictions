@@ -24,7 +24,7 @@ public class EnvironmentVariablesManager {
      */
     public void addEnvironmentVariableFactory(PropertyFactory propertyFactory) {
         if(envVariablesToCreate.containsKey(propertyFactory.getName()))
-            throw new IllegalArgumentException("Error: an environment variable with the given name already exists!");
+            throw new IllegalArgumentException("an environment variable with the name \"" + propertyFactory.getName() + "\" already exists!");
 
         envVariablesToCreate.put(propertyFactory.getName(), propertyFactory);
     }

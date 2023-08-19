@@ -46,7 +46,7 @@ public class EntityManager {
      */
     public EntityFactory getEntityFactory(String name) {
         if(!entityFactories.containsKey(name))
-            throw new IllegalArgumentException("Error: could not find the received entity factory!");
+            throw new IllegalArgumentException("could not find an entity factory with the name \"" + name + "\"!");
 
         return entityFactories.get(name);
     }

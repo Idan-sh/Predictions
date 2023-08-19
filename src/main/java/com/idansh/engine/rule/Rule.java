@@ -49,12 +49,14 @@ public class Rule {
      * The rule will be activated if both the defined amount of ticks has passed and the probability was achieved.
      */
     public void invoke() {
+        activation.generateProbability();
+
         tickCounter.increaseCount();
 
         // Check if the amount of ticks in the simulation have passed, and check if the probability was activated
         if(activation.getTicks() == tickCounter.getCount() && activation.isProbabilityActivated()) {
             tickCounter.resetCount();
-            actionsSet.forEach(Action::invoke); // Activate the actions of the rule
+            actionsSet.forEach(Action::invoke); // Activate all actions of the rule
         }
 
         // Reset counter every tick amount set.
