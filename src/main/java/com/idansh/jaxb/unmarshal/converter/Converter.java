@@ -385,7 +385,7 @@ public abstract class Converter {
             retConditionAction = new SingleConditionAction(
                     worldContext,
                     prdAction.getEntity(),
-                    prdAction.getProperty(),
+                    prdAction.getPRDCondition().getProperty(),
                     prdCondition.getOperator(),
                     expressionConverter.convertExpression(prdAction, prdCondition.getValue()),
                     thenActions,

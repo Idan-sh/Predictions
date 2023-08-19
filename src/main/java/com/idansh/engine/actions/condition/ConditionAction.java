@@ -1,7 +1,6 @@
 package com.idansh.engine.actions.condition;
 
 import com.idansh.engine.actions.Action;
-import com.idansh.engine.expression.api.Expression;
 import com.idansh.engine.world.World;
 
 
@@ -22,7 +21,12 @@ public abstract class ConditionAction extends Action {
         this.elseActions = elseActions;
     }
 
-    public void invoke(boolean isCondition) {
+    /**
+     * Invokes "then" actions set if condition is true,
+     * or invokes "else" actions set if condition is false.
+     * @param isCondition the value of the condition defined in the action.
+     */
+    public void invokeActionsSet(boolean isCondition) {
         if(isCondition)
             thenActions.invoke();
         else
