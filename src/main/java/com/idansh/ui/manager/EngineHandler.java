@@ -13,6 +13,7 @@ import com.idansh.ui.display.ConsoleOut;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Connects the UI with the engine components through the various DTOs.
@@ -266,13 +267,7 @@ public class EngineHandler {
         List<EntityDTO> entityDTOList = simulationResultDTO.getEntityDTOList();
         int userInput;
 
-        int counter = 1;
-
-        ConsoleOut.printTitle("Entities List");
-        for(EntityDTO entityDTO : entityDTOList) {
-            System.out.print(counter++ + ". ");
-            ConsoleOut.printEntity(entityDTO);
-        }
+        ConsoleOut.printEntitiesList(entityDTOList);
 
         try {
             System.out.print("Please enter a number of an entity from the list: ");
@@ -283,21 +278,17 @@ public class EngineHandler {
             List<PropertyDTO> propertyDTOList = entityDTOList.get(userInput).getPropertyDTOList();
 
             ConsoleOut.printMessage("You chose entity \"" + entityDTOList.get(userInput).getName() + "\".");
-            ConsoleOut.printTitle("Properties List");
-
-            counter = 1;
-            for(PropertyDTO propertyDTO : propertyDTOList) {
-                System.out.print(counter++ + ". ");
-                ConsoleOut.printProperty(propertyDTO);
-            }
+            ConsoleOut.printPropertiesList(propertyDTOList);
 
             try {
                 System.out.print("Please enter a number of a property from the list: ");
                 userInput = consoleIn.getIntInput() - 1;
             } catch (NumberFormatException e) { return; }
 
-            if (userInput >= 1 && userInput < propertyDTOList.size()) {
-                ConsoleOut.printProperty(propertyDTOList.get(userInput));
+            if (userInput >= 0 && userInput < propertyDTOList.size()) {
+                Map<Object, Integer> propertyValues = engineManager.getPropertyValues(propertyDTOList.get(userInput));
+                ConsoleOut.printTitle("Property " + propertyDTOList.get(userInput).getName() + " Values");
+                ConsoleOut.printPropertyValues(propertyValues);
             } else
                 ConsoleOut.printError("wrong input choice for property number!");
         } else

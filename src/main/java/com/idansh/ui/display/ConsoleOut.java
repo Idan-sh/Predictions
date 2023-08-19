@@ -178,11 +178,24 @@ public abstract class ConsoleOut {
 
 
     /**
-     * Prints property's name.
+     * Prints property's info.
      * @param propertyDTO DTO containing property's details.
      */
     public static void printProperty(PropertyDTO propertyDTO) {
         System.out.println(propertyDTO.getName() + ": " + propertyDTO.getValue());
+    }
+
+
+    /**
+     * Prints all values of a property, and the number of entity instances of each one.
+     * @param propertyValuesMap map containing a property's value and counter of how many entity instances are with its amount.
+     */
+    public static void printPropertyValues(Map<Object, Integer> propertyValuesMap) {
+        propertyValuesMap.forEach(
+                (value, count) -> {
+                    System.out.println("Value: " + value + " , Count: " + count);
+                }
+        );
     }
 
 
@@ -217,6 +230,36 @@ public abstract class ConsoleOut {
 
         printMessage("Simulation with ID \"" + simulationEndTDO.getSimulationId() + "\"");
         printMessage("Ended with termination rule of \"" + simulationEndTDO.getEndReason() + "\"");
+    }
+
+
+    /**
+     * Prints simulation main entities list.
+     * @param entityDTOList TDO list that contains EntityDTOs with info on the main entities of the simulation.
+     */
+    public static void printEntitiesList(List<EntityDTO> entityDTOList) {
+        int counter = 1;
+
+        ConsoleOut.printTitle("Entities List");
+        for(EntityDTO entityDTO : entityDTOList) {
+            System.out.print(counter++ + ". ");
+            ConsoleOut.printEntity(entityDTO);
+        }
+    }
+
+
+    /**
+     * Prints a main entity's properties list.
+     * @param propertyDTOList TDO list that contains PropertyDTOs with info on a main entity's properties.
+     */
+    public static void printPropertiesList(List<PropertyDTO> propertyDTOList) {
+        int counter = 1;
+
+        ConsoleOut.printTitle("Properties List");
+        for(PropertyDTO propertyDTO : propertyDTOList) {
+            System.out.print(counter++ + ". ");
+            ConsoleOut.printMessage(propertyDTO.getName());
+        }
     }
 }
 

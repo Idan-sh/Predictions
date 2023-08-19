@@ -252,4 +252,28 @@ public class EngineManager {
     public boolean isSimulationLoaded() {
         return currWorld != null;
     }
+
+
+    /**
+     * Gets a map of:
+     * 1. key: the property's value
+     * 2. value: the amount of entities in the population with this value
+     */
+    public Map<Object, Integer> getPropertyValues(PropertyDTO propertyDTO) {
+        Map<Object, Integer> retValuesMap = new LinkedHashMap<>();
+
+        currWorld.entityManager.getPopulation().forEach(
+                entity -> {
+                    Object entityValue = entity.getPropertyByName(propertyDTO.getName()).getValue();
+
+                    if(retValuesMap.containsKey(entityValue)) {
+                        int oldVal = retValuesMap.get(entityValue);
+                        retValuesMap.put(entityValue, oldVal + 1);
+                    }
+                    else retValuesMap.put(entityValue, 1);
+                }
+        );
+
+        return retValuesMap;
+    }
 }
