@@ -122,7 +122,7 @@ public class EngineManager {
 
 
     /**
-     * Adds a newly finished simulation to the past simulations collection.
+     * Adds a newly finished simulation to the past simulations' collection.
      * @param simulationResult a simulation result that contains information/details of the last simulation ran.
      */
     private void addSimulationResult(SimulationResult simulationResult){
@@ -155,7 +155,7 @@ public class EngineManager {
         SimulationResult simulationResult = currWorld.run();
 
         // Save the simulation result
-        pastSimulations.put(simulationResult.getId(), simulationResult);
+        addSimulationResult(simulationResult);
 
         return new SimulationEndTDO(simulationResult.getId(), simulationResult.getEndReason());
     }

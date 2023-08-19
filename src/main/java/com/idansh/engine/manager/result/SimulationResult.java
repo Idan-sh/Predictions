@@ -1,7 +1,6 @@
 package com.idansh.engine.manager.result;
 
 import com.idansh.engine.entity.EntityManager;
-import com.idansh.engine.world.World;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

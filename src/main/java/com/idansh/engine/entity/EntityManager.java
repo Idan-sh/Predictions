@@ -1,7 +1,6 @@
 package com.idansh.engine.entity;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class EntityManager {
     private final Map<String, EntityFactory> entityFactories;   // Each entity factory will define instructions on how to instantiate a single entity with a unique name

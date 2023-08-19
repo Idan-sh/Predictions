@@ -2,7 +2,6 @@ package com.idansh.ui.display;
 
 import com.idansh.dto.entity.EntityDTO;
 import com.idansh.dto.environment.EnvironmentVariableDTO;
-import com.idansh.dto.environment.EnvironmentVariablesListDTO;
 import com.idansh.dto.property.PropertyDTO;
 import com.idansh.dto.rule.RuleDTO;
 import com.idansh.dto.rule.TerminationRuleDTO;
@@ -174,15 +173,6 @@ public abstract class ConsoleOut {
      */
     public static void printEntity(EntityDTO entityDTO) {
         System.out.println(entityDTO.getName());
-    }
-
-
-    /**
-     * Prints property's info.
-     * @param propertyDTO DTO containing property's details.
-     */
-    public static void printProperty(PropertyDTO propertyDTO) {
-        System.out.println(propertyDTO.getName() + ": " + propertyDTO.getValue());
     }
 
 

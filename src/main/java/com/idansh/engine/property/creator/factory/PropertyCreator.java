@@ -5,7 +5,6 @@ import com.idansh.engine.property.creator.generator.value.fixed.FixedValueGenera
 import com.idansh.engine.property.instance.Property;
 import com.idansh.engine.property.instance.PropertyType;
 import com.idansh.engine.property.creator.generator.value.api.ValueGenerator;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Creates properties by the value type defined, using a value generator.

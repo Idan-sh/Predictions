@@ -10,7 +10,7 @@ public class Rule {
     private final String name;
     private final RuleActivation activation;    // Determines when to activate the rule
     private final Set<Action> actionsSet;             // Set of actions to be preformed when the rule is activated
-    private Counter tickCounter;
+    private final Counter tickCounter;
 
     public Rule(String name, RuleActivation activation) {
         this.name = name;

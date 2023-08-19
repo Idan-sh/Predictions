@@ -13,8 +13,6 @@ import com.idansh.engine.property.instance.PropertyType;
 import com.idansh.engine.world.World;
 import com.idansh.jaxb.schema.generated.PRDAction;
 
-import java.util.IllegalFormatConversionException;
-
 /**
  * Class that converts expressions from generated XML file classes to Expression object,
  * which the simulation can use.
