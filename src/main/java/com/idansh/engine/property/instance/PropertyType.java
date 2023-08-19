@@ -36,7 +36,6 @@ public enum PropertyType {
     /**
      * Converts a PropertyType of integer/float/boolean/string to
      * its corresponding string format.
-     * @param type the property type.
      * @return string that defines the property type received.
      * @throws IllegalArgumentException if the property type received is in invalid format (not one of the specified types).
      */
