@@ -98,7 +98,7 @@ public class World {
 
             // Checks if the timer expired
             if(countdown.isFinished()) {
-                return new SimulationResult("Timer Expired", this);
+                return new SimulationResult("Timer Expired", entityManager);
             }
 
             // Generate probabilities for all rules, then invoke them
@@ -110,7 +110,7 @@ public class World {
             );
         }
 
-        return new SimulationResult("Ticks Reached", this);
+        return new SimulationResult("Ticks Reached", entityManager);
     }
 
     public Map<TerminationRule.Type, TerminationRule> getTerminationRules() {

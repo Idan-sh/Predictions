@@ -147,7 +147,6 @@ public class EngineManager {
      * Start running the current simulation that was loaded.
      * Loads user received input for environment variables.
      * @param environmentVariablesListDTO contains data of environment variables to update in the simulation.
-     * @throws
      */
     public SimulationEndTDO runSimulation(EnvironmentVariablesListDTO environmentVariablesListDTO) {
         updateEnvironmentVariablesFromInput(environmentVariablesListDTO);
@@ -206,8 +205,12 @@ public class EngineManager {
         pastSimulations.forEach(
                 (id, simulationResult) -> {
                     // Create simulation result DTO
-                    SimulationResultDTO simulationResultDTO = new SimulationResultDTO(simulationResult.getDateTime(), simulationResult.getDateTimeString(), simulationResult.getId());
-                    currWorld.entityManager.getEntityFactories().forEach(
+                    SimulationResultDTO simulationResultDTO = new SimulationResultDTO(
+                            simulationResult.getDateTime(),
+                            simulationResult.getDateTimeString(),
+                            simulationResult.getId());
+
+                    simulationResult.getEntityManager().getEntityFactories().forEach(
                             (entityName, entityFactory) -> {
                                 EntityDTO entityDTO = new EntityDTO(
                                         entityName,
@@ -270,7 +273,8 @@ public class EngineManager {
                         int oldVal = retValuesMap.get(entityValue);
                         retValuesMap.put(entityValue, oldVal + 1);
                     }
-                    else retValuesMap.put(entityValue, 1);
+                    else
+                        retValuesMap.put(entityValue, 1);
                 }
         );
 

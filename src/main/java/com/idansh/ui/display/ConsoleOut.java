@@ -192,9 +192,7 @@ public abstract class ConsoleOut {
      */
     public static void printPropertyValues(Map<Object, Integer> propertyValuesMap) {
         propertyValuesMap.forEach(
-                (value, count) -> {
-                    System.out.println("Value: " + value + " , Count: " + count);
-                }
+                (value, count) -> System.out.println("Value: " + value + " , Number of Entities: " + count)
         );
     }
 

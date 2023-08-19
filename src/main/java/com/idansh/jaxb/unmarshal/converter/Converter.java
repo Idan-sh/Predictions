@@ -24,10 +24,9 @@ import com.idansh.jaxb.schema.generated.*;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * A static class with methods to convert generated data from the XML scheme to the simulation's objects.
+ * An abstract class with static methods to convert generated data from the XML scheme to the simulation's objects.
  */
-public class Converter {
-
+public abstract class Converter {
     /**
      * Converts a PRDWorld object that was read from the XML file
      * into a World Object.
