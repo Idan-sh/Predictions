@@ -12,13 +12,16 @@ public abstract class ConditionAction extends Action {
     private final Type type;
     private final ThenOrElseActions thenActions;
     private final ThenOrElseActions elseActions;
+    private boolean isMainCondition, isActivated;
 
 
-    public ConditionAction(World worldContext, String entityContext, Type type, ThenOrElseActions thenActions, ThenOrElseActions elseActions) {
+    public ConditionAction(World worldContext, String entityContext, Type type, ThenOrElseActions thenActions, ThenOrElseActions elseActions, boolean isMainCondition) {
         super(worldContext, entityContext);
         this.type = type;
         this.thenActions = thenActions;
         this.elseActions = elseActions;
+        this.isMainCondition = isMainCondition;
+        this.isActivated = false;
     }
 
     /**
@@ -32,5 +35,17 @@ public abstract class ConditionAction extends Action {
         else
             if(!elseActions.isEmpty())
                 elseActions.invoke();
+    }
+
+    public boolean isMainCondition() {
+        return isMainCondition;
+    }
+
+    public boolean isActivated() {
+        return isActivated;
+    }
+
+    public void setActivated(boolean activated) {
+        isActivated = activated;
     }
 }

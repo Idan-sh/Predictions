@@ -389,7 +389,8 @@ public abstract class Converter {
                     prdCondition.getOperator(),
                     expressionConverter.convertExpression(prdAction, prdCondition.getValue()),
                     thenActions,
-                    elseActions
+                    elseActions,
+                    true
             );
         } else if (prdCondition.getSingularity().equals("multiple")) {
             retConditionAction = new MultiConditionAction(

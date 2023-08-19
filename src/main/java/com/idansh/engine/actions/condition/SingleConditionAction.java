@@ -18,8 +18,8 @@ public class SingleConditionAction extends ConditionAction{
      *                     possible values:  = (equal) / != (not equal) / bt (greater than) / lt (less than)
      * @param value        a number that will be compared to the property's value
      */
-    public SingleConditionAction(World worldContext, String entityContext, String propertyName, String operator, Expression value, ThenOrElseActions thenActions, ThenOrElseActions elseActions) {
-        super(worldContext, entityContext, Type.SINGLE, thenActions, elseActions);
+    public SingleConditionAction(World worldContext, String entityContext, String propertyName, String operator, Expression value, ThenOrElseActions thenActions, ThenOrElseActions elseActions, boolean isMainCondition) {
+        super(worldContext, entityContext, Type.SINGLE, thenActions, elseActions, isMainCondition);
         this.propertyName = propertyName;
         this.expression = value;
         this.operator = ConditionOperator.getConditionOperator(operator); // Try to convert to ConditionOperator, if fails throw exception
@@ -33,28 +33,40 @@ public class SingleConditionAction extends ConditionAction{
     @Override
     public void invoke() {
         Object propertyValue = getWorldContext().entityManager.getEntityFactory(getEntityContext()).getPropertyFactory(propertyName).getValue();
+        boolean res;
 
         switch (operator) {
             case EQUAL:
-                super.invokeActionsSet(isEqual(propertyValue, expression.getValue()));
+                res = isEqual(propertyValue, expression.getValue());
+                if (res) setActivated(true);
+                if(isMainCondition())
+                    super.invokeActionsSet(res);
                 break;
 
             case NOT_EQUAL:
-                super.invokeActionsSet(!isEqual(propertyValue, expression.getValue()));
+                res = !isEqual(propertyValue, expression.getValue());
+                if (res) setActivated(true);
+                if(isMainCondition())
+                    super.invokeActionsSet(res);
                 break;
 
             case LESS_THAN:
                 // Check if the property's value is less than the expression's value
-                super.invokeActionsSet(isLessThan(propertyValue, expression.getValue()));
+                res = isLessThan(propertyValue, expression.getValue());
+                if (res) setActivated(true);
+                if(isMainCondition())
+                    super.invokeActionsSet(res);
                 break;
 
             case MORE_THAN:
                 // Check if the property's value is more than the expression's value
-                super.invokeActionsSet(isLessThan(expression.getValue(), propertyValue));
+                res = isLessThan(expression.getValue(), propertyValue);
+                if (res) setActivated(true);
+                if(isMainCondition())
+                    super.invokeActionsSet(res);
                 break;
         }
     }
-
 
     /**
      * Checks if the left numeric object is less than the right numeric object.
