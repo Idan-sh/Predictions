@@ -242,7 +242,12 @@ public class EngineHandler {
                             return floatValue;
 
                     case "boolean":
-                        return consoleIn.getBooleanInput();
+                        try{
+                            return consoleIn.getBooleanInput();
+                        } catch (IllegalArgumentException e) {
+                            ConsoleOut.printError(e.getMessage());
+                            break;
+                        }
 
                     case "string":
                         String stringValue = consoleIn.getInput();
