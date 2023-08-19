@@ -47,7 +47,7 @@ public class SimulationManager {
      */
     public boolean handleMenuChoice() {
         MenuOptions menuOption;
-        try{
+        try {
             menuOption = consoleIn.getMenuInput();
         } catch (IllegalArgumentException e) {
             ConsoleOut.printError(e.getMessage());

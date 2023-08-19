@@ -163,35 +163,55 @@ public abstract class Converter {
      * @return PropertyFactory object with the data of the PRDEnvProperty received.
      */
     private static PropertyFactory environmentVariableConvert(PRDEnvProperty prdEnvProperty) {
-        PropertyFactory retPropertyFactory;
+        PropertyFactory retEnvironmentVariable = null;
         PropertyType envVarType = PropertyType.getType(prdEnvProperty.getType());
-        ValueGenerator<?> valueGenerator = null;
+        ValueGenerator<?> valueGenerator;
+        Range range;
 
-        // Create value generator according to the environment variable's type
+        // Create value generator and environment variable result according to the environment variable's type
         switch(envVarType) {
             case INTEGER:
-                valueGenerator = new RandomIntegerValueGenerator(rangeConvert(prdEnvProperty.getPRDRange()));
+                range = rangeConvert(prdEnvProperty.getPRDRange());
+                valueGenerator = new RandomIntegerValueGenerator(range);
+                retEnvironmentVariable = new PropertyCreator<>(
+                        prdEnvProperty.getPRDName(),
+                        envVarType,
+                        valueGenerator,
+                        range
+                );
                 break;
 
             case FLOAT:
-                valueGenerator = new RandomFloatValueGenerator(rangeConvert(prdEnvProperty.getPRDRange()));
+                range = rangeConvert(prdEnvProperty.getPRDRange());
+                valueGenerator = new RandomFloatValueGenerator(range);
+                retEnvironmentVariable = new PropertyCreator<>(
+                        prdEnvProperty.getPRDName(),
+                        envVarType,
+                        valueGenerator,
+                        range
+                );
                 break;
 
             case BOOLEAN:
                 valueGenerator = new RandomBooleanValueGenerator();
+                retEnvironmentVariable = new PropertyCreator<>(
+                        prdEnvProperty.getPRDName(),
+                        envVarType,
+                        valueGenerator
+                );
                 break;
 
             case STRING:
                 valueGenerator = new RandomStringValueGenerator();
+                retEnvironmentVariable = new PropertyCreator<>(
+                        prdEnvProperty.getPRDName(),
+                        envVarType,
+                        valueGenerator
+                );
                 break;
         }
 
-        retPropertyFactory = new PropertyCreator<>(
-                prdEnvProperty.getPRDName(),
-                envVarType,
-                valueGenerator);
-
-        return retPropertyFactory;
+        return retEnvironmentVariable;
     }
 
 
@@ -380,6 +400,8 @@ public abstract class Converter {
         // Convert Then/Else action sets
         thenOrElseConvert(prdAction, worldContext, thenActions, elseActions);
 
+
+        //---------------------------------- todo - convert inner conditions recursively
         // Create condition action depending on its type
         if(prdCondition.getSingularity().equals("single")){
             retConditionAction = new SingleConditionAction(
@@ -402,7 +424,7 @@ public abstract class Converter {
                     true
             );
 
-            // todo - convert inner conditions recursively
+            // ---------------------------------- todo - move this block into a recursive function !!!
         }
         else {
             throw new RuntimeException("Error: invalid condition action received from XML!");

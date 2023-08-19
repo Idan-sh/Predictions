@@ -9,7 +9,7 @@ public abstract class InputValidator {
      * @return true if the value is within the range, false otherwise.
      */
     public static boolean isIntegerInRange(int value, RangeDTO rangeDTO) {
-        return (value >= rangeDTO.getFrom() || value <= rangeDTO.getTo());
+        return (value >= rangeDTO.getFrom() && value <= rangeDTO.getTo());
     }
 
     /**

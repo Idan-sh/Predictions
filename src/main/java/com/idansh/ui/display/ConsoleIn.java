@@ -25,7 +25,7 @@ public class ConsoleIn {
         try {
             return Integer.parseInt(getInput());
         } catch(NumberFormatException e) {
-            throw new IllegalArgumentException("invalid input, enter a number for menu choice!");
+            throw new IllegalArgumentException("invalid input, enter a number!");
         }
     }
 

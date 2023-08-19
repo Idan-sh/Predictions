@@ -222,7 +222,7 @@ public class EngineHandler {
                             if (InputValidator.isIntegerInRange(integerValue, rangeDTO)) {
                                 return integerValue;
                             } else {
-                                ConsoleOut.printError("integer number received is not within the environment variable's range (" + rangeDTO.getFrom() + ", " + rangeDTO.getTo() + ")!");
+                                ConsoleOut.printError("integer number received \"" + integerValue + "\" is not within the environment variable's range (" + rangeDTO.getFrom() + ", " + rangeDTO.getTo() + ")!");
                                 break;
                             }
                         } else

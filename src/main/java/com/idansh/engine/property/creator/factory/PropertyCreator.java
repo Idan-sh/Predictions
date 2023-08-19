@@ -40,7 +40,7 @@ public class PropertyCreator<T> implements PropertyFactory{
         this.type = type;
 
         if(!this.isNumericProperty())
-            throw new IllegalArgumentException("Error: range can be set only for numeric properties! the type of this property creator is- " + type.toString());
+            throw new IllegalArgumentException("range can be set only for numeric properties! the type of this property creator is \"" + type.toString() + "\"!");
 
         this.range = range;
         this.name = name;
