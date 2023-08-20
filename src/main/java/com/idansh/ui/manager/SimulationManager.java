@@ -68,6 +68,10 @@ public class SimulationManager {
                 return true;
 
             case RUN_SIMULATION:
+                if(!engineHandler.isSimulationLoaded()) {
+                    ConsoleOut.printError("no simulation loaded! please load before trying to run!");
+                    return true;
+                }
                 engineHandler.runSimulation();
                 return true;
 
