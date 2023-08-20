@@ -16,11 +16,11 @@ public class KillAction extends Action {
         super(worldContext, entityContext);
     }
 
-    public void invoke() {
+    @Override
+    public void invoke(Entity entity) {
         World worldContext = getWorldContext();
-        Entity entityToKill = worldContext.entityManager.getEntityInPopulation(getEntityContext());
-        if(entityToKill != null)
-            worldContext.entityManager.killEntity(entityToKill);
+        if(entity != null)
+            worldContext.entityManager.killEntity(entity);
     }
 
 

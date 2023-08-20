@@ -1,5 +1,6 @@
 package com.idansh.engine.actions;
 
+import com.idansh.engine.entity.Entity;
 import com.idansh.engine.expression.api.Expression;
 import com.idansh.engine.property.instance.Property;
 import com.idansh.engine.world.World;
@@ -23,20 +24,14 @@ public class IncreaseAction extends Action {
         this.amount = amount;
     }
 
-    public void invoke() {
-        super.getWorldContext().entityManager.getPopulation().forEach(
-            entity -> {
-                // Preform action only on the entities instances of the entity context
-                if (entity.getName().equals(super.getEntityContext())) {
-                    Property property = entity.getPropertyByName(propertyName);
+    @Override
+    public void invoke(Entity entity) {
+        Property property = entity.getPropertyByName(propertyName);
 
-                    if (!property.isNumericProperty())
-                        throw new IllegalArgumentException("Error: can preform increase only on numeric properties!");
+        if (!property.isNumericProperty())
+            throw new IllegalArgumentException("can preform increase only on numeric properties! the property if of type \"" + property.getType() + "\".");
 
-                    property.addNumToValue(amount.getValue());
-                }
-            }
-        );
+        property.addNumToValue(amount.getValue());
     }
 
 

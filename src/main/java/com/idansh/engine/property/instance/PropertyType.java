@@ -29,7 +29,7 @@ public enum PropertyType {
                 return STRING;
 
             default:
-                throw new IllegalArgumentException("Error: invalid property type- \"" + s + "\"");
+                throw new IllegalArgumentException("invalid string \"" + s + "\", this string cannot be converted to a valid property type");
         }
     }
 
@@ -54,7 +54,7 @@ public enum PropertyType {
                 return "string";
 
             default:
-                throw new IllegalArgumentException("Error: invalid property type- \"" + this + "\"");
+                throw new IllegalArgumentException("invalid property type of \"" + this + "\"");
         }
     }
 

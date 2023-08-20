@@ -1,6 +1,7 @@
 package com.idansh.engine.rule;
 
 import com.idansh.engine.actions.Action;
+import com.idansh.engine.entity.Entity;
 import com.idansh.engine.helpers.Counter;
 
 import java.util.HashSet;
@@ -34,7 +35,7 @@ public class Rule {
      */
     public void addAction(Action action) {
         if(actionsSet.contains(action))
-            throw new IllegalArgumentException("Error: action " + action.getClass() + " already exists in the rules set!");
+            throw new IllegalArgumentException("action " + action.getClass() + " already exists in the rules set!");
 
         actionsSet.add(action);
     }
@@ -47,20 +48,26 @@ public class Rule {
     /**
      * Tries to activate the rule by invoking all actions defined in this rule.
      * The rule will be activated if both the defined amount of ticks has passed and the probability was achieved.
+     * @param entity the current entity in which we try to invoke the rule.
      */
-    public void invoke() {
+    public void invoke(Entity entity) {
         activation.generateProbability();
 
         tickCounter.increaseCount();
 
-        // Check if the amount of ticks in the simulation have passed, and check if the probability was activated
-        if(activation.getTicks() == tickCounter.getCount() && activation.isProbabilityActivated()) {
-            tickCounter.resetCount();
-            actionsSet.forEach(Action::invoke); // Activate all actions of the rule
-        }
+        // Check if the amount of ticks in the simulation have passed
+        if((activation.getTicks() == tickCounter.getCount())) {
+            tickCounter.resetCount();   // Reset counter every tick amount set.
 
-        // Reset counter every tick amount set.
-        if(activation.getTicks() == tickCounter.getCount())
-            tickCounter.resetCount();
+            // Check if the probability was activated
+            if(activation.isProbabilityActivated())
+                actionsSet.forEach(
+                        action -> {
+                            // Invoke only actions that are within the received entity's context
+                            if(entity.getName().equals(action.getEntityContext()))
+                                action.invoke(entity);
+                        }
+                );
+        }
     }
 }

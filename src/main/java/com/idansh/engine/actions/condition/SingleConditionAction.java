@@ -22,7 +22,7 @@ public class SingleConditionAction extends ConditionAction{
      * @param value        a number that will be compared to the property's value
      */
     public SingleConditionAction(World worldContext, String entityContext, String propertyName, String operator, Expression value, ThenOrElseActions thenActions, ThenOrElseActions elseActions, boolean isMainCondition) {
-        super(worldContext, entityContext, Type.SINGLE, thenActions, elseActions, isMainCondition);
+        super(worldContext, entityContext, thenActions, elseActions, isMainCondition);
         this.propertyName = propertyName;
         this.expression = value;
         this.operator = ConditionOperator.getConditionOperator(operator); // Try to convert to ConditionOperator, if fails throw exception
@@ -36,56 +36,40 @@ public class SingleConditionAction extends ConditionAction{
 
 
     @Override
-    public void invoke() {
-        List<Entity> population = getWorldContext().entityManager.getPopulation();
+    public void invoke(Entity entity) {
+        Object propertyValue = entity.getPropertyByName(propertyName).getValue();
+        boolean res;
 
-        // Check if the condition is activated on every entity instance of the main entity defined
-        for (Entity entity : population) {
-            // Only perform condition on entity instances of the main entity defined
-            if (!entity.getName().equals(getEntityContext()))
-                continue;
+        switch (operator) {
+            case EQUAL:
+                res = isEqual(propertyValue, expression.getValue());
+                if (res) setActivated(true);
+                if (isMainCondition())
+                    invokeActionsSet(entity, res);
+                break;
 
-            Object propertyValue = entity.getPropertyByName(propertyName).getValue();
-            boolean res;
+            case NOT_EQUAL:
+                res = !isEqual(propertyValue, expression.getValue());
+                if (res) setActivated(true);
+                if (isMainCondition())
+                    invokeActionsSet(entity, res);
+                break;
 
-            switch (operator) {
-                case EQUAL:
-                    res = isEqual(propertyValue, expression.getValue());
-                    if (res) setActivated(true);
-                    if(isMainCondition())
-                        invokeActionsSet(res);
-                    break;
+            case LESS_THAN:
+                // Check if the property's value is less than the expression's value
+                res = isLessThan(propertyValue, expression.getValue());
+                if (res) setActivated(true);
+                if (isMainCondition())
+                    invokeActionsSet(entity, res);
+                break;
 
-                case NOT_EQUAL:
-                    res = !isEqual(propertyValue, expression.getValue());
-                    if (res) setActivated(true);
-                    if(isMainCondition())
-                        invokeActionsSet(res);
-                    break;
-
-                case LESS_THAN:
-                    // Check if the property's value is less than the expression's value
-                    res = isLessThan(propertyValue, expression.getValue());
-
-                    if (res)
-                        setActivated(true);
-
-                    if(isMainCondition())
-                        invokeActionsSet(res);
-
-                    break;
-
-                case MORE_THAN:
-                    // Check if the property's value is more than the expression's value
-                    res = isLessThan(expression.getValue(), propertyValue);
-                    if (res)
-                        setActivated(true);
-
-                    if(isMainCondition())
-                        invokeActionsSet(res);
-
-                    break;
-            }
+            case MORE_THAN:
+                // Check if the property's value is more than the expression's value
+                res = isLessThan(expression.getValue(), propertyValue);
+                if (res) setActivated(true);
+                if (isMainCondition())
+                    invokeActionsSet(entity, res);
+                break;
         }
     }
 
@@ -109,7 +93,7 @@ public class SingleConditionAction extends ConditionAction{
             return (float) left < (float) right;
 
         throw new IllegalArgumentException("can only perform less than on numeric values" +
-                " of the same type! got types \"" + left.getClass() + "\" and \"" + right.getClass() + "\"");
+                " of the same type! got types \"" + left.getClass() + "\" and \"" + right.getClass() + "\".");
     }
 
 
@@ -129,6 +113,6 @@ public class SingleConditionAction extends ConditionAction{
             return ((String) obj1).equals((String) obj2);
         } else
             throw new IllegalArgumentException("can only check if values are equal on values" +
-                " of the same type! got types \"" + obj1.getClass() + "\" and \"" + obj2.getClass() + "\"");
+                " of the same type! got types \"" + obj1.getClass() + "\" and \"" + obj2.getClass() + "\".");
     }
 }

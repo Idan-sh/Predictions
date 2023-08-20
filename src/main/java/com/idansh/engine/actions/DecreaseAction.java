@@ -1,5 +1,6 @@
 package com.idansh.engine.actions;
 
+import com.idansh.engine.entity.Entity;
 import com.idansh.engine.expression.api.Expression;
 import com.idansh.engine.property.instance.Property;
 import com.idansh.engine.world.World;
@@ -24,20 +25,14 @@ public class DecreaseAction extends Action {
         this.amount = amount;
     }
 
-    public void invoke() {
-        super.getWorldContext().entityManager.getPopulation().forEach(
-                entity -> {
-                    // Preform action only on the entities instances of the entity context
-                    if (entity.getName().equals(super.getEntityContext())) {
-                        Property property = entity.getPropertyByName(propertyName);
+    @Override
+    public void invoke(Entity entity) {
+        Property property = entity.getPropertyByName(propertyName);
 
-                        if (!property.isNumericProperty())
-                            throw new IllegalArgumentException("Error: can preform decrease only on numeric properties!");
+        if (!property.isNumericProperty())
+            throw new IllegalArgumentException("can preform decrease only on numeric properties! the property if of type \"" + property.getType() + "\".");
 
-                        property.addNumToValue(invertValue(amount.getValue()));
-                    }
-                }
-        );
+        property.addNumToValue(invertValue(amount.getValue()));
     }
 
 
@@ -52,7 +47,7 @@ public class DecreaseAction extends Action {
         if(valueToInvert instanceof Float)
             return ((float) valueToInvert) * (-1);
 
-        throw new IllegalArgumentException("Error: invertValue can be preformed only on Integer or Float (non-primitive) values!");
+        throw new IllegalArgumentException("invertValue can be preformed only on Integer or Float values! got value to invert of type \"" + valueToInvert.getClass() + "\".");
     }
 
     @Override

@@ -79,7 +79,7 @@ public class World {
      */
     public void addRule(Rule rule) {
         if(rulesMap.containsKey(rule.getName()))
-            throw new IllegalArgumentException("Error: received Rule's name - " + rule.getName() + " already exists!");
+            throw new IllegalArgumentException("received Rule's name - " + rule.getName() + " already exists!");
 
         rulesMap.put(rule.getName(), rule);
     }
@@ -94,15 +94,20 @@ public class World {
 
         // Check if the current tick has reached the termination rule tick defined, if one does not exist keeps going until reached the timer defined
         while((!terminationRules.containsKey(TerminationRule.Type.TICKS)) || (terminationRules.containsKey(TerminationRule.Type.TICKS) && tickCounter.getCount() < terminationRules.get(TerminationRule.Type.TICKS).getValue())) {
-            tickCounter.increaseCount();
-
             // Checks if the timer expired
             if(countdown.isFinished()) {
                 return new SimulationResult("Timer Expired", entityManager);
             }
 
-            // Invoke all rules
-            rulesMap.forEach((ruleName, rule) -> rule.invoke());
+            // Run on every entity in the population and check if a rule can be invoked on it
+            entityManager.getPopulation().forEach(
+                    entity -> {
+                        // Invoke all rules
+                        rulesMap.forEach((ruleName, rule) -> rule.invoke(entity));
+                    }
+            );
+
+            tickCounter.increaseCount();
         }
 
         return new SimulationResult("Ticks Reached", entityManager);

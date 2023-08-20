@@ -63,11 +63,11 @@ public class Property {
     public void setValue(Object newValue) {
         // Check that the type of the new value is of the property
         if(!isNewValueOfPropertyType(newValue))
-            throw new IllegalArgumentException("Error: newValue received in setValue is not in the property's type!");
+            throw new IllegalArgumentException("value received in setValue is not of the property's type! new value received is of type " + newValue.getClass() + ", while the property's type is " + type.getTypeString());
 
         // Checks if the newValue is a number, and if so, checks if it's in the range.
         if((newValue instanceof Integer || newValue instanceof Float) && isRangeOverflow(newValue))
-            throw new IllegalArgumentException("Error: newValue received in setValue is not within the property's range!");
+            throw new IllegalArgumentException("newValue received in setValue is not within the property's range! new value received is " + newValue + ", while the property's range is (" + range.getBottom() + ", " + range.getTop() + ")");
 
         // Update the value
         this.value = newValue;
@@ -105,16 +105,16 @@ public class Property {
 
 
     /**
-     * Adds a number of the type Integer/Float (non-primitive) to the property's value.
+     * Adds a number of the type Integer/Float to the property's value.
      * If the addition exceeds the range bounds, sets the bound exceeded as the new value.
      * @param toAdd the number to add to the property's value.
      */
     public void addNumToValue(Object toAdd) {
-        if(!this.isNumericProperty())
-            throw new IllegalArgumentException("Error: can preform addNumToValue only on numeric properties!");
+        if(!isNumericProperty())
+            throw new IllegalArgumentException("can preform addNumToValue only on numeric properties! the property's type is \"" + type.getTypeString() + "\".");
 
         if(!(toAdd instanceof Integer) && !(toAdd instanceof Float))
-            throw new IllegalArgumentException("Error: can only add a number (non-primitive) to the property's value!");
+            throw new IllegalArgumentException("can only add a number to the property's value! got value of type \" + toAdd.getClass()");
 
         // Check if exceeded the range, if so then continue without updating (without throwing en exception)
         if(isRangeOverflowAfterAddition(toAdd))
@@ -151,7 +151,7 @@ public class Property {
             return newVal > range.getTop() || newVal < range.getBottom();
         }
 
-        throw new IllegalArgumentException("Error: can only perform checkRange on numeric properties!");
+        throw new IllegalArgumentException("can only perform checkRange on numeric properties! got value of type: " + toAdd.getClass());
     }
 
 
@@ -173,6 +173,6 @@ public class Property {
             return (float) newVal > range.getTop() || (float) newVal < range.getBottom();
         }
 
-        throw new IllegalArgumentException("Error: can only perform checkRange on numeric properties!");
+        throw new IllegalArgumentException("can only perform checkRange on numeric properties! the property's type is \"" + type.getTypeString() + "\".");
     }
 }

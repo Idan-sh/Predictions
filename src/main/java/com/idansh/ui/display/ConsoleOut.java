@@ -79,15 +79,6 @@ public abstract class ConsoleOut {
     }
 
 
-//    /**
-//     * Receives a SimulationResultDTO with the data of a past simulation,
-//     * formats it and prints it.
-//     * @param simulationResultDTO a simulation result to print its details.
-//     */
-//    public static void printPastSimulationDetails(SimulationResultDTO simulationResultDTO) {
-//    }
-
-
     /**
      * Prints out the basic details of past simulation received from the engine.
      * @param pastSimulationsResults - an array of SimulationResultDTO containing simulations results.
@@ -257,9 +248,23 @@ public abstract class ConsoleOut {
             ConsoleOut.printMessage("No properties to display...");
     }
 
+
+    /**
+     * Prints error information on a runtime exception.
+     * @param e the runtime exception error that was thrown.
+     */
     public static void printRuntimeException(RuntimeException e) {
         ConsoleOut.printMessage("Cause: " + e.getMessage());
         ConsoleOut.printMessage("Exception's Class: " + e.getClass().toString());
+//        printTrace(e);
+    }
+
+
+    /**
+     * Prints the trace of a runtime exception.
+     * @param e the runtime exception error that was thrown.
+     */
+    public static void printTrace(RuntimeException e) {
         ConsoleOut.printMessage("Trace: ");
         for (StackTraceElement stackTraceElement : e.getStackTrace())
             ConsoleOut.printMessage("   " + stackTraceElement.toString());
