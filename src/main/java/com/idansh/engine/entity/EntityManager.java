@@ -7,7 +7,6 @@ public class EntityManager {
     private final Map<String, EntityFactory> entityFactories;   // Each entity factory will define instructions on how to instantiate a single entity with a unique name
     private final List<Entity> population;
 
-
     public EntityManager() {
         this.entityFactories = new HashMap<>();
         this.population = new CopyOnWriteArrayList<>(); // Note: using a thread-safe collection that can handle concurrent modifications and iterations (we try to kill entity instances while iterating on the population list)
@@ -19,7 +18,7 @@ public class EntityManager {
      */
     public void addEntityFactory(EntityFactory entityFactory) {
         if(entityFactories.containsKey(entityFactory.getName()))
-            throw new IllegalArgumentException("Error: received entityFactory's name already exists!");
+            throw new IllegalArgumentException("received entityFactory's name \"" + entityFactory.getName() + "\" already exists!");
 
         entityFactories.put(entityFactory.getName(), entityFactory);
     }

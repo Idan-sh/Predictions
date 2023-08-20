@@ -6,20 +6,14 @@ import com.idansh.engine.world.World;
 
 
 public abstract class ConditionAction extends Action {
-    public enum Type {
-        SINGLE, MULTI
-    }
-
-    private final Type type;
     private final ThenOrElseActions thenActions;
     private final ThenOrElseActions elseActions;
     private final boolean isMainCondition;      // Whether this condition action has "then" and "else" actions blocks, which are set only on the outermost condition action.
     private boolean isActivated;
 
 
-    public ConditionAction(World worldContext, String entityContext, Type type, ThenOrElseActions thenActions, ThenOrElseActions elseActions, boolean isMainCondition) {
+    public ConditionAction(World worldContext, String entityContext, ThenOrElseActions thenActions, ThenOrElseActions elseActions, boolean isMainCondition) {
         super(worldContext, entityContext);
-        this.type = type;
         this.thenActions = thenActions;
         this.elseActions = elseActions;
         this.isMainCondition = isMainCondition;

@@ -22,7 +22,7 @@ public class SingleConditionAction extends ConditionAction{
      * @param value        a number that will be compared to the property's value
      */
     public SingleConditionAction(World worldContext, String entityContext, String propertyName, String operator, Expression value, ThenOrElseActions thenActions, ThenOrElseActions elseActions, boolean isMainCondition) {
-        super(worldContext, entityContext, Type.SINGLE, thenActions, elseActions, isMainCondition);
+        super(worldContext, entityContext, thenActions, elseActions, isMainCondition);
         this.propertyName = propertyName;
         this.expression = value;
         this.operator = ConditionOperator.getConditionOperator(operator); // Try to convert to ConditionOperator, if fails throw exception
@@ -37,8 +37,6 @@ public class SingleConditionAction extends ConditionAction{
 
     @Override
     public void invoke(Entity entity) {
-        System.out.println("invoked single condition");
-
         Object propertyValue = entity.getPropertyByName(propertyName).getValue();
         boolean res;
 
@@ -66,18 +64,11 @@ public class SingleConditionAction extends ConditionAction{
                 break;
 
             case MORE_THAN:
-                System.out.println("in property of name: " + propertyName);
-                System.out.println(propertyValue + " is more than " + expression.getValue() + "?");
                 // Check if the property's value is more than the expression's value
                 res = isLessThan(expression.getValue(), propertyValue);
-                if (res) {
-                    System.out.println("it is more than!");
-                    setActivated(true);
-                }
-
+                if (res) setActivated(true);
                 if (isMainCondition())
                     invokeActionsSet(entity, res);
-
                 break;
         }
     }
@@ -102,7 +93,7 @@ public class SingleConditionAction extends ConditionAction{
             return (float) left < (float) right;
 
         throw new IllegalArgumentException("can only perform less than on numeric values" +
-                " of the same type! got types \"" + left.getClass() + "\" and \"" + right.getClass() + "\"");
+                " of the same type! got types \"" + left.getClass() + "\" and \"" + right.getClass() + "\".");
     }
 
 
@@ -122,6 +113,6 @@ public class SingleConditionAction extends ConditionAction{
             return ((String) obj1).equals((String) obj2);
         } else
             throw new IllegalArgumentException("can only check if values are equal on values" +
-                " of the same type! got types \"" + obj1.getClass() + "\" and \"" + obj2.getClass() + "\"");
+                " of the same type! got types \"" + obj1.getClass() + "\" and \"" + obj2.getClass() + "\".");
     }
 }

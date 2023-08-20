@@ -79,15 +79,6 @@ public abstract class ConsoleOut {
     }
 
 
-//    /**
-//     * Receives a SimulationResultDTO with the data of a past simulation,
-//     * formats it and prints it.
-//     * @param simulationResultDTO a simulation result to print its details.
-//     */
-//    public static void printPastSimulationDetails(SimulationResultDTO simulationResultDTO) {
-//    }
-
-
     /**
      * Prints out the basic details of past simulation received from the engine.
      * @param pastSimulationsResults - an array of SimulationResultDTO containing simulations results.

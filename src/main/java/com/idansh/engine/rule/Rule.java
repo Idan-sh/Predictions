@@ -35,7 +35,7 @@ public class Rule {
      */
     public void addAction(Action action) {
         if(actionsSet.contains(action))
-            throw new IllegalArgumentException("Error: action " + action.getClass() + " already exists in the rules set!");
+            throw new IllegalArgumentException("action " + action.getClass() + " already exists in the rules set!");
 
         actionsSet.add(action);
     }

@@ -30,7 +30,7 @@ public class DecreaseAction extends Action {
         Property property = entity.getPropertyByName(propertyName);
 
         if (!property.isNumericProperty())
-            throw new IllegalArgumentException("Error: can preform decrease only on numeric properties!");
+            throw new IllegalArgumentException("can preform decrease only on numeric properties! the property if of type \"" + property.getType() + "\".");
 
         property.addNumToValue(invertValue(amount.getValue()));
     }
@@ -47,7 +47,7 @@ public class DecreaseAction extends Action {
         if(valueToInvert instanceof Float)
             return ((float) valueToInvert) * (-1);
 
-        throw new IllegalArgumentException("Error: invertValue can be preformed only on Integer or Float (non-primitive) values!");
+        throw new IllegalArgumentException("invertValue can be preformed only on Integer or Float values! got value to invert of type \"" + valueToInvert.getClass() + "\".");
     }
 
     @Override

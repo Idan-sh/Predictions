@@ -29,7 +29,7 @@ public class IncreaseAction extends Action {
         Property property = entity.getPropertyByName(propertyName);
 
         if (!property.isNumericProperty())
-            throw new IllegalArgumentException("Error: can preform increase only on numeric properties!");
+            throw new IllegalArgumentException("can preform increase only on numeric properties! the property if of type \"" + property.getType() + "\".");
 
         property.addNumToValue(amount.getValue());
     }

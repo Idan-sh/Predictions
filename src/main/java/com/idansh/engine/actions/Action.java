@@ -42,7 +42,7 @@ public abstract class Action {
                     return Type.PROXIMITY;
 
                 default:
-                    throw new IllegalArgumentException("Error: invalid property type- \"" + s + "\"");
+                    throw new IllegalArgumentException("cannot convert received string to action type! received string is \"" + s + "\".");
             }
         }
     }

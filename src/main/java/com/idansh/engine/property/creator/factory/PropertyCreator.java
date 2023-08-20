@@ -61,7 +61,7 @@ public class PropertyCreator<T> implements PropertyFactory{
     @Override
     public void updateValue(Object newValue) {
         if(!valueGenerator.generateValue().getClass().equals(newValue.getClass()))
-            throw new IllegalArgumentException("value received in updateValue is not of the property factory's type!");
+            throw new IllegalArgumentException("value received in updateValue is not of the property factory's type! got value of type " + newValue.getClass() + ", while the property factory is of type " + type.getTypeString());
 
         valueGenerator = new FixedValueGenerator<>((T) newValue);
     }

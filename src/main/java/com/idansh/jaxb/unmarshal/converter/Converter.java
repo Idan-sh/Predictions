@@ -95,6 +95,9 @@ public abstract class Converter {
         boolean isRandom = prdProperty.getPRDValue().isRandomInitialize();
         Range range = rangeConvert(prdProperty.getPRDRange());
 
+        if(!isRandom && (prdProperty.getPRDValue().getInit() == null))
+            throw new IllegalArgumentException("random-initialize field is false, but no init field provided!");
+
         // Create the property according to its type:
         // PropertyType.getType handles errors with the prdProperty's type
         switch(PropertyType.getType(prdProperty.getType())) {
@@ -151,7 +154,7 @@ public abstract class Converter {
         else if (prdTermination.getClass().equals(PRDBySecond.class))
             retTerminationRule = new TerminationRule(TerminationRule.Type.SECONDS, ((PRDBySecond) prdTermination).getCount());
         else
-            throw new IllegalArgumentException("Error: prdTermination received is not of type" +
+            throw new IllegalArgumentException("prdTermination received is not of type" +
                     "PRDByTicks or PRDBySecond! (the type is- " + prdTermination.getClass() + ")");
 
         return retTerminationRule;
@@ -380,7 +383,7 @@ public abstract class Converter {
                     CalculationAction.Type.DIVIDE);
         }
         else {
-            throw new RuntimeException("Error: invalid calculation action received from XML!");
+            throw new RuntimeException("invalid calculation action received from XML, both prdMultiply and prdDivide fields do not exist! please add them and try again...");
         }
 
         return retCalculationAction;
@@ -428,7 +431,7 @@ public abstract class Converter {
 
             return retMultiConditionAction;
         } else {
-            throw new RuntimeException("Error: invalid condition action received from XML!");
+            throw new RuntimeException("invalid condition action received from XML, singularity field's value is not \"single\" or \"multiple\"!");
         }
     }
 
@@ -470,7 +473,7 @@ public abstract class Converter {
                         convertInnerConditions(prdAction, prdCondition.getPRDCondition(), worldContext, expressionConverter, multiConditionAction);
                         mainConditionAction.addInnerCondition(multiConditionAction);    // Add finished multi-condition action with inner conditions to the main condition action.
                     } else {
-                        throw new RuntimeException("Error: invalid condition action received from XML!");
+                        throw new RuntimeException("invalid condition action received from XML, singularity field's value is not \"single\" or \"multiple\"!");
                     }
                 }
         );
@@ -490,7 +493,7 @@ public abstract class Converter {
 
         // Check if the then actions block contains no actions
         if(thenActions.isEmpty())
-            throw new RuntimeException("then actions set received from XML is empty!");
+            throw new RuntimeException("then actions set received from XML is empty! add at least one action to the then actions set...");
 
         // Check if there is an else actions block
         if(prdAction.getPRDElse() != null)

@@ -13,7 +13,6 @@ import java.util.Map;
 public class ActiveEnvironmentVariables {
     private final Map<String, Property> environmentVariables;
 
-
     public ActiveEnvironmentVariables() {
         this.environmentVariables = new HashMap<>();
     }

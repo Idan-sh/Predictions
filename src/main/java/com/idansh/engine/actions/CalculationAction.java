@@ -43,10 +43,10 @@ public class CalculationAction extends Action {
         Object val2 = arg2.getValue();
 
         if (!propertyToSave.isNumericProperty())
-            throw new IllegalArgumentException("Error: can preform calculation only on numeric properties!");
+            throw new IllegalArgumentException("can preform calculation only on numeric properties! the property if of type \"" + propertyToSave.getType() + "\".");
 
         if (!isNumber(val1) || !isNumber(val2))
-            throw new IllegalArgumentException("Error: can preform calculation only on numeric arguments!");
+            throw new IllegalArgumentException("can preform calculation only on numeric properties! the property if of type \"" + propertyToSave.getType() + "\".");
 
         // Perform action according to the type
         switch (type) {
