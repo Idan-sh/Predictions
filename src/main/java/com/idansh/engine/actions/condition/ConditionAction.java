@@ -1,6 +1,7 @@
 package com.idansh.engine.actions.condition;
 
 import com.idansh.engine.actions.Action;
+import com.idansh.engine.entity.Entity;
 import com.idansh.engine.world.World;
 
 
@@ -31,12 +32,12 @@ public abstract class ConditionAction extends Action {
      * or invokes "else" actions set if condition is false.
      * @param isCondition the value of the condition defined in the action.
      */
-    public void invokeActionsSet(boolean isCondition) {
+    public void invokeActionsSet(Entity entity, boolean isCondition) {
         if(thenActions != null && isCondition)
-            thenActions.invoke();
+            thenActions.invoke(entity);
         else
             if(elseActions != null && !elseActions.isEmpty())
-                elseActions.invoke();
+                elseActions.invoke(entity);
     }
 
 

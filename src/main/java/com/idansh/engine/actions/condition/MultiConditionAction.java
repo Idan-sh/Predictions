@@ -1,5 +1,6 @@
 package com.idansh.engine.actions.condition;
 
+import com.idansh.engine.entity.Entity;
 import com.idansh.engine.world.World;
 
 import java.util.ArrayList;
@@ -50,38 +51,56 @@ public class MultiConditionAction extends ConditionAction{
     }
 
     @Override
-    public void invoke() {
+    public void invoke(Entity entity) {
+        System.out.println("\ninvoking multi-condition");
+
         List<Boolean> innerConditionsResults = new ArrayList<>();
 
         innerConditions.forEach(
                 conditionAction -> {
-                    conditionAction.invoke();
+                    System.out.println("\nrunning inner condition");
+                    conditionAction.invoke(entity);
 
                     // Check if the inner condition was activated, add the result to the list
                     if(conditionAction.isActivated())
+                    {
                         innerConditionsResults.add(true);
+                        System.out.println("added inner condition result true");
+
+                        // Reset condition activation for future use
+                        conditionAction.setActivated(false);
+                    }
                     else
+                    {
                         innerConditionsResults.add(false);
+                        System.out.println("added inner condition result false");
+                    }
                 }
         );
 
         switch (logicOp) {
             case OR:
+                System.out.println("got OR logic op");
+                System.out.println("res is: " + innerConditionsResults.contains(true));
                 // Check if one of the inner conditions resulted as "true", invoke the proper actions set
-                invokeActionsSet(innerConditionsResults.contains(true));
+                invokeActionsSet(entity, innerConditionsResults.contains(true));
 
             case AND:
+                System.out.println("got AND logic op");
                 boolean flag = true; // Flag that checks if there is a false inner condition
                 for(Boolean innerConditionRes : innerConditionsResults) {
+                    System.out.println("in loop got: " + innerConditionRes);
                     // Check if the current condition result is false, if so the AND logic is also false
                     if (!innerConditionRes) {
-                        invokeActionsSet(false); // Invoke the "else" actions set
+                        invokeActionsSet(entity, false); // Invoke the "else" actions set
                         flag = false;
                     }
                 }
+                System.out.println("res is: " + flag);
+
                 // There was no inner condition of value false
                 if(flag)
-                    invokeActionsSet(true); // Invoke the "then" actions set
+                    invokeActionsSet(entity, true); // Invoke the "then" actions set
 
         }
     }

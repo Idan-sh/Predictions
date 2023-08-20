@@ -94,15 +94,23 @@ public class World {
 
         // Check if the current tick has reached the termination rule tick defined, if one does not exist keeps going until reached the timer defined
         while((!terminationRules.containsKey(TerminationRule.Type.TICKS)) || (terminationRules.containsKey(TerminationRule.Type.TICKS) && tickCounter.getCount() < terminationRules.get(TerminationRule.Type.TICKS).getValue())) {
-            tickCounter.increaseCount();
+            System.out.println();
+            System.out.println("-------- CURRENT TICK : " + tickCounter.getCount() + " ----------");
 
             // Checks if the timer expired
             if(countdown.isFinished()) {
                 return new SimulationResult("Timer Expired", entityManager);
             }
 
-            // Invoke all rules
-            rulesMap.forEach((ruleName, rule) -> rule.invoke());
+            // Run on every entity in the population and check if a rule can be invoked on it
+            entityManager.getPopulation().forEach(
+                    entity -> {
+                        // Invoke all rules
+                        rulesMap.forEach((ruleName, rule) -> rule.invoke(entity));
+                    }
+            );
+
+            tickCounter.increaseCount();
         }
 
         return new SimulationResult("Ticks Reached", entityManager);

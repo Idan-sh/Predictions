@@ -36,56 +36,49 @@ public class SingleConditionAction extends ConditionAction{
 
 
     @Override
-    public void invoke() {
-        List<Entity> population = getWorldContext().entityManager.getPopulation();
+    public void invoke(Entity entity) {
+        System.out.println("invoked single condition");
 
-        // Check if the condition is activated on every entity instance of the main entity defined
-        for (Entity entity : population) {
-            // Only perform condition on entity instances of the main entity defined
-            if (!entity.getName().equals(getEntityContext()))
-                continue;
+        Object propertyValue = entity.getPropertyByName(propertyName).getValue();
+        boolean res;
 
-            Object propertyValue = entity.getPropertyByName(propertyName).getValue();
-            boolean res;
+        switch (operator) {
+            case EQUAL:
+                res = isEqual(propertyValue, expression.getValue());
+                if (res) setActivated(true);
+                if (isMainCondition())
+                    invokeActionsSet(entity, res);
+                break;
 
-            switch (operator) {
-                case EQUAL:
-                    res = isEqual(propertyValue, expression.getValue());
-                    if (res) setActivated(true);
-                    if(isMainCondition())
-                        invokeActionsSet(res);
-                    break;
+            case NOT_EQUAL:
+                res = !isEqual(propertyValue, expression.getValue());
+                if (res) setActivated(true);
+                if (isMainCondition())
+                    invokeActionsSet(entity, res);
+                break;
 
-                case NOT_EQUAL:
-                    res = !isEqual(propertyValue, expression.getValue());
-                    if (res) setActivated(true);
-                    if(isMainCondition())
-                        invokeActionsSet(res);
-                    break;
+            case LESS_THAN:
+                // Check if the property's value is less than the expression's value
+                res = isLessThan(propertyValue, expression.getValue());
+                if (res) setActivated(true);
+                if (isMainCondition())
+                    invokeActionsSet(entity, res);
+                break;
 
-                case LESS_THAN:
-                    // Check if the property's value is less than the expression's value
-                    res = isLessThan(propertyValue, expression.getValue());
+            case MORE_THAN:
+                System.out.println("in property of name: " + propertyName);
+                System.out.println(propertyValue + " is more than " + expression.getValue() + "?");
+                // Check if the property's value is more than the expression's value
+                res = isLessThan(expression.getValue(), propertyValue);
+                if (res) {
+                    System.out.println("it is more than!");
+                    setActivated(true);
+                }
 
-                    if (res)
-                        setActivated(true);
+                if (isMainCondition())
+                    invokeActionsSet(entity, res);
 
-                    if(isMainCondition())
-                        invokeActionsSet(res);
-
-                    break;
-
-                case MORE_THAN:
-                    // Check if the property's value is more than the expression's value
-                    res = isLessThan(expression.getValue(), propertyValue);
-                    if (res)
-                        setActivated(true);
-
-                    if(isMainCondition())
-                        invokeActionsSet(res);
-
-                    break;
-            }
+                break;
         }
     }
 

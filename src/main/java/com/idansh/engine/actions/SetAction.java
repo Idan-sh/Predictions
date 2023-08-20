@@ -1,5 +1,6 @@
 package com.idansh.engine.actions;
 
+import com.idansh.engine.entity.Entity;
 import com.idansh.engine.expression.api.Expression;
 import com.idansh.engine.property.instance.Property;
 import com.idansh.engine.world.World;
@@ -25,17 +26,10 @@ public class SetAction extends Action {
     }
 
 
-    public void invoke() {
-        super.getWorldContext().entityManager.getPopulation().forEach(
-                entity -> {
-                    // Preform action only on the entities instances of the entity context
-                    if (entity.getName().equals(super.getEntityContext())) {
-                        Property property = entity.getPropertyByName(propertyName);
-
-                        property.setValue(amount.getValue());
-                    }
-                }
-        );
+    @Override
+    public void invoke(Entity entity) {
+        Property property = entity.getPropertyByName(propertyName);
+        property.setValue(amount.getValue());
     }
 
 

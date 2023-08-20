@@ -1,5 +1,6 @@
 package com.idansh.engine.actions;
 
+import com.idansh.engine.entity.Entity;
 import com.idansh.engine.property.instance.Property;
 import com.idansh.engine.property.instance.PropertyType;
 import com.idansh.engine.world.World;
@@ -69,8 +70,9 @@ public abstract class Action {
     /**
      * Invokes the action, according to the action's type.
      * The action will be invoked on every instance of the defined entity in the population of the simulation.
+     * @param entity the entity instance on which the action will be performed.
      */
-    public abstract void invoke();
+    public abstract void invoke(Entity entity);
 
 
     /**

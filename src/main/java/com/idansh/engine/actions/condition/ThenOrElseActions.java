@@ -1,6 +1,7 @@
 package com.idansh.engine.actions.condition;
 
 import com.idansh.engine.actions.Action;
+import com.idansh.engine.entity.Entity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +27,11 @@ public class ThenOrElseActions {
 
     /**
      * Invokes each action in the Then/Else set of actions.
+     * @param entity the entity instance on which the actions will be invoked
      */
-    public void invoke(){
-        actionsToInvoke.forEach(Action::invoke);
+    public void invoke(Entity entity){
+        actionsToInvoke.forEach(
+                action -> action.invoke(entity)
+        );
     }
 }

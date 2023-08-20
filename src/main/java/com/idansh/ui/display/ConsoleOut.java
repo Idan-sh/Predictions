@@ -257,9 +257,23 @@ public abstract class ConsoleOut {
             ConsoleOut.printMessage("No properties to display...");
     }
 
+
+    /**
+     * Prints error information on a runtime exception.
+     * @param e the runtime exception error that was thrown.
+     */
     public static void printRuntimeException(RuntimeException e) {
         ConsoleOut.printMessage("Cause: " + e.getMessage());
         ConsoleOut.printMessage("Exception's Class: " + e.getClass().toString());
+//        printTrace(e);
+    }
+
+
+    /**
+     * Prints the trace of a runtime exception.
+     * @param e the runtime exception error that was thrown.
+     */
+    public static void printTrace(RuntimeException e) {
         ConsoleOut.printMessage("Trace: ");
         for (StackTraceElement stackTraceElement : e.getStackTrace())
             ConsoleOut.printMessage("   " + stackTraceElement.toString());
