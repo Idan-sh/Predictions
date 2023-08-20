@@ -69,7 +69,7 @@ public class EntityManager {
      */
     public void killEntity(Entity entityToKill) {
         if(!population.contains(entityToKill))
-            throw new IllegalArgumentException("cannot kill entity with name " + entityToKill.getName() + ", this entity does not exist in the population!");
+            return;
 
         // Remove the entity from the population and decrease the population counter for the main entity
         entityFactories.get(entityToKill.getName()).decreasePopulationCounter();
