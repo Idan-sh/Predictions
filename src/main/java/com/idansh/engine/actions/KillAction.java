@@ -1,7 +1,6 @@
 package com.idansh.engine.actions;
 
 import com.idansh.engine.entity.Entity;
-import com.idansh.engine.environment.ActiveEnvironmentVariables;
 import com.idansh.engine.world.World;
 
 /**

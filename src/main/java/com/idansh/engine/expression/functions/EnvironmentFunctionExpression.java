@@ -1,7 +1,6 @@
 package com.idansh.engine.expression.functions;
 
 import com.idansh.engine.environment.ActiveEnvironmentVariables;
-import com.idansh.engine.property.instance.Property;
 import com.idansh.engine.property.instance.PropertyType;
 
 public class EnvironmentFunctionExpression extends FunctionActivationExpression {

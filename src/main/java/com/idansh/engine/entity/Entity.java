@@ -2,7 +2,6 @@ package com.idansh.engine.entity;
 
 
 import com.idansh.engine.helpers.Counter;
-import com.idansh.engine.property.creator.factory.PropertyFactory;
 import com.idansh.engine.property.instance.Property;
 
 import java.util.HashMap;

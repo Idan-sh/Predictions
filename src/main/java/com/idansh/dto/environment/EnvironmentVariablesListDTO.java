@@ -1,6 +1,5 @@
 package com.idansh.dto.environment;
 
-
 import com.idansh.dto.range.RangeDTO;
 
 import java.util.ArrayList;

@@ -3,7 +3,6 @@ package com.idansh.ui.manager;
 
 import com.idansh.ui.display.ConsoleIn;
 import com.idansh.ui.display.ConsoleOut;
-import com.sun.nio.sctp.IllegalReceiveException;
 
 import static java.lang.System.exit;
 
@@ -44,7 +43,7 @@ public class SimulationManager {
      * Receives user's menu choice input and handles it accordingly.
      * @return false if the user chose to exit, and true otherwise.
      * @throws NumberFormatException in case the input string cannot be converted to int.
-     * @throws IllegalReceiveException in case the option number received is not a valid choice.
+     * @throws IllegalArgumentException in case the option number received is not a valid choice.
      */
     public boolean handleMenuChoice() {
         MenuOptions menuOption;
@@ -80,7 +79,7 @@ public class SimulationManager {
                 return false;
 
             default:
-                throw new RuntimeException("menuOption type is invalid!"); // This error should not happen on wrong user input, consoleIn.getMenuInput() throws that error
+                throw new IllegalArgumentException("menuOption type is invalid!"); // This error should not happen on wrong user input, consoleIn.getMenuInput() throws that error
         }
     }
 }

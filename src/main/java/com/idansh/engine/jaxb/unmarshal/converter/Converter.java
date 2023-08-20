@@ -21,7 +21,6 @@ import com.idansh.engine.rule.Rule;
 import com.idansh.engine.rule.RuleActivation;
 import com.idansh.engine.rule.TerminationRule;
 import com.idansh.engine.world.World;
-import com.idansh.engine.jaxb.schema.generated.*;
 
 import java.util.List;
 

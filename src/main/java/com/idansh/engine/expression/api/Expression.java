@@ -1,6 +1,5 @@
 package com.idansh.engine.expression.api;
 
-import com.idansh.engine.expression.functions.FunctionActivationExpression;
 import com.idansh.engine.property.instance.PropertyType;
 
 /**

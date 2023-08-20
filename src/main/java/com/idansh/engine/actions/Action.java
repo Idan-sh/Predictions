@@ -1,8 +1,6 @@
 package com.idansh.engine.actions;
 
 import com.idansh.engine.entity.Entity;
-import com.idansh.engine.property.instance.Property;
-import com.idansh.engine.property.instance.PropertyType;
 import com.idansh.engine.world.World;
 
 public abstract class Action {

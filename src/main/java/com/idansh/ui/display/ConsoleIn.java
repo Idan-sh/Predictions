@@ -1,7 +1,6 @@
 package com.idansh.ui.display;
 
 import com.idansh.ui.manager.MenuOptions;
-import com.sun.nio.sctp.IllegalReceiveException;
 
 import java.util.Scanner;
 
@@ -66,7 +65,7 @@ public class ConsoleIn {
      * Receives user input from the menu options.
      * @return MenuOptions enum which defines the user choice.
      * @throws NumberFormatException in case the input string cannot be converted to int.
-     * @throws IllegalReceiveException in case the option number received is not a valid choice.
+     * @throws IllegalArgumentException in case the option number received is not a valid choice.
      */
     public MenuOptions getMenuInput() throws IllegalArgumentException
     {

@@ -1,6 +1,5 @@
 package com.idansh.dto.property;
 
-
 import com.idansh.dto.range.RangeDTO;
 
 /**
