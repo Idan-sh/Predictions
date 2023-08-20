@@ -1,7 +1,5 @@
 package com.idansh.engine.helpers;
 
-import com.idansh.ui.display.ConsoleOut;
-
 import java.util.TimerTask;
 
 /**

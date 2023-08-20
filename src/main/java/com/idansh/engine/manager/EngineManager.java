@@ -12,10 +12,9 @@ import com.idansh.dto.simulation.SimulationResultDTO;
 import com.idansh.engine.helpers.Range;
 import com.idansh.engine.manager.result.SimulationResult;
 import com.idansh.engine.property.creator.factory.PropertyFactory;
-import com.idansh.engine.property.instance.PropertyType;
 import com.idansh.engine.rule.TerminationRule;
 import com.idansh.engine.world.World;
-import com.idansh.jaxb.unmarshal.reader.Reader;
+import com.idansh.engine.jaxb.unmarshal.reader.Reader;
 
 import java.util.*;
 
