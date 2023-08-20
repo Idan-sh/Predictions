@@ -1,5 +1,6 @@
 package com.idansh.engine.property.creator.factory;
 
+import com.idansh.engine.helpers.Range;
 import com.idansh.engine.property.instance.Property;
 import com.idansh.engine.property.instance.PropertyType;
 
@@ -32,10 +33,27 @@ public interface PropertyFactory {
 
 
     /**
+     * @return The range of the property factory.
+     */
+    Range getRange();
+
+
+    /**
+     * @return is the value of the property factory randomly generated.
+     */
+    boolean isRandomGenerated();
+
+
+    /**
      * Checks if the property is of the type FLOAT or INTEGER.
      * @return true if the property factory given is numeric, false otherwise.
      */
     boolean isNumericProperty();
 
 
+    /**
+     * Updates the value of the property factory.
+     * Has to be of the same type of the property.
+     */
+    void updateValue(Object newValue);
 }

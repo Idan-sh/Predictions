@@ -25,12 +25,19 @@ public class DecreaseAction extends Action {
     }
 
     public void invoke() {
-        Property property = getWorldContext().entityManager.getEntityInPopulation(getEntityContext()).getPropertyByName(propertyName);
+        super.getWorldContext().entityManager.getPopulation().forEach(
+                entity -> {
+                    // Preform action only on the entities instances of the entity context
+                    if (entity.getName().equals(super.getEntityContext())) {
+                        Property property = entity.getPropertyByName(propertyName);
 
-        if(!property.isNumericProperty())
-            throw new IllegalArgumentException("Error: can preform increase only on numeric properties!");
+                        if (!property.isNumericProperty())
+                            throw new IllegalArgumentException("Error: can preform decrease only on numeric properties!");
 
-        property.addNumToValue(invertValue(amount.getValue()));
+                        property.addNumToValue(invertValue(amount.getValue()));
+                    }
+                }
+        );
     }
 
 
@@ -46,5 +53,10 @@ public class DecreaseAction extends Action {
             return ((float) valueToInvert) * (-1);
 
         throw new IllegalArgumentException("Error: invertValue can be preformed only on Integer or Float (non-primitive) values!");
+    }
+
+    @Override
+    public String getActionTypeString() {
+        return "decrease";
     }
 }

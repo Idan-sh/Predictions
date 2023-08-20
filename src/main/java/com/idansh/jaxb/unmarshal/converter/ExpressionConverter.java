@@ -9,6 +9,7 @@ import com.idansh.engine.expression.functions.EnvironmentFunctionExpression;
 import com.idansh.engine.expression.functions.FunctionActivationExpression;
 import com.idansh.engine.expression.functions.RandomFunctionExpression;
 import com.idansh.engine.expression.property.PropertyExpression;
+import com.idansh.engine.property.instance.PropertyType;
 import com.idansh.engine.world.World;
 import com.idansh.jaxb.schema.generated.PRDAction;
 
@@ -27,15 +28,15 @@ public class ExpressionConverter {
         this.worldContext = world;
     }
 
+
     /**
      * Converts a PRDAction object that was read from the XML file
      * into an Expression Object.
      * Checks if the expression's value's typ matches the action's type.
      * If the type matches, returns the Expression object, otherwise throws exception.
-     * @param prdAction PRDAction object that was read from the XML file.
      * @return Action object with the data of the PRDAction received.
      */
-    public Expression convertExpression(PRDAction prdAction, String prdStr) {
+    public Expression convertExpression(String actionType, String entityName, String propertyName, String prdStr) {
         Expression retExpression;
 
         // Try to convert to FunctionExpression
@@ -43,7 +44,7 @@ public class ExpressionConverter {
 
         // Try to convert to PropertyExpression
         if(retExpression == null) {
-            retExpression = getPropertyExpression(prdAction);
+            retExpression = getPropertyExpression(entityName, prdStr);
         }
 
         // Convert to FixedExpression
@@ -51,12 +52,47 @@ public class ExpressionConverter {
             retExpression = getFixedValue(prdStr);
         }
 
-//        // Check for type error
-//        if(!compareActionValueToGivenPropertyValue(prdAction, value)){
-//            throw new RuntimeException("Error: the created expression's type does not match the action's type!");
-//        }
+        // Check for type error
+        validateValueType(actionType, entityName, propertyName, retExpression);
 
         return retExpression;
+    }
+
+
+    /**
+     * Validates that an expression created by expressionConvert is compatible with the action's type.
+     * @param actionType type action in which the expression is set.
+     * @param entityName name of the entity defined in the action.
+     * @param propertyName name of the property defined in the action.
+     * @param expression expression that was defined in the action.
+     */
+    private void validateValueType(String actionType, String entityName, String propertyName, Expression expression) {
+        PropertyType expressionType = expression.getType();
+
+        // Check if the action is of type condition
+        if(actionType.equals("condition")) {
+            PropertyType propertyType = entityManager.getEntityFactory(entityName).getPropertyFactory(propertyName).getType();
+
+            // Check if types are not equal and if at least one of them is not numeric (if both are numeric it is possible to convert between the types)
+            if(!propertyType.equals(expressionType) && ((!propertyType.isNumeric()) || (!expressionType.isNumeric()))) {
+                throw new RuntimeException("cannot check condition on expression of type \"" + expressionType + "\" with the property of type \"" + propertyType + "\"");
+            }
+
+        } else {
+            // Check if action is of type increase/decrease/set
+            if(actionType.equals("increase") || actionType.equals("decrease") || actionType.equals("set")) {
+                PropertyType propertyType = entityManager.getEntityFactory(entityName).getPropertyFactory(propertyName).getType();
+                if(!propertyType.equals(expressionType))
+                    throw new RuntimeException("cannot save expression of type \"" + expressionType + "\" in the action \"" + actionType + "\" to the property of type \"" + propertyType + "\"");
+            } // Action type is of calculation
+            else if (actionType.equals("calculation")) {
+                PropertyType propertyType = entityManager.getEntityFactory(entityName).getPropertyFactory(propertyName).getType();
+                if(!propertyType.equals(expressionType))
+                    throw new RuntimeException("cannot save expression of type \"" + expressionType + "\" in the action \"" + actionType + "\" to the property of type \"" + propertyType + "\"");
+            } // Illegal action type
+            else
+                throw new RuntimeException("cannot validate expression's value type, action type \"" + actionType + "\" is invalid!");
+        }
     }
 
 
@@ -72,7 +108,7 @@ public class ExpressionConverter {
         String functionName = getFunctionName(prdStr);
 
         if (functionName != null) {
-            switch (FunctionActivationExpression.Type.valueOf(functionName)) {
+            switch (FunctionActivationExpression.Type.getType(functionName)) {
                 case ENVIRONMENT:
                     retFunctionExpression = new EnvironmentFunctionExpression(environmentVariables, getFunctionArgument(prdStr));
                     break;
@@ -134,22 +170,21 @@ public class ExpressionConverter {
     // -------------------------- Property --------------------------
 
     /**
-     * Checks if the PRDAction is a property expression.
-     * If it is then returns a new property expression with its name, otherwise returns null.
-     * @param prdAction PRDAction received from the XML file.
+     * Checks if the expression is a property expression.
+     * If it is then returns a new property expression with its data, otherwise returns null.
+     * @param entityName name of the entity in which the property will be searched.
      */
-    private Expression getPropertyExpression(PRDAction prdAction) {
+    private Expression getPropertyExpression(String entityName, String prdStr) {
         try{
-            String entityName = prdAction.getEntity();
-            String propertyName = prdAction.getBy();
-
             // Try to get an entity with the given name, if one does not exist continue
             Entity entity = entityManager.getEntityInPopulation(entityName);
+            if(entity == null)
+                return null;
 
             // Try to get the entity's property with the given name, if one does not exist continue
-            entity.getPropertyByName(propertyName);
+            entity.getPropertyByName(prdStr);
 
-            return new PropertyExpression(worldContext, entityName, propertyName);
+            return new PropertyExpression(worldContext, entityName, prdStr);
         } catch (IllegalArgumentException ignored) { }
         return null;
     }
@@ -169,27 +204,34 @@ public class ExpressionConverter {
      */
     private Expression getFixedValue(String prdStr){
         Object retValue;
+        PropertyType retType;
 
         try {
             // Try to convert to integer
             retValue = Integer.parseInt(prdStr);
+            retType = PropertyType.INTEGER;
         } catch (NumberFormatException notInt) {
             try {
                 // Try to convert to float
                 retValue = Float.parseFloat(prdStr);
+                retType = PropertyType.FLOAT;
             } catch (NumberFormatException notFloat) {
                 // Try to convert to boolean
-                if(prdStr.equalsIgnoreCase("true"))
+                if(prdStr.equalsIgnoreCase("true")) {
                     retValue = true;
-                else if (prdStr.equalsIgnoreCase("false"))
+                    retType = PropertyType.BOOLEAN;
+                }
+                else if (prdStr.equalsIgnoreCase("false")) {
                     retValue = false;
-                else // Keep as string
+                    retType = PropertyType.BOOLEAN;
+                }
+                else { // Keep as string
                     retValue = prdStr;
+                    retType = PropertyType.STRING;
+                }
             }
         }
 
-        // todo- check value for type error
-
-        return new FixedValueExpression(retValue);
+        return new FixedValueExpression(retValue, retType);
     }
 }

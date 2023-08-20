@@ -7,10 +7,19 @@ public class Counter {
         this.count = init;
     }
 
-    public void addCount() {
+    public void increaseCount() {
         count++;
     }
+
+    public void decreaseCount() {
+        count--;
+    }
+
     public int getCount() {
         return count;
+    }
+
+    public void resetCount() {
+        count = 0;
     }
 }

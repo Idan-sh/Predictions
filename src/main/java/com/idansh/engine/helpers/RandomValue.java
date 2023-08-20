@@ -17,6 +17,8 @@ public abstract class RandomValue {
     public static Boolean getRandomBoolean() {
         return rnd.nextBoolean();
     }
+
+
     /**
      * Get a random decimal number in a range, including both the bottom and top bounds.
      * If from/to params received have a fraction, they will be rounded down to the closest integer,
@@ -38,6 +40,14 @@ public abstract class RandomValue {
     public static float getRandomFloat(double from, double to) {
         double randomDouble = from + (to - from) * rnd.nextDouble(); // Get a random double within the specified range
         return (float) randomDouble; // Convert to float and return it
+    }
+
+
+    /**
+     * Get a random double number from 0 to 1, including both the bottom and top bounds.
+     */
+    public static double getRandomDouble() {
+        return rnd.nextInt(1001) / 1000.0;
     }
 
 

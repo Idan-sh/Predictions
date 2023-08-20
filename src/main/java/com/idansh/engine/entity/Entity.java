@@ -34,7 +34,7 @@ public class Entity {
      */
     public Property getPropertyByName(String name) {
         if(!properties.containsKey(name))
-            throw new IllegalArgumentException("Error: the property with the given name does not exist!");
+            throw new IllegalArgumentException("Error: the property with the given name \"" + name + "\" does not exist!");
 
         return properties.get(name);
     }

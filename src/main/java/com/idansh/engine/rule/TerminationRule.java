@@ -11,6 +11,21 @@ public class TerminationRule {
      */
     public enum Type {
         TICKS, SECONDS;
+
+        /**
+         * @param type TerminationRule.Type object of the termination rule.
+         * @return the termination rule type in string format.
+         */
+        public static String getTypeString(Type type){
+            switch (type) {
+                case TICKS:
+                    return "ticks";
+                case SECONDS:
+                    return "seconds";
+                default:
+                    throw new RuntimeException("termination rule type received is invalid!");
+            }
+        }
     }
     Type type;  // the type of the termination rule
     int value;  // nof ticks/seconds

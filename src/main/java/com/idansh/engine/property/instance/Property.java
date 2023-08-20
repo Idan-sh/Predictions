@@ -43,6 +43,9 @@ public class Property {
         return value;
     }
 
+    public Range getRange() {
+        return range;
+    }
 
     /**
      * Checks if the property is of the type FLOAT or INTEGER.
@@ -58,12 +61,13 @@ public class Property {
      * @param newValue the number to set as the property's value.
      */
     public void setValue(Object newValue) {
-        // Checks if the newValue is a number, and if so, checks if it's in the range.
-        if((newValue instanceof Integer || newValue instanceof Float) && isRangeOverflow(newValue))
-            throw new IllegalArgumentException("Error: newValue received in setValue is not in the property's range!");
-
+        // Check that the type of the new value is of the property
         if(!isNewValueOfPropertyType(newValue))
             throw new IllegalArgumentException("Error: newValue received in setValue is not in the property's type!");
+
+        // Checks if the newValue is a number, and if so, checks if it's in the range.
+        if((newValue instanceof Integer || newValue instanceof Float) && isRangeOverflow(newValue))
+            throw new IllegalArgumentException("Error: newValue received in setValue is not within the property's range!");
 
         // Update the value
         this.value = newValue;
@@ -112,45 +116,61 @@ public class Property {
         if(!(toAdd instanceof Integer) && !(toAdd instanceof Float))
             throw new IllegalArgumentException("Error: can only add a number (non-primitive) to the property's value!");
 
+        // Check if exceeded the range, if so then continue without updating (without throwing en exception)
+        if(isRangeOverflowAfterAddition(toAdd))
+            return;
+
         // Perform the addition
-        if(type.equals(PropertyType.INTEGER))
-        value = (Integer) value + (int) toAdd;
-        else
+        if(type.equals(PropertyType.INTEGER)) {
+            value = (Integer) value + (int) toAdd;
+        }
+        else {
             if(type.equals(PropertyType.FLOAT))
                 value = (Float) value + (float) toAdd;
-
-        // Check if exceeded the range, if so then set the bound exceeded as the new value
-        if(range != null) {
-            if(value instanceof Integer) {
-                if ((Integer) value > range.getTop())
-                    value = (int) range.getTop();
-                else if((Integer) value < range.getBottom())
-                    value = (int) range.getBottom();
-            }
-            else if(value instanceof Float) {
-                if ((Float) value > range.getTop())
-                    value = (float) range.getTop();
-                else if((Float) value < range.getBottom())
-                    value = (float) range.getBottom();
-            }
         }
+    }
+
+
+    /**
+     * Checks if the value of the property after an addition has reached above the top of the range,
+     * or reached below the bottom of the range.
+     * @param toAdd a number of the type of the property's value to add to it.
+     * @return true if reached outside the range, false otherwise.
+     */
+    private boolean isRangeOverflowAfterAddition(Object toAdd) {
+        if(range == null)
+            return false;
+
+        if(type.equals(PropertyType.INTEGER)) {
+            int newVal = (int) value + (int) toAdd;
+            return newVal > range.getTop() || newVal < range.getBottom();
+        }
+
+        if(type.equals(PropertyType.FLOAT)) {
+            float newVal = (float) value + (float) toAdd;
+            return newVal > range.getTop() || newVal < range.getBottom();
+        }
+
+        throw new IllegalArgumentException("Error: can only perform checkRange on numeric properties!");
     }
 
 
     /**
      * Checks if the value reached above the top of the range,
      * or reached below the bottom of the range.
-     * If so, returns true, otherwise returns false.
+     * @param newVal a number of the type of the property's value to set to.
+     * @return true if reached outside the range, false otherwise.
      */
-    private boolean isRangeOverflow(Object toAdd) {
+    private boolean isRangeOverflow(Object newVal) {
         if(range == null)
             return false;
 
         if(type.equals(PropertyType.INTEGER)) {
-            return (int) value + (int) toAdd > range.getTop() || (int) value + (int) toAdd < range.getBottom();
+            return (int) newVal > range.getTop() || (int) newVal < range.getBottom();
         }
-        else if(type.equals(PropertyType.FLOAT)) {
-            return (float) value + (float) toAdd > range.getTop() || (float) value + (float) toAdd < range.getBottom();
+
+        if(type.equals(PropertyType.FLOAT)) {
+            return (float) newVal > range.getTop() || (float) newVal < range.getBottom();
         }
 
         throw new IllegalArgumentException("Error: can only perform checkRange on numeric properties!");

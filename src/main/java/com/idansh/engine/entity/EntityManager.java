@@ -1,7 +1,7 @@
 package com.idansh.engine.entity;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class EntityManager {
     private final Map<String, EntityFactory> entityFactories;   // Each entity factory will define instructions on how to instantiate a single entity with a unique name
@@ -10,7 +10,7 @@ public class EntityManager {
 
     public EntityManager() {
         this.entityFactories = new HashMap<>();
-        this.population = new ArrayList<>();
+        this.population = new CopyOnWriteArrayList<>(); // Note: using a thread-safe collection that can handle concurrent modifications and iterations (we try to kill entity instances while iterating on the population list)
     }
 
 
@@ -46,7 +46,7 @@ public class EntityManager {
      */
     public EntityFactory getEntityFactory(String name) {
         if(!entityFactories.containsKey(name))
-            throw new IllegalArgumentException("Error: could not find the received entity factory!");
+            throw new IllegalArgumentException("could not find an entity factory with the name \"" + name + "\"!");
 
         return entityFactories.get(name);
     }
@@ -60,10 +60,7 @@ public class EntityManager {
         Optional<Entity> retEntity =
                 population.stream().filter(e -> e.getName().equals(name)).findAny();
 
-        if(!retEntity.isPresent())
-            throw new IllegalArgumentException("Error: entity name \"" + name + "\" does not exist in the population!");
-
-        return retEntity.get();
+        return retEntity.orElse(null);
     }
 
 
@@ -73,9 +70,18 @@ public class EntityManager {
      */
     public void killEntity(Entity entityToKill) {
         if(!population.contains(entityToKill))
-            throw new IllegalArgumentException("Error: cannot kill entity with name " + entityToKill.getName() + ", this entity does not exist in the population!");
+            throw new IllegalArgumentException("cannot kill entity with name " + entityToKill.getName() + ", this entity does not exist in the population!");
 
+        // Remove the entity from the population and decrease the population counter for the main entity
+        entityFactories.get(entityToKill.getName()).decreasePopulationCounter();
         population.remove(entityToKill);
     }
 
+    public List<Entity> getPopulation() {
+        return population;
+    }
+
+    public Map<String, EntityFactory> getEntityFactories() {
+        return entityFactories;
+    }
 }

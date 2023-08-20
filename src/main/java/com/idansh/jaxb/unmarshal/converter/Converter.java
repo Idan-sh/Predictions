@@ -23,11 +23,12 @@ import com.idansh.engine.world.World;
 import com.idansh.jaxb.schema.generated.*;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * A static class with methods to convert generated data from the XML scheme to the simulation's objects.
- */
-public class Converter {
+import java.util.List;
 
+/**
+ * An abstract class with static methods to convert generated data from the XML scheme to the simulation's objects.
+ */
+public abstract class Converter {
     /**
      * Converts a PRDWorld object that was read from the XML file
      * into a World Object.
@@ -92,28 +93,43 @@ public class Converter {
     private static PropertyFactory propertyConvert(PRDProperty prdProperty) {
         PropertyFactory retPropertyFactory = null;
         boolean isRandom = prdProperty.getPRDValue().isRandomInitialize();
+        Range range = rangeConvert(prdProperty.getPRDRange());
 
         // Create the property according to its type:
         // PropertyType.getType handles errors with the prdProperty's type
         switch(PropertyType.getType(prdProperty.getType())) {
             case INTEGER:
-                retPropertyFactory = new PropertyCreator<>(prdProperty.getPRDName(), PropertyType.INTEGER,
-                        isRandom ? new RandomIntegerValueGenerator(new Range(prdProperty.getPRDRange().getFrom(), prdProperty.getPRDRange().getTo())) : new FixedValueGenerator<>(Integer.parseInt(prdProperty.getPRDValue().getInit())));
+                retPropertyFactory = new PropertyCreator<>(
+                        prdProperty.getPRDName(),
+                        PropertyType.INTEGER,
+                        isRandom ? new RandomIntegerValueGenerator(range) : new FixedValueGenerator<>(Integer.parseInt(prdProperty.getPRDValue().getInit())),
+                        range
+                );
                 break;
 
             case FLOAT:
-                retPropertyFactory = new PropertyCreator<>(prdProperty.getPRDName(), PropertyType.FLOAT,
-                        isRandom ? new RandomFloatValueGenerator(new Range(prdProperty.getPRDRange().getFrom(), prdProperty.getPRDRange().getTo())) : new FixedValueGenerator<>(Float.parseFloat(prdProperty.getPRDValue().getInit())));
+                retPropertyFactory = new PropertyCreator<>(
+                        prdProperty.getPRDName(),
+                        PropertyType.FLOAT,
+                        isRandom ? new RandomFloatValueGenerator(range) : new FixedValueGenerator<>(Float.parseFloat(prdProperty.getPRDValue().getInit())),
+                        range
+                );
                 break;
 
             case BOOLEAN:
-                retPropertyFactory = new PropertyCreator<>(prdProperty.getPRDName(), PropertyType.BOOLEAN,
-                        isRandom ? new RandomBooleanValueGenerator() : new FixedValueGenerator<>(Boolean.parseBoolean(prdProperty.getPRDValue().getInit())));
+                retPropertyFactory = new PropertyCreator<>(
+                        prdProperty.getPRDName(),
+                        PropertyType.BOOLEAN,
+                        isRandom ? new RandomBooleanValueGenerator() : new FixedValueGenerator<>(Boolean.parseBoolean(prdProperty.getPRDValue().getInit()))
+                );
                 break;
 
             case STRING:
-                retPropertyFactory = new PropertyCreator<>(prdProperty.getPRDName(), PropertyType.STRING,
-                        isRandom ? new RandomStringValueGenerator() : new FixedValueGenerator<>(prdProperty.getPRDValue().getInit()));
+                retPropertyFactory = new PropertyCreator<>(
+                        prdProperty.getPRDName(),
+                        PropertyType.STRING,
+                        isRandom ? new RandomStringValueGenerator() : new FixedValueGenerator<>(prdProperty.getPRDValue().getInit())
+                );
                 break;
         }
 
@@ -149,35 +165,55 @@ public class Converter {
      * @return PropertyFactory object with the data of the PRDEnvProperty received.
      */
     private static PropertyFactory environmentVariableConvert(PRDEnvProperty prdEnvProperty) {
-        PropertyFactory retPropertyFactory;
+        PropertyFactory retEnvironmentVariable = null;
         PropertyType envVarType = PropertyType.getType(prdEnvProperty.getType());
-        ValueGenerator<?> valueGenerator = null;
+        ValueGenerator<?> valueGenerator;
+        Range range;
 
-        // Create value generator according to the environment variable's type
+        // Create value generator and environment variable result according to the environment variable's type
         switch(envVarType) {
             case INTEGER:
-                valueGenerator = new RandomIntegerValueGenerator(rangeConvert(prdEnvProperty.getPRDRange()));
+                range = rangeConvert(prdEnvProperty.getPRDRange());
+                valueGenerator = new RandomIntegerValueGenerator(range);
+                retEnvironmentVariable = new PropertyCreator<>(
+                        prdEnvProperty.getPRDName(),
+                        envVarType,
+                        valueGenerator,
+                        range
+                );
                 break;
 
             case FLOAT:
-                valueGenerator = new RandomFloatValueGenerator(rangeConvert(prdEnvProperty.getPRDRange()));
+                range = rangeConvert(prdEnvProperty.getPRDRange());
+                valueGenerator = new RandomFloatValueGenerator(range);
+                retEnvironmentVariable = new PropertyCreator<>(
+                        prdEnvProperty.getPRDName(),
+                        envVarType,
+                        valueGenerator,
+                        range
+                );
                 break;
 
             case BOOLEAN:
                 valueGenerator = new RandomBooleanValueGenerator();
+                retEnvironmentVariable = new PropertyCreator<>(
+                        prdEnvProperty.getPRDName(),
+                        envVarType,
+                        valueGenerator
+                );
                 break;
 
             case STRING:
                 valueGenerator = new RandomStringValueGenerator();
+                retEnvironmentVariable = new PropertyCreator<>(
+                        prdEnvProperty.getPRDName(),
+                        envVarType,
+                        valueGenerator
+                );
                 break;
         }
 
-        retPropertyFactory = new PropertyCreator<>(
-                prdEnvProperty.getPRDName(),
-                envVarType,
-                valueGenerator);
-
-        return retPropertyFactory;
+        return retEnvironmentVariable;
     }
 
 
@@ -188,6 +224,9 @@ public class Converter {
      * @return Range object with the data of the PRDRange received.
      */
     private static Range rangeConvert(PRDRange prdRange) {
+        if(prdRange == null)
+            return null;
+
         return new Range(prdRange.getFrom(), prdRange.getTo());
     }
 
@@ -199,9 +238,18 @@ public class Converter {
      * @return Rule object with the data of the PRDRule received.
      */
     private static Rule ruleConvert(PRDRule prdRule, World worldContext) {
-        Rule retRule = new Rule(
-                prdRule.getName(),
-                activationConvert(prdRule.getPRDActivation()));
+        Rule retRule;
+
+        // Check if the PRDActivation field exists
+        if(prdRule.getPRDActivation() != null) {
+            retRule = new Rule(
+                    prdRule.getName(),
+                    activationConvert(prdRule.getPRDActivation()));
+        } else {
+            retRule = new Rule(
+                    prdRule.getName(),
+                    new RuleActivation());
+        }
 
         // Iterates over all prdActions, converts them to actions and adds them to the rule
         prdRule.getPRDActions().getPRDAction().forEach(
@@ -219,6 +267,15 @@ public class Converter {
      * @return RuleActivation object with the data of the PRDActivation received.
      */
     private static RuleActivation activationConvert(PRDActivation prdActivation) {
+        // Only ticks available
+        if(prdActivation.getProbability() == null)
+            return new RuleActivation(prdActivation.getTicks());
+
+        // Only probability available
+        if(prdActivation.getTicks() == null)
+            return new RuleActivation(prdActivation.getProbability());
+
+        // both ticks and probability available
         return new RuleActivation(prdActivation.getTicks(), prdActivation.getProbability());
     }
 
@@ -233,13 +290,13 @@ public class Converter {
         Action retAction = null;
         ExpressionConverter expressionConverter = new ExpressionConverter(worldContext);
 
-        switch (Action.Type.valueOf(prdAction.getType())) {
+        switch (Action.Type.getType(prdAction.getType())) {
             case INCREASE:
                 retAction = new IncreaseAction(
                         worldContext,
                         prdAction.getEntity(),
                         prdAction.getProperty(),
-                        expressionConverter.convertExpression(prdAction, prdAction.getBy())
+                        expressionConverter.convertExpression("increase", prdAction.getEntity(), prdAction.getProperty(), prdAction.getBy())
                 );
                 break;
 
@@ -248,7 +305,7 @@ public class Converter {
                         worldContext,
                         prdAction.getEntity(),
                         prdAction.getProperty(),
-                        expressionConverter.convertExpression(prdAction, prdAction.getBy())
+                        expressionConverter.convertExpression("decrease", prdAction.getEntity(), prdAction.getProperty(), prdAction.getBy())
                 );
                 break;
 
@@ -273,7 +330,7 @@ public class Converter {
                         worldContext,
                         prdAction.getEntity(),
                         prdAction.getProperty(),
-                        expressionConverter.convertExpression(prdAction, prdAction.getBy())
+                        expressionConverter.convertExpression("set", prdAction.getEntity(), prdAction.getProperty(), prdAction.getValue())
                 );
                 break;
 
@@ -309,17 +366,17 @@ public class Converter {
             retCalculationAction = new CalculationAction(
                     worldContext,
                     prdAction.getEntity(),
-                    prdAction.getProperty(),
-                    expressionConverter.convertExpression(prdAction, prdMultiply.getArg1()),
-                    expressionConverter.convertExpression(prdAction, prdMultiply.getArg2()),
+                    prdAction.getResultProp(),
+                    expressionConverter.convertExpression("calculation", prdAction.getEntity(), prdAction.getResultProp(), prdMultiply.getArg1()),
+                    expressionConverter.convertExpression("calculation", prdAction.getEntity(), prdAction.getResultProp(), prdMultiply.getArg2()),
                     CalculationAction.Type.MULTIPLY);
         } else if (prdDivide != null) {
             retCalculationAction = new CalculationAction(
                     worldContext,
                     prdAction.getEntity(),
-                    prdAction.getProperty(),
-                    expressionConverter.convertExpression(prdAction, prdDivide.getArg1()),
-                    expressionConverter.convertExpression(prdAction, prdDivide.getArg2()),
+                    prdAction.getResultProp(),
+                    expressionConverter.convertExpression("calculation", prdAction.getEntity(), prdAction.getResultProp(), prdDivide.getArg1()),
+                    expressionConverter.convertExpression("calculation", prdAction.getEntity(), prdAction.getResultProp(), prdDivide.getArg2()),
                     CalculationAction.Type.DIVIDE);
         }
         else {
@@ -334,42 +391,89 @@ public class Converter {
      * Converts a PRDAction of single or multiple condition that was read from the XML file
      * into a ConditionAction Object.
      * @param prdAction PRDAction object that was read from the XML file.
+     * @param worldContext the simulated world in which the conditions are set.
+     * @param expressionConverter used for converting expressions into values.
      * @return ConditionAction object with the data of the PRDAction received.
      */
     private static ConditionAction conditionActionConvert(PRDAction prdAction, World worldContext, ExpressionConverter expressionConverter){
-        ConditionAction retConditionAction;
         PRDCondition prdCondition = prdAction.getPRDCondition();
-
         final ThenOrElseActions thenActions = new ThenOrElseActions(), elseActions = new ThenOrElseActions();
 
         // Convert Then/Else action sets
         thenOrElseConvert(prdAction, worldContext, thenActions, elseActions);
 
-        //
-        if(prdCondition.getSingularity().equals("single")){
-            retConditionAction = new SingleConditionAction(
+        // Create main condition action depending on its type
+        if (prdCondition.getSingularity().equals("single")) {
+            return new SingleConditionAction(
                     worldContext,
                     prdAction.getEntity(),
-                    prdAction.getProperty(),
+                    prdCondition.getProperty(),
                     prdCondition.getOperator(),
-                    expressionConverter.convertExpression(prdAction, prdAction.getValue()),
+                    expressionConverter.convertExpression("condition", prdAction.getEntity(), prdCondition.getProperty(), prdCondition.getValue()),
                     thenActions,
-                    elseActions
+                    elseActions,
+                    true
             );
         } else if (prdCondition.getSingularity().equals("multiple")) {
-            retConditionAction = new MultiConditionAction(
+            MultiConditionAction retMultiConditionAction = new MultiConditionAction(
                     worldContext,
                     prdAction.getEntity(),
                     prdCondition.getLogical(),
                     thenActions,
-                    elseActions
+                    elseActions,
+                    true
             );
-        }
-        else {
+            // Only in case of multiple conditions, convert the inner conditions and add them to the main condition action "retMultiConditionAction"
+            convertInnerConditions(prdAction, prdAction.getPRDCondition().getPRDCondition(), worldContext, expressionConverter, retMultiConditionAction);
+
+            return retMultiConditionAction;
+        } else {
             throw new RuntimeException("Error: invalid condition action received from XML!");
         }
+    }
 
-        return retConditionAction;
+
+    /**
+     * Converts recursively all inner multi-conditions of a multi-condition.
+     * @param prdAction the main action in which the conditions are set.
+     * @param prdConditionList list of all inner conditions to convert.
+     * @param worldContext the simulated world in which the conditions are set.
+     * @param expressionConverter used for converting expressions into values.
+     * @param mainConditionAction the main multi-action in which we search for inner conditions. these inner conditions will be added to the main condition action's list.
+     */
+    private static void convertInnerConditions(PRDAction prdAction, List<PRDCondition> prdConditionList, World worldContext, ExpressionConverter expressionConverter, MultiConditionAction mainConditionAction) {
+        // Convert each condition action in the list of the main condition action
+        prdConditionList.forEach(
+                prdCondition -> {
+                    // Create condition action depending on its type
+                    if (prdCondition.getSingularity().equals("single")) {
+                        mainConditionAction.addInnerCondition(new SingleConditionAction(
+                                worldContext,
+                                prdCondition.getEntity(),
+                                prdCondition.getProperty(),
+                                prdCondition.getOperator(),
+                                expressionConverter.convertExpression("condition", prdCondition.getEntity(), prdCondition.getProperty(), prdCondition.getValue()),
+                                null,
+                                null,
+                                false
+                        ));
+                    } else if (prdCondition.getSingularity().equals("multiple")) {
+                        MultiConditionAction multiConditionAction = new MultiConditionAction(
+                                worldContext,
+                                prdAction.getEntity(),
+                                prdCondition.getLogical(),
+                                null,
+                                null,
+                                false
+                        );
+                        // Find and convert all inner conditions of the multi-condition action
+                        convertInnerConditions(prdAction, prdCondition.getPRDCondition(), worldContext, expressionConverter, multiConditionAction);
+                        mainConditionAction.addInnerCondition(multiConditionAction);    // Add finished multi-condition action with inner conditions to the main condition action.
+                    } else {
+                        throw new RuntimeException("Error: invalid condition action received from XML!");
+                    }
+                }
+        );
     }
 
 
@@ -384,10 +488,13 @@ public class Converter {
                 a -> thenActions.addAction(actionConvert(a, worldContext))
         );
 
+        // Check if the then actions block contains no actions
         if(thenActions.isEmpty())
-            throw new RuntimeException("Error: Then actions set received from XML is empty!");
+            throw new RuntimeException("then actions set received from XML is empty!");
 
-        prdAction.getPRDElse().getPRDAction().forEach(
+        // Check if there is an else actions block
+        if(prdAction.getPRDElse() != null)
+            prdAction.getPRDElse().getPRDAction().forEach(
                 a -> elseActions.addAction(actionConvert(a, worldContext))
         );
     }

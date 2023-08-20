@@ -6,11 +6,11 @@ package com.idansh.engine.helpers;
  * bottom value must be lower than the top value (or equal to).
  */
 public class Range {
-    private double bottom, top;
+    private final double bottom, top;
 
     public Range(double from, double to) {
         if(from > to)
-            throw new RuntimeException("Range bottom value is higher than top value.");
+            throw new RuntimeException("range bottom value of \"" + from + "\" is higher than top value of \"" + to + "\"");
 
         this.bottom = from;
         this.top = to;

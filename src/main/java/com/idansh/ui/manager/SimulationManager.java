@@ -5,9 +5,10 @@ import com.idansh.ui.display.ConsoleIn;
 import com.idansh.ui.display.ConsoleOut;
 import com.sun.nio.sctp.IllegalReceiveException;
 
+import static java.lang.System.exit;
+
 /**
- * Handles the simulations, user inputs and connects with the engine through
- * the various DTOs.
+ * Handles the simulations.
  * The main loop of the simulation will run through this class.
  */
 public class SimulationManager {
@@ -23,22 +24,19 @@ public class SimulationManager {
     /**
      * Starts the main loop of the program.
      */
-    public void run() {
-        while(true) {
-            ConsoleOut.printMenu();
+    public void startProgram() {
+        try {
+            // Run until user chooses to exit
+            do {
+                ConsoleOut.printMenu();
+            } while (handleMenuChoice());   // Handle the user's choice and check if chose to exit.
 
-            try {
-                // Handle the user's choice and check if chose to exit.
-                if(!handleMenuChoice())
-                    break;
-            } catch (NumberFormatException e) {
-                ConsoleOut.printError("input entered is not a valid number!");
-            } catch (IllegalReceiveException e) {
-                ConsoleOut.printError("number entered is not a valid option number!");
-            }
+            ConsoleOut.printGoodbye();
+            exit(0);
+        } catch (RuntimeException e) { // Catch all unhandled exceptions, display their details and finish the program
+            ConsoleOut.printError("Program Stopped.");
+            ConsoleOut.printRuntimeException(e);
         }
-
-        ConsoleOut.printGoodbye();
     }
 
 
@@ -49,7 +47,13 @@ public class SimulationManager {
      * @throws IllegalReceiveException in case the option number received is not a valid choice.
      */
     public boolean handleMenuChoice() {
-        MenuOptions menuOption = consoleIn.getMenuInput();
+        MenuOptions menuOption;
+        try {
+            menuOption = consoleIn.getMenuInput();
+        } catch (IllegalArgumentException e) {
+            ConsoleOut.printError(e.getMessage());
+            return true;
+        }
 
         switch (menuOption) {
             case LOAD_FILE:
@@ -57,6 +61,10 @@ public class SimulationManager {
                 return true;
 
             case SHOW_SIMULATION_DETAILS:
+                if(!engineHandler.isSimulationLoaded()) {
+                    ConsoleOut.printError("no simulation loaded! please load before trying to show details!");
+                    return true;
+                }
                 engineHandler.showCurrentSimulationDetails();
                 return true;
 
@@ -72,7 +80,7 @@ public class SimulationManager {
                 return false;
 
             default:
-                throw new RuntimeException("menuOption is invalid!"); // This error should not happen on wrong user input, consoleIn.getMenuInput() throws that error
+                throw new RuntimeException("menuOption type is invalid!"); // This error should not happen on wrong user input, consoleIn.getMenuInput() throws that error
         }
     }
 }

@@ -1,27 +1,134 @@
 package com.idansh.engine.actions.condition;
 
+import com.idansh.engine.entity.Entity;
 import com.idansh.engine.expression.api.Expression;
 import com.idansh.engine.world.World;
 
+import java.util.List;
+
 public class SingleConditionAction extends ConditionAction{
     private final String propertyName;
-    private final String operator;
-    private final Expression value;
+    private final ConditionOperator operator;
+    private final Expression expression;
 
     /**
      * Checks if a single condition is met,
-     * if the condition is met then the received actions will be performed.
+     * if the condition is met then the "then" actions will be performed,
+     * if not then the "else" actions will be preformed (if exist).
      * Referred by the singularity value "single"
-     *
      * @param propertyName name of the property that will be checked by the condition
      * @param operator     comparison operator for the condition.
      *                     possible values:  = (equal) / != (not equal) / bt (greater than) / lt (less than)
      * @param value        a number that will be compared to the property's value
      */
-    public SingleConditionAction(World worldContext, String entityContext, String propertyName, String operator, Expression value, ThenOrElseActions thenActions, ThenOrElseActions elseActions) {
-        super(worldContext, entityContext, Type.SINGLE, thenActions, elseActions);
+    public SingleConditionAction(World worldContext, String entityContext, String propertyName, String operator, Expression value, ThenOrElseActions thenActions, ThenOrElseActions elseActions, boolean isMainCondition) {
+        super(worldContext, entityContext, Type.SINGLE, thenActions, elseActions, isMainCondition);
         this.propertyName = propertyName;
-        this.operator = operator;
-        this.value = value;
+        this.expression = value;
+        this.operator = ConditionOperator.getConditionOperator(operator); // Try to convert to ConditionOperator, if fails throw exception
+    }
+
+
+    @Override
+    public String getActionTypeString() {
+        return "condition";
+    }
+
+
+    @Override
+    public void invoke() {
+        List<Entity> population = getWorldContext().entityManager.getPopulation();
+
+        // Check if the condition is activated on every entity instance of the main entity defined
+        for (Entity entity : population) {
+            // Only perform condition on entity instances of the main entity defined
+            if (!entity.getName().equals(getEntityContext()))
+                continue;
+
+            Object propertyValue = entity.getPropertyByName(propertyName).getValue();
+            boolean res;
+
+            switch (operator) {
+                case EQUAL:
+                    res = isEqual(propertyValue, expression.getValue());
+                    if (res) setActivated(true);
+                    if(isMainCondition())
+                        invokeActionsSet(res);
+                    break;
+
+                case NOT_EQUAL:
+                    res = !isEqual(propertyValue, expression.getValue());
+                    if (res) setActivated(true);
+                    if(isMainCondition())
+                        invokeActionsSet(res);
+                    break;
+
+                case LESS_THAN:
+                    // Check if the property's value is less than the expression's value
+                    res = isLessThan(propertyValue, expression.getValue());
+
+                    if (res)
+                        setActivated(true);
+
+                    if(isMainCondition())
+                        invokeActionsSet(res);
+
+                    break;
+
+                case MORE_THAN:
+                    // Check if the property's value is more than the expression's value
+                    res = isLessThan(expression.getValue(), propertyValue);
+                    if (res)
+                        setActivated(true);
+
+                    if(isMainCondition())
+                        invokeActionsSet(res);
+
+                    break;
+            }
+        }
+    }
+
+
+    /**
+     * Checks if the left numeric object is less than the right numeric object.
+     * Accepts only Integer/Float numbers.
+     * @return true if the left number is less than the right number, false otherwise.
+     */
+    private boolean isLessThan(Object left, Object right) {
+        if(left instanceof Integer && right instanceof Integer)
+            return (int) left < (int) right;
+
+        if(left instanceof Integer && right instanceof Float )
+            return (int) left < (float) right;
+
+        if(left instanceof Float && right instanceof Integer )
+            return (float) left < (int) right;
+
+        if(left instanceof Float && right instanceof Float)
+            return (float) left < (float) right;
+
+        throw new IllegalArgumentException("can only perform less than on numeric values" +
+                " of the same type! got types \"" + left.getClass() + "\" and \"" + right.getClass() + "\"");
+    }
+
+
+    /**
+     * Checks if two objects' values are equal.
+     * Accepts only Integer/Float/Boolean/String values.
+     * @return true if the objects' values are equal, false otherwise.
+     */
+    private boolean isEqual(Object obj1, Object obj2) {
+        if(obj1 instanceof Integer && obj2 instanceof Integer ) {
+            return (int) obj1 == (int) obj2;
+        } else if(obj1 instanceof Float && obj2 instanceof Float) {
+            return (float) obj1 == (float) obj2;
+        } else if(obj1 instanceof Boolean && obj2 instanceof Boolean) {
+            return (boolean) obj1 == (boolean) obj2;
+        } else if(obj1 instanceof String && obj2 instanceof String) {
+            return ((String) obj1).equals((String) obj2);
+        } else
+            throw new IllegalArgumentException("can only check if values are equal on values" +
+                " of the same type! got types \"" + obj1.getClass() + "\" and \"" + obj2.getClass() + "\"");
     }
 }

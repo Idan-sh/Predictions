@@ -3,36 +3,40 @@ package com.idansh.engine.world;
 import com.idansh.engine.entity.EntityManager;
 import com.idansh.engine.environment.ActiveEnvironmentVariables;
 import com.idansh.engine.environment.EnvironmentVariablesManager;
+import com.idansh.engine.helpers.Countdown;
+import com.idansh.engine.helpers.Counter;
+import com.idansh.engine.manager.result.SimulationResult;
 import com.idansh.engine.property.creator.factory.PropertyFactory;
 import com.idansh.engine.rule.Rule;
 import com.idansh.engine.rule.TerminationRule;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Main engine component that in charge of a single simulation,
  * and the various functions of the simulation.
  */
 public class World {
-    private final Map<TerminationRule.Type, TerminationRule> terminationRulesMap;  // Rules on when to end the simulation
-    private final Map<String, Rule> rulesMap;                                    // Rules that can activate during the simulation
-    private final EnvironmentVariablesManager environmentVariablesManager;      // Contains all the environment variables factories
-    private ActiveEnvironmentVariables activeEnvironmentVariables;              // Contains all the activated environment variables
-    public final EntityManager entityManager;                                   // Contains all the entities (population) of the simulation
-    private int currTick;                                                       // The current iteration of the simulation
+    public final EntityManager entityManager;                                       // Contains all the entities (population) of the simulation
+    private final Map<TerminationRule.Type, TerminationRule> terminationRules;      // Rules on when to end the simulation
+    private final Map<String, Rule> rulesMap;                                       // Rules that can activate during the simulation
+    private ActiveEnvironmentVariables activeEnvironmentVariables;                  // Contains all the activated environment variables
+    public final EnvironmentVariablesManager environmentVariablesManager;           // Contains all the environment variables factories
+    private final Counter tickCounter;                                              // The current iteration of the simulation
+    private final Timer timer;                                                      // Timer for the termination rule SECONDS
 
 
     /**
      * Initialize the simulated world.
      */
     public World() {
-        this.terminationRulesMap = new HashMap<>();
-        this.rulesMap = new HashMap<>();
+        this.terminationRules = new HashMap<>();
+        this.rulesMap = new LinkedHashMap<>();
         this.environmentVariablesManager = new EnvironmentVariablesManager();
         this.activeEnvironmentVariables = null;
         this.entityManager = new EntityManager();
-        this.currTick = 0;
+        this.tickCounter = new Counter(0);
+        this.timer = new Timer();
     }
 
     public ActiveEnvironmentVariables getActiveEnvironmentVariables() {
@@ -62,10 +66,10 @@ public class World {
      * There can only be one termination rule of each type - seconds or ticks.
      */
     public void addTerminationRule(TerminationRule terminationRule) {
-        if(terminationRulesMap.containsKey(terminationRule.getType()))
-            throw new IllegalArgumentException("Error: received terminationRule's type - " + terminationRule.getType() + " already exists!");
+        if(terminationRules.containsKey(terminationRule.getType()))
+            throw new IllegalArgumentException("received terminationRule's type - " + terminationRule.getType() + " already exists!");
 
-        terminationRulesMap.put(terminationRule.getType(), terminationRule);
+        terminationRules.put(terminationRule.getType(), terminationRule);
     }
 
 
@@ -80,12 +84,36 @@ public class World {
         rulesMap.put(rule.getName(), rule);
     }
 
+    public SimulationResult run() {
+        // Timer countdown for the termination rule SECONDS
+        Countdown countdown = new Countdown();
 
-    /**
-     * Starts the simulation using the defined initial properties.
-     */
-    public void startSimulation() {
-        // todo- continue with the simulation iterations...
+        // If a termination rule of SECONDS was set, starts a timer.
+        if(terminationRules.containsKey(TerminationRule.Type.SECONDS))
+            timer.schedule(countdown, terminationRules.get(TerminationRule.Type.SECONDS).getValue() * 1000L); // Get the amount of seconds and multiply by 1000 to get in milliseconds
+
+        // Check if the current tick has reached the termination rule tick defined, if one does not exist keeps going until reached the timer defined
+        while((!terminationRules.containsKey(TerminationRule.Type.TICKS)) || (terminationRules.containsKey(TerminationRule.Type.TICKS) && tickCounter.getCount() < terminationRules.get(TerminationRule.Type.TICKS).getValue())) {
+            tickCounter.increaseCount();
+
+            // Checks if the timer expired
+            if(countdown.isFinished()) {
+                return new SimulationResult("Timer Expired", entityManager);
+            }
+
+            // Invoke all rules
+            rulesMap.forEach((ruleName, rule) -> rule.invoke());
+        }
+
+        return new SimulationResult("Ticks Reached", entityManager);
+    }
+
+    public Map<TerminationRule.Type, TerminationRule> getTerminationRules() {
+        return terminationRules;
+    }
+
+    public Map<String, Rule> getRulesMap() {
+        return rulesMap;
     }
 }
 

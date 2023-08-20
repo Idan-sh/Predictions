@@ -1,5 +1,7 @@
 package com.idansh.engine.expression.functions;
 
+import com.idansh.engine.property.instance.PropertyType;
+
 import java.util.Random;
 
 /**
@@ -23,5 +25,12 @@ public class RandomFunctionExpression extends FunctionActivationExpression {
     @Override
     public Object getValue() {
         Random random = new Random();
-        return random.nextInt(maxValue + 1);    }
+        return random.nextInt(maxValue + 1);
+    }
+
+
+    @Override
+    public PropertyType getType() {
+        return PropertyType.INTEGER;
+    }
 }
