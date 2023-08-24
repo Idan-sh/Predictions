@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.net.URL;
 
 public class PredictionsApplication extends Application {
-    private final String LOADER_SCENE_RELATIVE_PATH = "scenes/loader/LoaderScene.fxml";
+    private final String LOADER_SCENE_RELATIVE_PATH = "/scenes/LoaderScene.fxml"; // this path is relative to the resources directory
     private SimulationManager simulationManager;
 
     @Override
@@ -19,25 +19,27 @@ public class PredictionsApplication extends Application {
         simulationManager = new SimulationManager();
         FXMLLoader loaderSceneLoader = getFXMLLoader(LOADER_SCENE_RELATIVE_PATH);
 
-//        Scene scene = new Scene(loaderSceneLoader.load(loaderSceneLoader.getLocation().openStream()), 500, 400);
-//
-//        primaryStage.setTitle("Players Manager");
-//        primaryStage.setScene(scene);
-//        primaryStage.show();
+        Scene loaderScene = new Scene(loaderSceneLoader.load(loaderSceneLoader.getLocation().openStream()), 500, 400);
+
+        primaryStage.setTitle("Predictions Simulator");
+        primaryStage.setScene(loaderScene);
+        primaryStage.show();
     }
+
 
     /**
      * Using the received relative path to an FXML file, creates a FXMLLoader object that
      * can be used to load the file.
-     * @param relativePath this path will be relative to the resources package of the application (src/main/resources).
+     * @param relativePath path relative to the resources package of the application (src/main/resources).
      * @return created FXMLLoader object that handles the FXML in the received path.
      */
     private FXMLLoader getFXMLLoader(String relativePath) {
         FXMLLoader fxmlLoader = new FXMLLoader();
-        URL url = getClass().getResource("/fxml/LoaderScene.fxml");
+        URL url = getClass().getResource(relativePath);
         fxmlLoader.setLocation(url);
         return fxmlLoader;
     }
+
 
     /**
      * The 'main' method is ignored in a correctly deployed JavaFX application.

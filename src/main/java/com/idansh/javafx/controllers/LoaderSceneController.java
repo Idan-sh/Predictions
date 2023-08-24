@@ -1,4 +1,4 @@
-package com.idansh.javafx.scenes.loader;
+package com.idansh.javafx.controllers;
 
 import javafx.fxml.Initializable;
 
