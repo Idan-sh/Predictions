@@ -1,8 +1,8 @@
-package com.idansh.ui.manager;
+package com.idansh.javafx.manager;
 
 
-import com.idansh.ui.display.ConsoleIn;
-import com.idansh.ui.display.ConsoleOut;
+import com.idansh.javafx.display.ConsoleIn;
+import com.idansh.javafx.display.ConsoleOut;
 
 import static java.lang.System.exit;
 

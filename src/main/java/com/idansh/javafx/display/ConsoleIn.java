@@ -1,6 +1,6 @@
-package com.idansh.ui.display;
+package com.idansh.javafx.display;
 
-import com.idansh.ui.manager.MenuOptions;
+import com.idansh.javafx.manager.MenuOptions;
 
 import java.util.Scanner;
 

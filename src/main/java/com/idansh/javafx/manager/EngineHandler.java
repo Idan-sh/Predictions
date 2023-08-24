@@ -1,4 +1,4 @@
-package com.idansh.ui.manager;
+package com.idansh.javafx.manager;
 
 import com.idansh.dto.entity.EntityDTO;
 import com.idansh.dto.environment.EnvironmentVariableDTO;
@@ -8,8 +8,8 @@ import com.idansh.dto.range.RangeDTO;
 import com.idansh.dto.simulation.SimulationEndTDO;
 import com.idansh.dto.simulation.SimulationResultDTO;
 import com.idansh.engine.manager.EngineManager;
-import com.idansh.ui.display.ConsoleIn;
-import com.idansh.ui.display.ConsoleOut;
+import com.idansh.javafx.display.ConsoleIn;
+import com.idansh.javafx.display.ConsoleOut;
 
 import java.util.List;
 import java.util.Map;

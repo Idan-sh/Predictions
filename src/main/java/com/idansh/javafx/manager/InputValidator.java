@@ -1,4 +1,4 @@
-package com.idansh.ui.manager;
+package com.idansh.javafx.manager;
 
 import com.idansh.dto.range.RangeDTO;
 

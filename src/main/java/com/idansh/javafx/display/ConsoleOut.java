@@ -1,4 +1,4 @@
-package com.idansh.ui.display;
+package com.idansh.javafx.display;
 
 import com.idansh.dto.entity.EntityDTO;
 import com.idansh.dto.environment.EnvironmentVariableDTO;

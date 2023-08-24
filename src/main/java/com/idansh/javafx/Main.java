@@ -1,6 +1,6 @@
-package com.idansh.ui;
+package com.idansh.javafx;
 
-import com.idansh.ui.manager.SimulationManager;
+import com.idansh.javafx.manager.SimulationManager;
 
 public class Main {
     public static void main(String[] args) {
