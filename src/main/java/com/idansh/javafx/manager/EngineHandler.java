@@ -11,6 +11,8 @@ import com.idansh.engine.manager.EngineManager;
 import com.idansh.javafx.display.ConsoleIn;
 import com.idansh.javafx.display.ConsoleOut;
 
+import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -31,12 +33,9 @@ public class EngineHandler {
      * Gets a path of a simulation XML file, loads the file into the engine.
      * If the path entered is not valid, prints a message to the user and returns.
      */
-    public void loadSimulationFromFile() {
-        System.out.print("Please enter path to the XML world config file: ");
-        String path = consoleIn.getInput();
-
+    public void loadSimulationFromFile(File file) {
         try {
-            engineManager.loadSimulationFromFile(path);
+            engineManager.loadSimulationFromFile(file);
             ConsoleOut.printMessage("Successfully loaded simulation data from file!");
         } catch (RuntimeException e) {
             ConsoleOut.printError("Simulation load failed!");

@@ -4,6 +4,8 @@ package com.idansh.javafx.manager;
 import com.idansh.javafx.display.ConsoleIn;
 import com.idansh.javafx.display.ConsoleOut;
 
+import java.io.File;
+
 import static java.lang.System.exit;
 
 /**
@@ -11,8 +13,8 @@ import static java.lang.System.exit;
  * The main loop of the simulation will run through this class.
  */
 public class SimulationManager {
-    EngineHandler engineHandler;
-    ConsoleIn consoleIn;
+    private EngineHandler engineHandler;
+    private ConsoleIn consoleIn;
 
     public SimulationManager() {
         engineHandler = new EngineHandler();
@@ -56,7 +58,6 @@ public class SimulationManager {
 
         switch (menuOption) {
             case LOAD_FILE:
-                engineHandler.loadSimulationFromFile();
                 return true;
 
             case SHOW_SIMULATION_DETAILS:
@@ -85,5 +86,10 @@ public class SimulationManager {
             default:
                 throw new IllegalArgumentException("menuOption type is invalid!"); // This error should not happen on wrong user input, consoleIn.getMenuInput() throws that error
         }
+    }
+
+
+    public void loadSimulationFromFile(File file) {
+        engineHandler.loadSimulationFromFile(file);
     }
 }

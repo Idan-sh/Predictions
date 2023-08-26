@@ -1,9 +1,14 @@
 package com.idansh.javafx.controllers;
 
+import com.idansh.javafx.manager.SimulationManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+import javafx.stage.FileChooser;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -32,6 +37,14 @@ public class AppController implements Initializable {
     @FXML private ResultsController resultsComponentController;
 
 
+    // Main Screen Elements:
+    @FXML private Button loadFileButton;
+    @FXML private TextField simulationPathTextField;
+
+
+    // Simulation manager object that handles the simulation itself
+    private SimulationManager simulationManager;
+
 
     /**
      * Initializes the controller class,
@@ -44,6 +57,21 @@ public class AppController implements Initializable {
             detailsComponentController.setMainController(this);
             newExecutionComponentController.setMainController(this);
             resultsComponentController.setMainController(this);
+            simulationManager = new SimulationManager();
         }
+    }
+
+    @FXML
+    public void loadFileButtonListener() {
+        FileChooser fileChooser = new FileChooser();
+
+        // Let the user choose only XML files.
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("XML Files", "*.xml")
+        );
+
+        File selectedFile = fileChooser.showOpenDialog(loadFileButton.getScene().getWindow());
+        simulationManager.loadSimulationFromFile(selectedFile);
+        simulationPathTextField.setText(selectedFile.getPath());
     }
 }

@@ -16,6 +16,8 @@ import com.idansh.engine.rule.TerminationRule;
 import com.idansh.engine.world.World;
 import com.idansh.engine.jaxb.unmarshal.reader.Reader;
 
+import java.io.File;
+import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -133,12 +135,8 @@ public class EngineManager {
      * Loads a simulation for XML file.
      * @param path path to the XML file location in the machine.
      */
-    public void loadSimulationFromFile(String path) {
-        if (Reader.isValidPath(path)) {
-            currWorld = Reader.readWorld(path);
-        }
-        else
-            throw new IllegalArgumentException("path \"" + path + "\" is not a valid path!");
+    public void loadSimulationFromFile(File file) {
+            currWorld = Reader.readWorld(file);
     }
 
 

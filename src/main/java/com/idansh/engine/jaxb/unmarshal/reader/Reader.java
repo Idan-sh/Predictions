@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.nio.file.Path;
 
 /**
  * Class that Converts data generated from an XML file to the project classes,
@@ -24,9 +25,9 @@ public class Reader {
      * @param path path to XML file containing world data.
      * @return World data class object.
      */
-    public static World readWorld(String path) {
+    public static World readWorld(File file) {
         try {
-            InputStream inputStream = new FileInputStream(path);
+            InputStream inputStream = new FileInputStream(file);
             PRDWorld prdWorld = deserializeXML(inputStream);
 
             return Converter.worldConvert(prdWorld);
@@ -44,17 +45,5 @@ public class Reader {
         JAXBContext jaxbContext = JAXBContext.newInstance(PRDWorld.class);
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
         return (PRDWorld) unmarshaller.unmarshal(inputStream);
-    }
-
-
-    /**
-     * Checks if a path to an XML file is valid.
-     * @param path path to the XML file.
-     * @return true if the file exists and ends with ".xml", false otherwise,
-     */
-    public static boolean isValidPath(String path) {
-        File filePath = new File(path);
-
-        return filePath.exists() && path.endsWith(".xml");
     }
 }

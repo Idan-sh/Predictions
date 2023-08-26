@@ -19,15 +19,18 @@
                <font>
                   <Font name="System Bold" size="28.0" />
                </font>
+               <VBox.margin>
+                  <Insets top="6.0" />
+               </VBox.margin>
             </Label>
             <HBox alignment="CENTER" prefWidth="200.0" spacing="10.0" VBox.vgrow="ALWAYS">
                <children>
-                  <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" text="Load">
+                  <Button fx:id="loadFileButton" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#loadFileButtonListener" text="Load">
                      <font>
                         <Font size="12.0" />
                      </font>
                   </Button>
-                  <TextField editable="false" prefWidth="300.0" text="No Simulation Loaded" HBox.hgrow="ALWAYS" />
+                  <TextField fx:id="simulationPathTextField" editable="false" prefWidth="300.0" text="No Simulation Loaded" HBox.hgrow="ALWAYS" />
                   <Button alignment="CENTER" contentDisplay="CENTER" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" text="Queue Managmet" textAlignment="CENTER" />
                </children>
                <VBox.margin>

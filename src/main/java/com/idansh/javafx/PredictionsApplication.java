@@ -10,23 +10,19 @@ import javafx.stage.Stage;
 import java.net.URL;
 
 public class PredictionsApplication extends Application {
-    private SimulationManager simulationManager;
-
     @Override
     public void start(Stage primaryStage) throws Exception {
         int APPLICATION_WIDTH = 500, APPLICATION_LENGTH = 400;
         String MAIN_SCREEN_RELATIVE_PATH = "/fxml/MainScreen.fxml";
 
-        simulationManager = new SimulationManager();
-
         // Load the first screen in which a simulation can be loaded, and its details will be showed
         // this path is relative to the resources directory
-        FXMLLoader loaderSceneLoader = getFXMLLoader(MAIN_SCREEN_RELATIVE_PATH);
-        Scene loaderScene = new Scene(loaderSceneLoader.load(loaderSceneLoader.getLocation().openStream()), APPLICATION_WIDTH, APPLICATION_LENGTH);
+        FXMLLoader mainScreenLoader = getFXMLLoader(MAIN_SCREEN_RELATIVE_PATH);
+        Scene mainScreen = new Scene(mainScreenLoader.load(mainScreenLoader.getLocation().openStream()), APPLICATION_WIDTH, APPLICATION_LENGTH);
 
         // Set up the stage, show the first screen
         setStageProperties(primaryStage);
-        primaryStage.setScene(loaderScene);
+        primaryStage.setScene(mainScreen);
         primaryStage.show();
     }
 
