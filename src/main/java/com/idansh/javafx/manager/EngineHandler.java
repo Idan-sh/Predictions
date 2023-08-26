@@ -5,6 +5,7 @@ import com.idansh.dto.environment.EnvironmentVariableDTO;
 import com.idansh.dto.environment.EnvironmentVariablesListDTO;
 import com.idansh.dto.property.PropertyDTO;
 import com.idansh.dto.range.RangeDTO;
+import com.idansh.dto.simulation.CurrentSimulationDTO;
 import com.idansh.dto.simulation.SimulationEndTDO;
 import com.idansh.dto.simulation.SimulationResultDTO;
 import com.idansh.engine.manager.EngineManager;
@@ -12,7 +13,6 @@ import com.idansh.javafx.display.ConsoleIn;
 import com.idansh.javafx.display.ConsoleOut;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -57,8 +57,8 @@ public class EngineHandler {
      * Gets CurrentSimulationDTO from the engine with details of the current simulation,
      * prints the simulation details to the screen.
      */
-    public void showCurrentSimulationDetails() {
-        ConsoleOut.printCurrentSimulationDetails(engineManager.getCurrentSimulationDetails());
+    public CurrentSimulationDTO getCurrentSimulationDetails() {
+        return engineManager.getCurrentSimulationDetails();
     }
 
 
@@ -76,70 +76,15 @@ public class EngineHandler {
      * and allows the user to choose which simulation to show full details of.
      * Prints the chosen simulation result.
      */
-    public void showPastSimulations() {
+    public List<SimulationResultDTO> getPastSimulationsResults() {
         List<SimulationResultDTO> pastSimulationsResults = engineManager.getPastSimulationsResults();
 
         if(pastSimulationsResults.size() == 0) {
             ConsoleOut.printError("please run a simulation before trying to shot past simulations!");
-            return;
+            // todo- popup error and return.
         }
 
-        SimulationResultDTO simulationResultDTO;
-        int userInput;
-
-        // Try until user enters correct input
-        while(true) {
-            ConsoleOut.printPastSimulationsShortDetails(pastSimulationsResults);
-            System.out.println();
-            System.out.print("Please choose number of a past simulation result to view the details of,\nor " + (pastSimulationsResults.size() + 1) + " to return to the main menu: ");
-
-            try {
-                userInput = consoleIn.getIntInput();
-            } catch (IllegalArgumentException e) {
-                ConsoleOut.printError(e.getMessage());
-                return;
-            }
-
-            if (userInput >= 1 && userInput <= pastSimulationsResults.size()) {
-                simulationResultDTO = pastSimulationsResults.get(userInput - 1);
-                break;
-            } else {
-                // Check if user requested to return the to main menu
-                if(userInput == pastSimulationsResults.size() + 1)
-                    return;
-
-                ConsoleOut.printError("invalid past simulation number! Try again...");
-            }
-        }
-
-        // Try until user enters correct input
-        while(true) {
-            ConsoleOut.printPastSimulationsMenu();
-
-            try {
-                userInput = consoleIn.getIntInput();
-            } catch (IllegalArgumentException e) {
-                ConsoleOut.printError(e.getMessage());
-                return;
-            }
-
-            switch(userInput) {
-                case 1:
-                    showNumberOfEntities(simulationResultDTO);
-                    return;
-
-                case 2:
-                    showPropertyInformation(simulationResultDTO);
-                    return;
-
-                case 3:
-                    return; // User chose to return to the main menu
-
-                default:
-                    ConsoleOut.printError("invalid past simulation menu choice! try again...");
-                    System.out.println();
-            }
-        }
+        return pastSimulationsResults;
     }
 
 

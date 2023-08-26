@@ -1,10 +1,12 @@
 package com.idansh.javafx.manager;
 
 
-import com.idansh.javafx.display.ConsoleIn;
+import com.idansh.dto.simulation.CurrentSimulationDTO;
+import com.idansh.dto.simulation.SimulationResultDTO;
 import com.idansh.javafx.display.ConsoleOut;
 
 import java.io.File;
+import java.util.List;
 
 import static java.lang.System.exit;
 
@@ -13,83 +15,52 @@ import static java.lang.System.exit;
  * The main loop of the simulation will run through this class.
  */
 public class SimulationManager {
-    private EngineHandler engineHandler;
-    private ConsoleIn consoleIn;
+    private final EngineHandler engineHandler;
 
     public SimulationManager() {
         engineHandler = new EngineHandler();
-        consoleIn = new ConsoleIn();
     }
 
 
     /**
-     * Starts the main loop of the program.
+     * Loads an XML file with world data into the engine.
+     * @param file a valid XML file that was chosen by the user.
      */
-    public void startProgram() {
-        try {
-            // Run until user chooses to exit
-            do {
-                ConsoleOut.printMenu();
-            } while (handleMenuChoice());   // Handle the user's choice and check if chose to exit.
-
-            ConsoleOut.printGoodbye();
-            exit(0);
-        } catch (RuntimeException e) { // Catch all unhandled exceptions, display their details and finish the program
-            ConsoleOut.printError("Program Stopped.");
-            ConsoleOut.printRuntimeException(e);
-        }
-    }
-
-
-    /**
-     * Receives user's menu choice input and handles it accordingly.
-     * @return false if the user chose to exit, and true otherwise.
-     * @throws NumberFormatException in case the input string cannot be converted to int.
-     * @throws IllegalArgumentException in case the option number received is not a valid choice.
-     */
-    public boolean handleMenuChoice() {
-        MenuOptions menuOption;
-        try {
-            menuOption = consoleIn.getMenuInput();
-        } catch (IllegalArgumentException e) {
-            ConsoleOut.printError(e.getMessage());
-            return true;
-        }
-
-        switch (menuOption) {
-            case LOAD_FILE:
-                return true;
-
-            case SHOW_SIMULATION_DETAILS:
-                if(!engineHandler.isSimulationLoaded()) {
-                    ConsoleOut.printError("no simulation loaded! please load before trying to show details!");
-                    return true;
-                }
-                engineHandler.showCurrentSimulationDetails();
-                return true;
-
-            case RUN_SIMULATION:
-                if(!engineHandler.isSimulationLoaded()) {
-                    ConsoleOut.printError("no simulation loaded! please load before trying to run!");
-                    return true;
-                }
-                engineHandler.runSimulation();
-                return true;
-
-            case SHOW_PAST_SIMULATION_DETAILS:
-                engineHandler.showPastSimulations();
-                return true;
-
-            case EXIT:
-                return false;
-
-            default:
-                throw new IllegalArgumentException("menuOption type is invalid!"); // This error should not happen on wrong user input, consoleIn.getMenuInput() throws that error
-        }
-    }
-
-
     public void loadSimulationFromFile(File file) {
         engineHandler.loadSimulationFromFile(file);
+    }
+
+
+    /**
+     * Gets from the engine the current loaded simulation's details.
+     * @return DTO containing details of the current loaded simulation.
+     */
+    public CurrentSimulationDTO getCurrentSimulationDetails() {
+        if(!engineHandler.isSimulationLoaded()) {
+            ConsoleOut.printError("no simulation loaded! please load before trying to run!");
+            // todo- show error popup, return
+        }
+
+        return engineHandler.getCurrentSimulationDetails();
+    }
+
+
+    /**
+     * Runs the current loaded simulation.
+     */
+    public void runSimulation() {
+        if(!engineHandler.isSimulationLoaded()) {
+            ConsoleOut.printError("no simulation loaded! please load before trying to run!");
+            // todo- show error popup, return
+        }
+        engineHandler.runSimulation();
+    }
+
+
+    /**
+     * Get all the past simulations' results from the engine.
+     */
+    public List<SimulationResultDTO> getPastSimulationsResults() {
+        return engineHandler.getPastSimulationsResults();
     }
 }

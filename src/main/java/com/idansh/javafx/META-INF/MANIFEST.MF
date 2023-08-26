@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
-Main-Class: com.idansh.javafx.Main
+Main-Class: com.idansh.javafx.PredictionsApplication
 Class-Path: dto.jar engine.jar
 

@@ -1,5 +1,6 @@
 package com.idansh.javafx.controllers;
 
+import com.idansh.dto.simulation.CurrentSimulationDTO;
 import com.idansh.javafx.manager.SimulationManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -61,6 +62,11 @@ public class AppController implements Initializable {
         }
     }
 
+
+    /**
+     * Opens file chooser dialog, which allows the user
+     * to choose and upload an XML file into the program.
+     */
     @FXML
     public void loadFileButtonListener() {
         FileChooser fileChooser = new FileChooser();
@@ -73,5 +79,8 @@ public class AppController implements Initializable {
         File selectedFile = fileChooser.showOpenDialog(loadFileButton.getScene().getWindow());
         simulationManager.loadSimulationFromFile(selectedFile);
         simulationPathTextField.setText(selectedFile.getPath());
+
+        CurrentSimulationDTO currentSimulationDTO = simulationManager.getCurrentSimulationDetails();
+        // todo- display current simulation's details in the UI
     }
 }

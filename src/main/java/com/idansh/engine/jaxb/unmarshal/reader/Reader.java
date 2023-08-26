@@ -22,7 +22,7 @@ public class Reader {
      * Converts a PRD-World with its data to a World class and returns it.
      * Reads the XML world's data into an intermediate class from the given schema,
      * and converts the intermediate object to a World object which the simulation can use.
-     * @param path path to XML file containing world data.
+     * @param file XML file containing world data.
      * @return World data class object.
      */
     public static World readWorld(File file) {

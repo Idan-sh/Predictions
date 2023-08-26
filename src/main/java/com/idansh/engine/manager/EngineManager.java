@@ -133,7 +133,7 @@ public class EngineManager {
 
     /**
      * Loads a simulation for XML file.
-     * @param path path to the XML file location in the machine.
+     * @param file XML file with world data.
      */
     public void loadSimulationFromFile(File file) {
             currWorld = Reader.readWorld(file);
