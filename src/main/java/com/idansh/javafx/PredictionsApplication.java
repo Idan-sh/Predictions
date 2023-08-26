@@ -7,23 +7,40 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.net.URL;
 
 public class PredictionsApplication extends Application {
-    private final String LOADER_SCENE_RELATIVE_PATH = "/scenes/LoaderScene.fxml"; // this path is relative to the resources directory
     private SimulationManager simulationManager;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        int APPLICATION_WIDTH = 500, APPLICATION_LENGTH = 400;
+        String MAIN_SCREEN_RELATIVE_PATH = "/fxml/MainScreen.fxml";
+
         simulationManager = new SimulationManager();
-        FXMLLoader loaderSceneLoader = getFXMLLoader(LOADER_SCENE_RELATIVE_PATH);
 
-        Scene loaderScene = new Scene(loaderSceneLoader.load(loaderSceneLoader.getLocation().openStream()), 500, 400);
+        // Load the first screen in which a simulation can be loaded, and its details will be showed
+        // this path is relative to the resources directory
+        FXMLLoader loaderSceneLoader = getFXMLLoader(MAIN_SCREEN_RELATIVE_PATH);
+        Scene loaderScene = new Scene(loaderSceneLoader.load(loaderSceneLoader.getLocation().openStream()), APPLICATION_WIDTH, APPLICATION_LENGTH);
 
-        primaryStage.setTitle("Predictions Simulator");
+        // Set up the stage, show the first screen
+        setStageProperties(primaryStage);
         primaryStage.setScene(loaderScene);
         primaryStage.show();
+    }
+
+
+    /**
+     * Set up a stage's basic properties.
+     * @param stage the main stage on which the scenes will be shown.
+     */
+    private void setStageProperties(Stage stage) {
+        // Set the minimal size of the window
+        stage.setMinWidth(300);
+        stage.setMinHeight(200);
+
+        stage.setTitle("Predictions Simulator");
     }
 
 
