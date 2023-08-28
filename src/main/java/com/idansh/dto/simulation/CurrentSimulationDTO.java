@@ -1,6 +1,7 @@
 package com.idansh.dto.simulation;
 
 import com.idansh.dto.entity.EntityDTO;
+import com.idansh.dto.environment.EnvironmentVariablesListDTO;
 import com.idansh.dto.rule.RuleDTO;
 import com.idansh.dto.rule.TerminationRuleDTO;
 
@@ -14,11 +15,17 @@ public class CurrentSimulationDTO {
     List<EntityDTO> entityDTOList;
     List<RuleDTO> ruleDTOList;
     List<TerminationRuleDTO> terminationRuleDTOList;
+    EnvironmentVariablesListDTO environmentVariablesListDTO;
 
-    public CurrentSimulationDTO() {
-        entityDTOList = new ArrayList<>();
-        ruleDTOList = new ArrayList<>();
-        terminationRuleDTOList = new ArrayList<>();
+    public CurrentSimulationDTO(EnvironmentVariablesListDTO environmentVariablesListDTO) {
+        this.entityDTOList = new ArrayList<>();
+        this.ruleDTOList = new ArrayList<>();
+        this.terminationRuleDTOList = new ArrayList<>();
+        this.environmentVariablesListDTO = environmentVariablesListDTO;
+    }
+
+    public EnvironmentVariablesListDTO getEnvironmentVariablesListDTO() {
+        return environmentVariablesListDTO;
     }
 
     public void addEntityDTO(EntityDTO entityDTO) {

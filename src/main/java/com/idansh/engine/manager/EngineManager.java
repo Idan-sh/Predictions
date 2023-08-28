@@ -38,7 +38,7 @@ public class EngineManager {
      * @return returns to the UI a DTO that contains information on the current loaded simulated world.
      */
     public CurrentSimulationDTO getCurrentSimulationDetails() {
-        CurrentSimulationDTO currentSimulationDTO = new CurrentSimulationDTO();
+        CurrentSimulationDTO currentSimulationDTO = new CurrentSimulationDTO(getEnvironmentVariablesListDTO());
 
         // Add Entities:
         currWorld.entityManager.getEntityFactories().forEach(
@@ -67,7 +67,8 @@ public class EngineManager {
                                         propertyFactory.getType().getTypeString(),
                                         rangeDTO,
                                         propertyFactory.isRandomGenerated(),
-                                        null);
+                                        propertyFactory.isRandomGenerated() ? null : propertyFactory.createProperty().getValue()    // If the value is not random, then get the fixed initial value
+                                        );
                                 entityDTO.addPropertyDTOtoList(propertyDTO);
                             }
                     );

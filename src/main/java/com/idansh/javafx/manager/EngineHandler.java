@@ -34,13 +34,7 @@ public class EngineHandler {
      * If the path entered is not valid, prints a message to the user and returns.
      */
     public void loadSimulationFromFile(File file) {
-        try {
-            engineManager.loadSimulationFromFile(file);
-            ConsoleOut.printMessage("Successfully loaded simulation data from file!");
-        } catch (RuntimeException e) {
-            ConsoleOut.printError("Simulation load failed!");
-            ConsoleOut.printRuntimeException(e);
-        }
+        engineManager.loadSimulationFromFile(file);
     }
 
 

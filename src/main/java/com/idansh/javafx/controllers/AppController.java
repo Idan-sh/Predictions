@@ -1,12 +1,15 @@
 package com.idansh.javafx.controllers;
 
 import com.idansh.dto.simulation.CurrentSimulationDTO;
+import com.idansh.javafx.display.ConsoleOut;
 import com.idansh.javafx.manager.SimulationManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 
 import java.io.File;
@@ -25,22 +28,30 @@ public class AppController implements Initializable {
      */
 
     // First window - Details
-    @FXML private ScrollPane detailsComponent;
-    @FXML private DetailsController detailsComponentController;
+    @FXML
+    private HBox detailsComponent;
+    @FXML
+    private DetailsController detailsComponentController;
 
     // Second window - New Execution
-    @FXML private ScrollPane newExecutionComponent;
-    @FXML private NewExecutionController newExecutionComponentController;
+    @FXML
+    private ScrollPane newExecutionComponent;
+    @FXML
+    private NewExecutionController newExecutionComponentController;
 
 
     // Third window - Results
-    @FXML private ScrollPane resultsComponent;
-    @FXML private ResultsController resultsComponentController;
+    @FXML
+    private ScrollPane resultsComponent;
+    @FXML
+    private ResultsController resultsComponentController;
 
 
     // Main Screen Elements:
-    @FXML private Button loadFileButton;
-    @FXML private TextField simulationPathTextField;
+    @FXML
+    private Button loadFileButton;
+    @FXML
+    private TextField simulationPathTextField;
 
 
     // Simulation manager object that handles the simulation itself
@@ -77,10 +88,20 @@ public class AppController implements Initializable {
         );
 
         File selectedFile = fileChooser.showOpenDialog(loadFileButton.getScene().getWindow());
-        simulationManager.loadSimulationFromFile(selectedFile);
-        simulationPathTextField.setText(selectedFile.getPath());
 
-        CurrentSimulationDTO currentSimulationDTO = simulationManager.getCurrentSimulationDetails();
-        // todo- display current simulation's details in the UI
+        // Try to load the simulation from the received file
+        try {
+            simulationManager.loadSimulationFromFile(selectedFile);
+            ConsoleOut.printMessage("Successfully loaded simulation");
+
+            simulationPathTextField.setText(selectedFile.getPath());    // Set the file's path into the TextField
+
+            // Get the current simulation's details and output it to the screen
+            CurrentSimulationDTO currentSimulationDTO = simulationManager.getCurrentSimulationDetails();
+            detailsComponentController.displayCurrentSimulationDetails(currentSimulationDTO);   // Display the current simulation's details
+        }  catch (RuntimeException e) {
+            ConsoleOut.printError("Simulation load failed!");
+            ConsoleOut.printRuntimeException(e);
+        }
     }
 }

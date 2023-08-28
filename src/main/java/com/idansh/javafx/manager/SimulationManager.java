@@ -37,7 +37,7 @@ public class SimulationManager {
      */
     public CurrentSimulationDTO getCurrentSimulationDetails() {
         if(!engineHandler.isSimulationLoaded()) {
-            ConsoleOut.printError("no simulation loaded! please load before trying to run!");
+            ConsoleOut.printError("no simulation loaded! please load before trying to show details!");
             // todo- show error popup, return
         }
 

@@ -48,7 +48,7 @@
          <tabs>
             <Tab closable="false" text="Details">
                <content>
-                  <fx:include fx:id="detailsComponent" minHeight="-Infinity" minWidth="-Infinity" source="Details.fxml" />
+                  <fx:include fx:id="detailsComponent" source="Details.fxml" />
                </content></Tab>
             <Tab closable="false" text="New Execution">
                <content>
