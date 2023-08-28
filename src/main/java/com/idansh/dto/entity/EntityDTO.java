@@ -40,4 +40,9 @@ public class EntityDTO {
     public List<PropertyDTO> getPropertyDTOList() {
         return propertyDTOList;
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

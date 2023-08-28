@@ -41,4 +41,9 @@ public class RuleDTO {
     public List<String> getActionNamesList() {
         return actionNamesList;
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

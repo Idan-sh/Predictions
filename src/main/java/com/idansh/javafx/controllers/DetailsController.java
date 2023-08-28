@@ -2,6 +2,7 @@ package com.idansh.javafx.controllers;
 
 import com.idansh.dto.entity.EntityDTO;
 import com.idansh.dto.property.PropertyDTO;
+import com.idansh.dto.rule.RuleDTO;
 import com.idansh.dto.simulation.CurrentSimulationDTO;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -96,6 +97,7 @@ public class DetailsController {
                     break;
 
                 case RULES_ROOT_NAME:
+                    addRuleDetails((RuleDTO) selectedTreeItem.getValue());
                     break;
 
                 case TERMINATION_RULES_ROOT_NAME:
@@ -109,6 +111,36 @@ public class DetailsController {
             }
         }
     }
+
+    /**
+     * Adds a single rule's details to the details tree view.
+     * @param ruleDTO DTO of the rule to display.
+     */
+    private void addRuleDetails(RuleDTO ruleDTO) {
+        String ACTION_NAMES_TITLE = "Action Names";
+        String NAME_TITLE = "Name: ", TICKS_TITLE = "Ticks: ", PROBABILITY_TITLE = "Probability: ",
+        NOF_ACTIONS_TITLE = "Number of Actions: ";
+
+        // Create the main root of the tree view
+        TreeItem<String> mainRoot = new TreeItem<>(MAIN_ROOT_NAME);
+        detailsTreeView.setRoot(mainRoot);
+
+        TreeItem<String> nameItem = new TreeItem<>(NAME_TITLE + ruleDTO.getName());
+        TreeItem<String> ticksItem = new TreeItem<>(TICKS_TITLE + ruleDTO.getTicks());
+        TreeItem<String> probabilityItem = new TreeItem<>(PROBABILITY_TITLE + ruleDTO.getProbability());
+        TreeItem<String> nofActionsItem = new TreeItem<>(NOF_ACTIONS_TITLE + ruleDTO.getNofActions());
+
+        TreeItem<String> actionNamesRoot = new TreeItem<>(ACTION_NAMES_TITLE);
+
+        // Add each action name to the action names root
+        ruleDTO.getActionNamesList().forEach(
+                actionName -> actionNamesRoot.getChildren().add(new TreeItem<>(actionName))
+        );
+
+        // Add all rule details to the main root
+        mainRoot.getChildren().addAll(nameItem, ticksItem, probabilityItem, nofActionsItem, actionNamesRoot);
+    }
+
 
 
     /**
@@ -129,6 +161,7 @@ public class DetailsController {
         TreeItem<String> initAmountItem = new TreeItem<>(INIT_AMOUNT_TITLE + Integer.toString(entityDTO.getInitAmountInPopulation()));
         TreeItem<String> propertiesRoot = new TreeItem<>(PROPERTIES_TITLE);
 
+        // Add each property to the properties root
         entityDTO.getPropertyDTOList().forEach(
                 propertyDTO -> {
                     // Each property will have its root
@@ -152,7 +185,7 @@ public class DetailsController {
                         propertyRoot.getChildren().addAll(propertyTypeItem, propertyValueItem, propertyIsRandomItem);
                     }
 
-                    // Add the finished property to the properties root
+                    // Add the finished property to the main root
                     propertiesRoot.getChildren().add(propertyRoot);
                 }
         );
@@ -162,6 +195,10 @@ public class DetailsController {
     }
 
 
+    /**
+     * Converts a propertyDTO's value into a TreeItem of type String.
+     * @param propertyDTO DTO containing an object value of the type "decimal"/"float"/"boolean"/"string".
+     */
     private TreeItem<String> getPropertyValueTreeItem(PropertyDTO propertyDTO) {
         String VALUE_TITLE = "Value: ";
 
