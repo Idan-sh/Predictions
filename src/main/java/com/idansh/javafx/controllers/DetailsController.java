@@ -1,8 +1,10 @@
 package com.idansh.javafx.controllers;
 
 import com.idansh.dto.entity.EntityDTO;
+import com.idansh.dto.environment.EnvironmentVariableDTO;
 import com.idansh.dto.property.PropertyDTO;
 import com.idansh.dto.rule.RuleDTO;
+import com.idansh.dto.rule.TerminationRuleDTO;
 import com.idansh.dto.simulation.CurrentSimulationDTO;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -20,11 +22,11 @@ import java.util.ResourceBundle;
  * and in charge of showing the loaded simulation details.
  */
 public class DetailsController {
-    private final String MAIN_ROOT_NAME = "Main Root";
-    private final String ENTITIES_ROOT_NAME = "Entities";
-    private final String RULES_ROOT_NAME = "Rules";
-    private final String TERMINATION_RULES_ROOT_NAME = "Termination Rules";
-    private final String ENVIRONMENT_VARIABLES_ROOT_NAME = "Environment Variables";
+    private final String MAIN_ROOT_NAME = "Main Root", ENTITIES_ROOT_NAME = "Entities", RULES_ROOT_NAME = "Rules",
+            TERMINATION_RULES_ROOT_NAME = "Termination Rules", ENVIRONMENT_VARIABLES_ROOT_NAME = "Environment Variables";
+    private final String NAME_TITLE = "Name: ", VALUE_TITLE = "Value: ", TYPE_TITLE = "Type: ";
+    private final String RANGE_TITLE = "Range", RANGE_FROM_TITLE = "From: ", RANGE_TO_TITLE = "To: ";
+    private final String PROPERTY_IS_RANDOM_TITLE = "Is Random: ";
 
     private AppController mainController;
 
@@ -84,6 +86,7 @@ public class DetailsController {
 
     /**
      * Activates when a tree node is pressed (one of the simulation breakdown's items was chosen).
+     * Displays the chosen item's full details in the detailsTreeView component.
      */
     public void selectItem() {
         TreeItem<Object> selectedTreeItem = breakdownTreeView.getSelectionModel().getSelectedItem();
@@ -101,9 +104,11 @@ public class DetailsController {
                     break;
 
                 case TERMINATION_RULES_ROOT_NAME:
+                    addTerminationRuleDetails((TerminationRuleDTO) selectedTreeItem.getValue());
                     break;
 
                 case ENVIRONMENT_VARIABLES_ROOT_NAME:
+                    addEnvironmentVariableDetails((EnvironmentVariableDTO) selectedTreeItem.getValue());
                     break;
 
                 default:
@@ -112,14 +117,60 @@ public class DetailsController {
         }
     }
 
+
+    /**
+     * Adds a single environment variable's details to the details tree view.
+     * @param environmentVariableDTO DTO of the environment variable to display.
+     */
+    private void addEnvironmentVariableDetails(EnvironmentVariableDTO environmentVariableDTO) {
+        // Create the main root of the tree view
+        TreeItem<String> mainRoot = new TreeItem<>(MAIN_ROOT_NAME);
+        detailsTreeView.setRoot(mainRoot);
+
+        TreeItem<String> nameItem = new TreeItem<>(NAME_TITLE + environmentVariableDTO.getName());
+        TreeItem<String> valueItem = new TreeItem<>(VALUE_TITLE + environmentVariableDTO.getValue());
+        TreeItem<String> typeItem = new TreeItem<>(TYPE_TITLE + environmentVariableDTO.getType());
+
+        if(environmentVariableDTO.getRange() != null) {
+            TreeItem<String> rangeRoot = new TreeItem<>(RANGE_TITLE);
+            TreeItem<String> rangeFromItem = new TreeItem<>(RANGE_FROM_TITLE + environmentVariableDTO.getRange().getFrom());
+            TreeItem<String> rangeToItem = new TreeItem<>(RANGE_TO_TITLE + environmentVariableDTO.getRange().getTo());
+            rangeRoot.getChildren().addAll(rangeFromItem, rangeToItem);  // Add range details to the range root
+
+            // Add all details of the property to its root, including range
+            mainRoot.getChildren().addAll(nameItem, valueItem, typeItem, rangeRoot);
+        } else {
+            // Add all details of the property to its root, excluding range
+            mainRoot.getChildren().addAll(nameItem, valueItem, typeItem);
+        }
+    }
+
+
+    /**
+     * Adds a single termination rule's details to the details tree view.
+     * @param terminationRuleDTO DTO of the termination rule to display.
+     */
+    private void addTerminationRuleDetails(TerminationRuleDTO terminationRuleDTO) {
+        // Create the main root of the tree view
+        TreeItem<String> mainRoot = new TreeItem<>(MAIN_ROOT_NAME);
+        detailsTreeView.setRoot(mainRoot);
+
+        TreeItem<String> valueItem = new TreeItem<>(VALUE_TITLE + terminationRuleDTO.getValue());
+        TreeItem<String> typeItem = new TreeItem<>(TYPE_TITLE + terminationRuleDTO.getType());
+
+        mainRoot.getChildren().addAll(valueItem, typeItem);
+    }
+
+
     /**
      * Adds a single rule's details to the details tree view.
      * @param ruleDTO DTO of the rule to display.
      */
     private void addRuleDetails(RuleDTO ruleDTO) {
         String ACTION_NAMES_TITLE = "Action Names";
-        String NAME_TITLE = "Name: ", TICKS_TITLE = "Ticks: ", PROBABILITY_TITLE = "Probability: ",
-        NOF_ACTIONS_TITLE = "Number of Actions: ";
+        String NOF_ACTIONS_TITLE = "Number of Actions: ";
+        String PROBABILITY_TITLE = "Probability: ";
+        String TICKS_TITLE = "Ticks: ";
 
         // Create the main root of the tree view
         TreeItem<String> mainRoot = new TreeItem<>(MAIN_ROOT_NAME);
@@ -149,9 +200,7 @@ public class DetailsController {
      */
     private void addEntityDetails(EntityDTO entityDTO) {
         String PROPERTIES_TITLE = "Properties";
-        String RANGE_TITLE = "Range", RANGE_FROM_TITLE = "From: ", RANGE_TO_TITLE = "To: ";
-        String NAME_TITLE = "Name: ", INIT_AMOUNT_TITLE = "Initial amount in population: ";
-        String PROPERTY_TYPE_TITLE = "Type: ", PROPERTY_IS_RANDOM_TITLE = "Is Random: ";
+        String INIT_AMOUNT_TITLE = "Initial amount in population: ";
 
         // Create the main root of the tree view
         TreeItem<String> mainRoot = new TreeItem<>(MAIN_ROOT_NAME);
@@ -168,7 +217,7 @@ public class DetailsController {
                     TreeItem<String> propertyRoot = new TreeItem<>(propertyDTO.getName());
 
                     // The property's details will be the roots children
-                    TreeItem<String> propertyTypeItem = new TreeItem<>(PROPERTY_TYPE_TITLE + propertyDTO.getType());
+                    TreeItem<String> propertyTypeItem = new TreeItem<>(TYPE_TITLE + propertyDTO.getType());
                     TreeItem<String> propertyValueItem = getPropertyValueTreeItem(propertyDTO);
                     TreeItem<String> propertyIsRandomItem = new TreeItem<>(PROPERTY_IS_RANDOM_TITLE + propertyDTO.isRandomGenerated());
 

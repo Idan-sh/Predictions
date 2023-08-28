@@ -35,6 +35,8 @@ public class PredictionsApplication extends Application {
         // Set the minimal size of the window
         stage.setMinWidth(300);
         stage.setMinHeight(200);
+        stage.setWidth(800);
+        stage.setHeight(600);
 
         stage.setTitle("Predictions Simulator");
     }
