@@ -8,7 +8,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 
@@ -35,7 +35,7 @@ public class AppController implements Initializable {
 
     // Second window - New Execution
     @FXML
-    private ScrollPane newExecutionComponent;
+    private GridPane newExecutionComponent;
     @FXML
     private NewExecutionController newExecutionComponentController;
 
@@ -57,6 +57,7 @@ public class AppController implements Initializable {
     // Simulation manager object that handles the simulation itself
     private SimulationManager simulationManager;
 
+    private boolean isSimulationLoaded = false;
 
     /**
      * Initializes the controller class,
@@ -93,15 +94,26 @@ public class AppController implements Initializable {
         try {
             simulationManager.loadSimulationFromFile(selectedFile);
             ConsoleOut.printMessage("Successfully loaded simulation");
+            isSimulationLoaded = true;
 
             simulationPathTextField.setText(selectedFile.getPath());    // Set the file's path into the TextField
 
             // Get the current simulation's details and output it to the screen
             CurrentSimulationDTO currentSimulationDTO = simulationManager.getCurrentSimulationDetails();
             detailsComponentController.displayCurrentSimulationDetails(currentSimulationDTO);   // Display the current simulation's details
+            newExecutionComponentController.displayDetails(currentSimulationDTO);               // Display the various variables that the user can interact with
         }  catch (RuntimeException e) {
             ConsoleOut.printError("Simulation load failed!");
             ConsoleOut.printRuntimeException(e);
         }
+    }
+
+
+    /**
+     * Returns whether a simulation was loaded into the program
+     * from an XML file.
+     */
+    public boolean isSimulationLoaded() {
+        return isSimulationLoaded;
     }
 }

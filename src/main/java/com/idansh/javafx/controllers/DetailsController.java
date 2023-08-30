@@ -7,14 +7,8 @@ import com.idansh.dto.rule.RuleDTO;
 import com.idansh.dto.rule.TerminationRuleDTO;
 import com.idansh.dto.simulation.CurrentSimulationDTO;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
 
 /**
  * FXML Controller class for the first screen of the application.
@@ -191,7 +185,6 @@ public class DetailsController {
         // Add all rule details to the main root
         mainRoot.getChildren().addAll(nameItem, ticksItem, probabilityItem, nofActionsItem, actionNamesRoot);
     }
-
 
 
     /**

@@ -34,7 +34,7 @@ public class PredictionsApplication extends Application {
     private void setStageProperties(Stage stage) {
         // Set the minimal size of the window
         stage.setMinWidth(300);
-        stage.setMinHeight(200);
+        stage.setMinHeight(260);
         stage.setWidth(800);
         stage.setHeight(600);
 
