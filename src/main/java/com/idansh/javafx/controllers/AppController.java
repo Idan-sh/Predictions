@@ -1,19 +1,20 @@
 package com.idansh.javafx.controllers;
 
+import com.idansh.dto.environment.EnvironmentVariableDTO;
+import com.idansh.dto.environment.EnvironmentVariablesListDTO;
 import com.idansh.dto.simulation.CurrentSimulationDTO;
 import com.idansh.javafx.display.ConsoleOut;
 import com.idansh.javafx.manager.SimulationManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 /**
@@ -45,6 +46,8 @@ public class AppController implements Initializable {
     private ScrollPane resultsComponent;
     @FXML
     private ResultsController resultsComponentController;
+    @FXML
+    private Tab resultsTab;
 
 
     // Main Screen Elements:
@@ -52,11 +55,13 @@ public class AppController implements Initializable {
     private Button loadFileButton;
     @FXML
     private TextField simulationPathTextField;
+    @FXML
+    private TabPane appTabPane;
 
 
     // Simulation manager object that handles the simulation itself
     private SimulationManager simulationManager;
-
+    private CurrentSimulationDTO currentSimulationDTO;
     private boolean isSimulationLoaded = false;
 
     /**
@@ -72,6 +77,14 @@ public class AppController implements Initializable {
             resultsComponentController.setMainController(this);
             simulationManager = new SimulationManager();
         }
+    }
+
+
+    /**
+     * Runs the current loaded simulation.
+     */
+    public void runCurrentLoadedSimulation() {
+        simulationManager.runSimulation(currentSimulationDTO.getEnvironmentVariablesListDTO());
     }
 
 
@@ -98,8 +111,8 @@ public class AppController implements Initializable {
 
             simulationPathTextField.setText(selectedFile.getPath());    // Set the file's path into the TextField
 
-            // Get the current simulation's details and output it to the screen
-            CurrentSimulationDTO currentSimulationDTO = simulationManager.getCurrentSimulationDetails();
+            // Get the current simulation's details, save it for variable updating, and output its details to the screen
+            currentSimulationDTO = simulationManager.getCurrentSimulationDetails();
             detailsComponentController.displayCurrentSimulationDetails(currentSimulationDTO);   // Display the current simulation's details
             newExecutionComponentController.displayDetails(currentSimulationDTO);               // Display the various variables that the user can interact with
         }  catch (RuntimeException e) {
@@ -115,5 +128,19 @@ public class AppController implements Initializable {
      */
     public boolean isSimulationLoaded() {
         return isSimulationLoaded;
+    }
+
+
+    /**
+     * Chooses and shows the Results tab.
+     */
+    public void moveToResultsTab() {
+        appTabPane.getSelectionModel().select(resultsTab);
+    }
+
+
+    public int getMaxNofEntities() {
+        return Integer.MAX_VALUE; // todo - change to the max number received from new format of XML files.
+//        return simulationManager.getCurrentSimulationDetails();
     }
 }

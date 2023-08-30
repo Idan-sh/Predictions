@@ -1,6 +1,7 @@
 package com.idansh.javafx.manager;
 
 
+import com.idansh.dto.environment.EnvironmentVariablesListDTO;
 import com.idansh.dto.simulation.CurrentSimulationDTO;
 import com.idansh.dto.simulation.SimulationResultDTO;
 import com.idansh.javafx.display.ConsoleOut;
@@ -47,13 +48,16 @@ public class SimulationManager {
 
     /**
      * Runs the current loaded simulation.
+     * @param environmentVariablesListDTO DTO containing a list of all the updated environment variables
+     *                                   to run the simulation with.
      */
-    public void runSimulation() {
+    public void runSimulation(EnvironmentVariablesListDTO environmentVariablesListDTO) {
         if(!engineHandler.isSimulationLoaded()) {
             ConsoleOut.printError("no simulation loaded! please load before trying to run!");
             // todo- show error popup, return
+            return;
         }
-        engineHandler.runSimulation();
+        engineHandler.runSimulation(environmentVariablesListDTO);
     }
 
 

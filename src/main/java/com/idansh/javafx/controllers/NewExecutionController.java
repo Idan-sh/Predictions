@@ -16,6 +16,7 @@ import javafx.scene.layout.VBox;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * FXML Controller class for the second screen of the application.
@@ -26,27 +27,137 @@ public class NewExecutionController {
 
     @FXML
     private Button clearButton;
-
     @FXML
     private Button startButton;
 
+    // Entities amounts section
+    @FXML
+    private Label entitiesTitleLabel;
     @FXML
     private VBox entitiesVBox;
     private Map<EntityDTO, TextField> entityDTOTextFieldMap;
 
+    // Environment variables' values section
+    @FXML
+    private Label environmentTitleLabel;
     @FXML
     private VBox environmentVBox;
     private Map<EnvironmentVariableDTO, TextField> environmentVariableDTOTextFieldMap;
+
 
     public void setMainController(AppController mainController) {
         this.mainController = mainController;
     }
 
     /**
+     * Validates user input, if user input is valid then starts
+     * a new simulation from the loaded file with the variables received.
+     */
+    public void startButtonListener() {
+        if(!mainController.isSimulationLoaded()){
+            // todo- add popup message in the UI
+            System.out.println("Error: please load a simulation before trying to run!");
+            return;
+        }
+
+        // Check if the input in valid, if not show error message
+        try {
+            getEntitiesInput();
+            getEnvironmentVariablesInput();
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage()); // todo- change to popup message in the UI
+            return;
+        }
+
+        // Run the current loaded simulation
+        mainController.runCurrentLoadedSimulation();
+
+        // Move to the Results tab to see the simulation in progress
+        mainController.moveToResultsTab();
+    }
+
+
+    /**
+     * Checks if all entity text fields were filled,
+     * and if the total amount of entities entered are within the correct range.
+     */
+    private void getEntitiesInput() {
+        AtomicInteger totalAmount = new AtomicInteger();
+        entityDTOTextFieldMap.forEach(
+                (entityDTO, textField) -> {
+                    if(textField.getText().isEmpty())
+                        throw new IllegalArgumentException("no amount of entity instances entered for entity \""
+                                + entityDTO.getName() + "\"");
+                    // todo - set this amount in the current simulation
+                    totalAmount.addAndGet(Integer.parseInt(textField.getText()));
+                }
+        );
+
+        int maxNofEntities = mainController.getMaxNofEntities();
+        if(totalAmount.get() > maxNofEntities)
+            throw new IllegalArgumentException("there can be only " + maxNofEntities
+                    + " entities in the simulation. Please lower the number of entities...");
+    }
+
+
+    /**
+     * Checks if all environment variables' text fields were filled,
+     * and if each one is of the correct type..
+     */
+    private void getEnvironmentVariablesInput() {
+        environmentVariableDTOTextFieldMap.forEach(
+                (environmentVariableDTO, textField) -> {
+                    String input = textField.getText();
+                    if(input.isEmpty())
+                        throw new IllegalArgumentException("no environment variable value entered for environment variable \""
+                                + environmentVariableDTO.getName() + "\"");
+
+                    // Try to parse into the correct type and update the environment variable, show error if failed.
+                    try {
+                        switch (environmentVariableDTO.getType()) {
+                            case "decimal":
+                                environmentVariableDTO.setValue(Integer.parseInt(input));
+                                break;
+
+                            case "float":
+                                environmentVariableDTO.setValue(Float.parseFloat(input));
+                                break;
+
+                            case "boolean":
+                                environmentVariableDTO.setValue(convertStringToBoolean(input));
+                                break;
+
+                            case "string":
+                                environmentVariableDTO.setValue(input);
+                                break;
+
+                            default:
+                                throw new IllegalArgumentException("invalid environment variable type "
+                                        + environmentVariableDTO.getType()
+                                        + " received, cannot display the environment variable of name "
+                                        + environmentVariableDTO.getName());
+                        }
+                    } catch (RuntimeException e) {
+                        // todo- show in UI
+                        throw new IllegalArgumentException("entered input invalid, not of correct type \""
+                                + environmentVariableDTO.getType() + "\"");
+                    }
+                }
+        );
+    }
+
+
+    /**
      * Activates when the Clear button is clicked.
      * Clears the user input and resets to the previous environment variables' values.
      */
     public void clearButtonListener() {
+        if(!mainController.isSimulationLoaded()){
+            // todo- add popup message in the UI
+            System.out.println("Error: please load a simulation before trying to clear!");
+            return;
+        }
+
         entityDTOTextFieldMap.forEach(
                 (entity, textField) -> textField.clear()
         );
@@ -60,12 +171,14 @@ public class NewExecutionController {
         entityDTOTextFieldMap = new HashMap<>();
         environmentVariableDTOTextFieldMap = new HashMap<>();
 
+        // Show titles for entity amounts and environment variables' values input
+        entitiesTitleLabel.setVisible(true);
+        environmentTitleLabel.setVisible(true);
+
         // Create text fields for entity amounts input
         currentSimulationDTO.getEntityDTOList().forEach(this::displayEntity);
-        // todo - on start pressed, check if all text fields are filled, and if the total amount is correct. if so then save the input.
 
         currentSimulationDTO.getEnvironmentVariablesListDTO().getEnvironmentVariableInputDTOs().forEach(this::displayEnvironmentVariable);
-        // todo- validate input.
     }
 
 
@@ -169,6 +282,21 @@ public class NewExecutionController {
         HBox.setHgrow(textField, Priority.ALWAYS);
 
         return textField;
+    }
+
+
+    /**
+     * Tries to convert a string to a boolean.
+     * if fails throws exception
+     * @throws IllegalArgumentException if user failed to enter a valid boolean- "true"/"false".
+     */
+    public boolean convertStringToBoolean(String input) {
+        if(input.equalsIgnoreCase("true"))
+            return true;
+        else
+        if (input.equalsIgnoreCase("false"))
+            return false;
+        else throw new IllegalArgumentException("invalid boolean value received! enter true/false!");
     }
 }
 

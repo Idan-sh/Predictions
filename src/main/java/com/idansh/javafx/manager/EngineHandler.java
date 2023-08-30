@@ -87,45 +87,13 @@ public class EngineHandler {
      * Firstly lets the user update the environment variables for the simulation,
      * then lets the user continue and start the running process of the simulation.
      */
-    public void runSimulation() {
-        EnvironmentVariablesListDTO environmentVariablesDTO = engineManager.getEnvironmentVariablesListDTO();
-        List<EnvironmentVariableDTO> environmentVariableDTOList = environmentVariablesDTO.getEnvironmentVariableInputDTOs();
-        int userInput;
-
-        while(true) {
-            ConsoleOut.printEnvironmentVariables(environmentVariableDTOList);
-
-            System.out.print("Please choose the number of environment variable to set its value manually, or enter " + (environmentVariableDTOList.size() + 1) + " to skip: ");
-
-            try {
-                userInput = consoleIn.getIntInput() - 1;
-            } catch (IllegalArgumentException e) {
-                ConsoleOut.printError(e.getMessage());
-                return;
-            }
-
-            // Check if user requested to finish setup process
-            if(userInput == environmentVariableDTOList.size())
-                break;
-
-            // Check if user input was outside the valid range
-            if(userInput < 0 || userInput > environmentVariableDTOList.size()) {
-                ConsoleOut.printError("invalid environment variable number chosen!");
-                continue;
-            }
-
-            // Update the environment variable requested
-            EnvironmentVariableDTO environmentVariableDTOtoSet = environmentVariableDTOList.get(userInput);
-            ConsoleOut.printTitle("You chose to update: " + environmentVariableDTOtoSet.getName());
-            environmentVariableDTOtoSet.setValue(getEnvironmentVariableValueInput(environmentVariableDTOtoSet));
-        }
-
+    public void runSimulation(EnvironmentVariablesListDTO environmentVariablesListDTO) {
         // Show updated environment variables
-        ConsoleOut.printEnvironmentVariables(environmentVariableDTOList);
+        ConsoleOut.printEnvironmentVariables(environmentVariablesListDTO.getEnvironmentVariableInputDTOs());
 
         // Finished setting up the environment variables, run the simulation using them
         try{
-            SimulationEndTDO simulationEndTDO = engineManager.runSimulation(environmentVariablesDTO);
+            SimulationEndTDO simulationEndTDO = engineManager.runSimulation(environmentVariablesListDTO);
             ConsoleOut.printSimulationEnd(simulationEndTDO);
         } catch (RuntimeException e) {
             ConsoleOut.printError("Simulation Stopped.");

@@ -44,7 +44,7 @@
       </VBox>
    </top>
    <center>
-      <TabPane tabClosingPolicy="UNAVAILABLE" tabMinHeight="30.0" tabMinWidth="120.0" BorderPane.alignment="CENTER">
+      <TabPane fx:id="appTabPane" tabClosingPolicy="UNAVAILABLE" tabMinHeight="30.0" tabMinWidth="120.0" BorderPane.alignment="CENTER">
          <tabs>
             <Tab closable="false" text="Details">
                <content>
@@ -55,7 +55,7 @@
                   <fx:include fx:id="newExecutionComponent" source="NewExecution.fxml" />
                </content>
             </Tab>
-            <Tab closable="false" text="Results">
+            <Tab fx:id="resultsTab" closable="false" text="Results">
                <content>
                   <fx:include fx:id="resultsComponent" source="Results.fxml" />
                </content>
