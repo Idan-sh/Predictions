@@ -84,7 +84,11 @@ public class AppController implements Initializable {
      * Runs the current loaded simulation.
      */
     public void runCurrentLoadedSimulation() {
-        simulationManager.runSimulation(currentSimulationDTO.getEnvironmentVariablesListDTO());
+        try{
+            simulationManager.runSimulation(currentSimulationDTO.getEnvironmentVariablesListDTO());
+        } catch (RuntimeException e) {
+            showErrorAlert("Simulation Stopped.\nReason: " + e.getMessage());
+        }
     }
 
 
@@ -103,10 +107,15 @@ public class AppController implements Initializable {
 
         File selectedFile = fileChooser.showOpenDialog(loadFileButton.getScene().getWindow());
 
+        // Check if the user canceled and chose no file
+        if(selectedFile == null) {
+            return;
+        }
+
         // Try to load the simulation from the received file
         try {
             simulationManager.loadSimulationFromFile(selectedFile);
-            ConsoleOut.printMessage("Successfully loaded simulation");
+            showInformationAlert("Successfully loaded simulation");
             isSimulationLoaded = true;
 
             simulationPathTextField.setText(selectedFile.getPath());    // Set the file's path into the TextField
@@ -116,8 +125,7 @@ public class AppController implements Initializable {
             detailsComponentController.displayCurrentSimulationDetails(currentSimulationDTO);   // Display the current simulation's details
             newExecutionComponentController.displayDetails(currentSimulationDTO);               // Display the various variables that the user can interact with
         }  catch (RuntimeException e) {
-            ConsoleOut.printError("Simulation load failed!");
-            ConsoleOut.printRuntimeException(e);
+            showErrorAlert("Simulation load failed...\nReason:  " + e.getMessage());
         }
     }
 
@@ -142,5 +150,31 @@ public class AppController implements Initializable {
     public int getMaxNofEntities() {
         return Integer.MAX_VALUE; // todo - change to the max number received from new format of XML files.
 //        return simulationManager.getCurrentSimulationDetails();
+    }
+
+
+    /**
+     * Displays an error alert (popup), with a given error message.
+     * @param errorMessage an error message to display to inform the user on what error occurred.
+     */
+    public void showErrorAlert(String errorMessage) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Predictions - Error");
+        alert.setHeaderText("Error  :(");
+        alert.setContentText(errorMessage);
+        alert.show();
+    }
+
+
+    /**
+     * Displays an information alert (popup), with a given information message.
+     * @param infoMessage an information message to display to inform the user on an even that happened.
+     */
+    public void showInformationAlert(String infoMessage) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Predictions - Information");
+        alert.setHeaderText("Message");
+        alert.setContentText(infoMessage);
+        alert.show();
     }
 }

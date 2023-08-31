@@ -38,8 +38,7 @@ public class SimulationManager {
      */
     public CurrentSimulationDTO getCurrentSimulationDetails() {
         if(!engineHandler.isSimulationLoaded()) {
-            ConsoleOut.printError("no simulation loaded! please load before trying to show details!");
-            // todo- show error popup, return
+            throw new RuntimeException("No simulation loaded! Please load before trying to show details!");
         }
 
         return engineHandler.getCurrentSimulationDetails();
@@ -53,10 +52,9 @@ public class SimulationManager {
      */
     public void runSimulation(EnvironmentVariablesListDTO environmentVariablesListDTO) {
         if(!engineHandler.isSimulationLoaded()) {
-            ConsoleOut.printError("no simulation loaded! please load before trying to run!");
-            // todo- show error popup, return
-            return;
+            throw new RuntimeException("No simulation loaded! Please load before trying to run!");
         }
+
         engineHandler.runSimulation(environmentVariablesListDTO);
     }
 

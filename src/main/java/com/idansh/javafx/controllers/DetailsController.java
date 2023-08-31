@@ -87,26 +87,30 @@ public class DetailsController {
 
         // Check if received TreeItem is a valid item. if so, show its details.
         if(selectedTreeItem != null && !selectedTreeItem.getParent().getValue().equals(MAIN_ROOT_NAME)) {
-            // The parents if all selectable items are of string type, find the type
-            switch((String) selectedTreeItem.getParent().getValue()) {
-                case ENTITIES_ROOT_NAME:
-                    addEntityDetails((EntityDTO) selectedTreeItem.getValue());
-                    break;
+            try {
+                // The parents if all selectable items are of string type, find the type
+                switch ((String) selectedTreeItem.getParent().getValue()) {
+                    case ENTITIES_ROOT_NAME:
+                        addEntityDetails((EntityDTO) selectedTreeItem.getValue());
+                        break;
 
-                case RULES_ROOT_NAME:
-                    addRuleDetails((RuleDTO) selectedTreeItem.getValue());
-                    break;
+                    case RULES_ROOT_NAME:
+                        addRuleDetails((RuleDTO) selectedTreeItem.getValue());
+                        break;
 
-                case TERMINATION_RULES_ROOT_NAME:
-                    addTerminationRuleDetails((TerminationRuleDTO) selectedTreeItem.getValue());
-                    break;
+                    case TERMINATION_RULES_ROOT_NAME:
+                        addTerminationRuleDetails((TerminationRuleDTO) selectedTreeItem.getValue());
+                        break;
 
-                case ENVIRONMENT_VARIABLES_ROOT_NAME:
-                    addEnvironmentVariableDetails((EnvironmentVariableDTO) selectedTreeItem.getValue());
-                    break;
+                    case ENVIRONMENT_VARIABLES_ROOT_NAME:
+                        addEnvironmentVariableDetails((EnvironmentVariableDTO) selectedTreeItem.getValue());
+                        break;
 
-                default:
-                    break;
+                    default:
+                        break;
+                }
+            } catch (IllegalArgumentException e) {
+                mainController.showErrorAlert(e.getMessage());
             }
         }
     }
@@ -240,6 +244,7 @@ public class DetailsController {
     /**
      * Converts a propertyDTO's value into a TreeItem of type String.
      * @param propertyDTO DTO containing an object value of the type "decimal"/"float"/"boolean"/"string".
+     * @throws IllegalArgumentException in case the property DTO received is not of a valid type.
      */
     private TreeItem<String> getPropertyValueTreeItem(PropertyDTO propertyDTO) {
         String VALUE_TITLE = "Value: ";

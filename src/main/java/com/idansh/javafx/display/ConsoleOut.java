@@ -57,29 +57,6 @@ public abstract class ConsoleOut {
 
 
     /**
-     * Prints message when exiting the program.
-     */
-    public static void printGoodbye() {
-        System.out.println("Exiting the program, Goodbye...");
-    }
-
-    /**
-     * Receives a CurrentSimulationDTO with the data of the current simulation,
-     * formats it and prints it.
-     * @param currentSimulationDTO the current loaded simulation in the engine to print its details.
-     */
-    public static void printCurrentSimulationDetails(CurrentSimulationDTO currentSimulationDTO) {
-        printTitle("simulation details");
-        currentSimulationDTO.getEntityDTOList().forEach(ConsoleOut::printFullDetailEntityDTO);                      // Print entities' details
-        System.out.println("Rules: ");
-        currentSimulationDTO.getRuleDTOList().forEach(ConsoleOut::printFullDetailRuleDTO);                          // Print rules' details
-        System.out.println();
-        System.out.println("Termination Rules: ");
-        currentSimulationDTO.getTerminationRuleDTOList().forEach(ConsoleOut::printFullDetailTerminationRuleDTO);    // Print termination rules' details
-    }
-
-
-    /**
      * Prints out the basic details of past simulation received from the engine.
      * @param pastSimulationsResults - an array of SimulationResultDTO containing simulations results.
      */
@@ -246,28 +223,6 @@ public abstract class ConsoleOut {
 
         if(propertyDTOList.isEmpty())
             ConsoleOut.printMessage("No properties to display...");
-    }
-
-
-    /**
-     * Prints error information on a runtime exception.
-     * @param e the runtime exception error that was thrown.
-     */
-    public static void printRuntimeException(RuntimeException e) {
-        ConsoleOut.printMessage("Cause: " + e.getMessage());
-        ConsoleOut.printMessage("Exception's Class: " + e.getClass().toString());
-//        printTrace(e);
-    }
-
-
-    /**
-     * Prints the trace of a runtime exception.
-     * @param e the runtime exception error that was thrown.
-     */
-    public static void printTrace(RuntimeException e) {
-        ConsoleOut.printMessage("Trace: ");
-        for (StackTraceElement stackTraceElement : e.getStackTrace())
-            ConsoleOut.printMessage("   " + stackTraceElement.toString());
     }
 }
 

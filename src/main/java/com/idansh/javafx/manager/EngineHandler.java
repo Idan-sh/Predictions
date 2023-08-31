@@ -68,14 +68,13 @@ public class EngineHandler {
     /**
      * Gets past simulations' results from the engine, prints simple information of each result,
      * and allows the user to choose which simulation to show full details of.
-     * Prints the chosen simulation result.
+     * @throws RuntimeException In case that no simulations were previously ran.
      */
     public List<SimulationResultDTO> getPastSimulationsResults() {
         List<SimulationResultDTO> pastSimulationsResults = engineManager.getPastSimulationsResults();
 
         if(pastSimulationsResults.size() == 0) {
-            ConsoleOut.printError("please run a simulation before trying to shot past simulations!");
-            // todo- popup error and return.
+            throw new RuntimeException("Please run a simulation before trying to shot past simulations!");
         }
 
         return pastSimulationsResults;
@@ -83,91 +82,13 @@ public class EngineHandler {
 
 
     /**
-     * Initiates the run process of the current loaded simulation.
-     * Firstly lets the user update the environment variables for the simulation,
-     * then lets the user continue and start the running process of the simulation.
+     * Initiates the running process of the current loaded simulation.
+     * Receives the result from the engine.
      */
     public void runSimulation(EnvironmentVariablesListDTO environmentVariablesListDTO) {
-        // Show updated environment variables
-        ConsoleOut.printEnvironmentVariables(environmentVariablesListDTO.getEnvironmentVariableInputDTOs());
-
-        // Finished setting up the environment variables, run the simulation using them
-        try{
-            SimulationEndTDO simulationEndTDO = engineManager.runSimulation(environmentVariablesListDTO);
-            ConsoleOut.printSimulationEnd(simulationEndTDO);
-        } catch (RuntimeException e) {
-            ConsoleOut.printError("Simulation Stopped.");
-            ConsoleOut.printRuntimeException(e);
-        }
-    }
-
-
-    /**
-     * Get a new value for an environment variable from the user.
-     * Keep requesting new value until the value entered is of the correct type and format for the environment variable.
-     * @param environmentVariableDTO DTO that contains data of an environment variable, which will be sent back to the engine.
-     * @return an Object value to be set into the environment variable.
-     */
-    private Object getEnvironmentVariableValueInput(EnvironmentVariableDTO environmentVariableDTO) {
-        // Keeps iterating until user enters the correct format
-        while (true) {
-            try {
-                RangeDTO rangeDTO = environmentVariableDTO.getRange();
-
-                System.out.print("Please enter a value of the type \"" + environmentVariableDTO.getType() + "\": ");
-
-                switch (environmentVariableDTO.getType()) {
-                    case "decimal":
-                        int integerValue;
-                        try {
-                            integerValue = consoleIn.getIntInput();
-                        } catch (IllegalArgumentException e) {
-                            ConsoleOut.printError(e.getMessage());
-                            continue;
-                        }
-
-                        if(rangeDTO != null) {
-                            if (InputValidator.isIntegerInRange(integerValue, rangeDTO)) {
-                                return integerValue;
-                            } else {
-                                ConsoleOut.printError("integer number received \"" + integerValue + "\" is not within the environment variable's range (" + rangeDTO.getFrom() + ", " + rangeDTO.getTo() + ")!");
-                                break;
-                            }
-                        } else
-                            return integerValue;
-
-                    case "float":
-                        float floatValue = consoleIn.getFloatInput();
-
-                        if(rangeDTO != null) {
-                            if (InputValidator.isFloatInRange(floatValue, rangeDTO)) {
-                                return floatValue;
-                            } else {
-                                ConsoleOut.printError("float number received is not within the environment variable's range (" + rangeDTO.getFrom() + ", " + rangeDTO.getTo() + ")!");
-                                break;
-                            }
-                        } else
-                            return floatValue;
-
-                    case "boolean":
-                        try{
-                            return consoleIn.getBooleanInput();
-                        } catch (IllegalArgumentException e) {
-                            ConsoleOut.printError(e.getMessage());
-                            break;
-                        }
-
-                    case "string":
-                        String stringValue = consoleIn.getInput();
-
-                        if(InputValidator.isStringValid(stringValue))
-                            return stringValue;
-
-                        ConsoleOut.printError("string received is not within the correct format!");
-                        break;
-                }
-            } catch (IllegalArgumentException ignored) { } // Continue to receive another input
-        }
+        SimulationEndTDO simulationEndTDO = engineManager.runSimulation(environmentVariablesListDTO);
+        ConsoleOut.printSimulationEnd(simulationEndTDO);
+        // todo- do something with the simulation end result
     }
 
 

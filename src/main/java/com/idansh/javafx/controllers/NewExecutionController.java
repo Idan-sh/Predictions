@@ -55,8 +55,7 @@ public class NewExecutionController {
      */
     public void startButtonListener() {
         if(!mainController.isSimulationLoaded()){
-            // todo- add popup message in the UI
-            System.out.println("Error: please load a simulation before trying to run!");
+            mainController.showErrorAlert("Please load a simulation before trying to run!");
             return;
         }
 
@@ -65,7 +64,7 @@ public class NewExecutionController {
             getEntitiesInput();
             getEnvironmentVariablesInput();
         } catch (IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage()); // todo- change to popup message in the UI
+            mainController.showErrorAlert(e.getMessage());
             return;
         }
 
@@ -85,11 +84,14 @@ public class NewExecutionController {
         AtomicInteger totalAmount = new AtomicInteger();
         entityDTOTextFieldMap.forEach(
                 (entityDTO, textField) -> {
+                    // Check if no input was entered
                     if(textField.getText().isEmpty())
                         throw new IllegalArgumentException("no amount of entity instances entered for entity \""
                                 + entityDTO.getName() + "\"");
-                    // todo - set this amount in the current simulation
-                    totalAmount.addAndGet(Integer.parseInt(textField.getText()));
+
+                    int amountInput = Integer.parseInt(textField.getText()); // todo - set this amount in the current simulation
+
+                    totalAmount.addAndGet(amountInput);
                 }
         );
 
@@ -138,7 +140,6 @@ public class NewExecutionController {
                                         + environmentVariableDTO.getName());
                         }
                     } catch (RuntimeException e) {
-                        // todo- show in UI
                         throw new IllegalArgumentException("entered input invalid, not of correct type \""
                                 + environmentVariableDTO.getType() + "\"");
                     }
@@ -153,8 +154,7 @@ public class NewExecutionController {
      */
     public void clearButtonListener() {
         if(!mainController.isSimulationLoaded()){
-            // todo- add popup message in the UI
-            System.out.println("Error: please load a simulation before trying to clear!");
+            mainController.showErrorAlert("Please load a simulation before trying to clear!");
             return;
         }
 
