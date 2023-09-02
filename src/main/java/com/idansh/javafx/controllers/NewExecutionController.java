@@ -79,6 +79,7 @@ public class NewExecutionController {
     /**
      * Checks if all entity text fields were filled,
      * and if the total amount of entities entered are within the correct range.
+     * If all is valid, updates the entities' amounts with the entered amounts.
      */
     private void getEntitiesInput() {
         AtomicInteger totalAmount = new AtomicInteger();
@@ -89,7 +90,8 @@ public class NewExecutionController {
                         throw new IllegalArgumentException("no amount of entity instances entered for entity \""
                                 + entityDTO.getName() + "\"");
 
-                    int amountInput = Integer.parseInt(textField.getText()); // todo - set this amount in the current simulation
+                    int amountInput = Integer.parseInt(textField.getText());
+                    mainController.setEntityAmount(entityDTO.getName(), amountInput);
 
                     totalAmount.addAndGet(amountInput);
                 }

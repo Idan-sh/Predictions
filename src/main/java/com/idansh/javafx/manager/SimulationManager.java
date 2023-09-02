@@ -62,4 +62,9 @@ public class SimulationManager {
     public List<SimulationResultDTO> getPastSimulationsResults() {
         return engineHandler.getPastSimulationsResults();
     }
+
+
+    public void setEntityAmount(String entityName, int amount) {
+        engineHandler.setEntityAmount(entityName, amount);
+    }
 }

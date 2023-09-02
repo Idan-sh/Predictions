@@ -49,8 +49,9 @@ public class EngineManager {
                     // Create entity DTO
                     EntityDTO entityDTO = new EntityDTO(
                             entityFactoryName,
-                            entityFactory.getPopulationCount(),
-                            entityFactory.getPopulationCount());
+                            -1,
+                            -1
+                    );
 
                     // Create properties for the entity DTO
                     entityFactory.getPropertiesToAssign().forEach(
@@ -148,7 +149,8 @@ public class EngineManager {
      * Loads user received input for environment variables.
      * @param environmentVariablesListDTO contains data of environment variables to update in the simulation.
      */
-    public SimulationEndTDO runSimulation(EnvironmentVariablesListDTO environmentVariablesListDTO) {
+    public void runSimulation(EnvironmentVariablesListDTO environmentVariablesListDTO) {
+        loadedWorld.entityManager.initEntityPopulation();
         updateEnvironmentVariablesFromInput(environmentVariablesListDTO);
 
         // Add the running world to the current running simulations
@@ -162,8 +164,6 @@ public class EngineManager {
 
         // Save the simulation result
         addSimulationResult(simulationResult);
-
-        return new SimulationEndTDO(simulationResult.getId(), simulationResult.getEndReason());
     }
 
 
@@ -375,5 +375,13 @@ public class EngineManager {
         );
 
         return retValuesMap;
+    }
+
+
+    /**
+     * Sets an initial amount of instances in the population of the entity with the given name.
+     */
+    public void setEntityAmount(String entityName, int amount) {
+        loadedWorld.entityManager.getEntityFactory(entityName).setInitPopulation(amount);
     }
 }

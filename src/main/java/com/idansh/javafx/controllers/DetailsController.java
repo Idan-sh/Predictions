@@ -197,14 +197,12 @@ public class DetailsController {
      */
     private void addEntityDetails(EntityDTO entityDTO) {
         String PROPERTIES_TITLE = "Properties";
-        String INIT_AMOUNT_TITLE = "Initial amount in population: ";
 
         // Create the main root of the tree view
         TreeItem<String> mainRoot = new TreeItem<>(MAIN_ROOT_NAME);
         detailsTreeView.setRoot(mainRoot);
 
         TreeItem<String> nameItem = new TreeItem<>(NAME_TITLE + entityDTO.getName());
-        TreeItem<String> initAmountItem = new TreeItem<>(INIT_AMOUNT_TITLE + Integer.toString(entityDTO.getInitAmountInPopulation()));
         TreeItem<String> propertiesRoot = new TreeItem<>(PROPERTIES_TITLE);
 
         // Add each property to the properties root
@@ -237,7 +235,7 @@ public class DetailsController {
         );
 
         // Add all entity details to the mainRoot
-        mainRoot.getChildren().addAll(nameItem, initAmountItem, propertiesRoot);
+        mainRoot.getChildren().addAll(nameItem, propertiesRoot);
     }
 
 

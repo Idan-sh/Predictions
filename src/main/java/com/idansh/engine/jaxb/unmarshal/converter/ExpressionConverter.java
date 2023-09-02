@@ -1,6 +1,7 @@
 package com.idansh.engine.jaxb.unmarshal.converter;
 
 import com.idansh.engine.entity.Entity;
+import com.idansh.engine.entity.EntityFactory;
 import com.idansh.engine.entity.EntityManager;
 import com.idansh.engine.environment.ActiveEnvironmentVariables;
 import com.idansh.engine.expression.api.Expression;
@@ -176,12 +177,12 @@ public class ExpressionConverter {
     private Expression getPropertyExpression(String entityName, String prdStr) {
         try{
             // Try to get an entity with the given name, if one does not exist continue
-            Entity entity = entityManager.getEntityInPopulation(entityName);
-            if(entity == null)
+            EntityFactory entityFactory = entityManager.getEntityFactory(entityName);
+            if(entityFactory == null)
                 return null;
 
             // Try to get the entity's property with the given name, if one does not exist continue
-            entity.getPropertyByName(prdStr);
+            entityFactory.getPropertyFactory(prdStr);
 
             return new PropertyExpression(worldContext, entityName, prdStr);
         } catch (IllegalArgumentException ignored) { }

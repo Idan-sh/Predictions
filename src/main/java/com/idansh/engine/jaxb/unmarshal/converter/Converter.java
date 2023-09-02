@@ -49,7 +49,7 @@ public abstract class Converter {
                 e -> retWorld.entityManager.addEntityFactory(entityConvert(e))
         );
 
-        retWorld.entityManager.initEntityPopulation();
+//        retWorld.entityManager.initEntityPopulation();
 
         // Iterates over all PRDRules, converts each rule and adds it to the world
         prdWorld.getPRDRules().getPRDRule().forEach(
@@ -72,7 +72,7 @@ public abstract class Converter {
      * @return EntityFactory object with the data of the PRDEntity received.
      */
     private static EntityFactory entityConvert(PRDEntity prdEntity) {
-        EntityFactory retEntityFactory = new EntityFactory(prdEntity.getName(), prdEntity.getPRDPopulation());
+        EntityFactory retEntityFactory = new EntityFactory(prdEntity.getName());
 
         prdEntity.getPRDProperties().getPRDProperty().forEach(
                 prdProperty -> retEntityFactory.addProperty(propertyConvert(prdProperty))

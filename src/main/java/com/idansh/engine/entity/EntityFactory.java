@@ -14,21 +14,18 @@ import java.util.Map;
  */
 public class EntityFactory {
     private final String name;        // Unique name for this type of entity creation, e.g. "Smoker"
-    private final Counter populationCounter;     // Amount of entities of this type in the environment
-    private final int initPopulation;
+    private Counter populationCounter;     // Amount of entities of this type in the environment
+    private int initPopulation;
     private final Map<String, PropertyFactory> propertiesToAssign;   // Properties that define this entity, the value of which will be assigned on instance creation
 
 
     /**
      * Constructor that defines the properties of new instances' information.
      * @param name Unique name of the new type of entity.
-     * @param initPopulation The initial population amount of this entity.
      */
-    public EntityFactory(String name, int initPopulation) {
+    public EntityFactory(String name) {
         this.name = name;
         this.propertiesToAssign = new HashMap<>();
-        this.populationCounter = new Counter(initPopulation);
-        this.initPopulation = initPopulation;
     }
 
     public String getName() {
@@ -99,5 +96,10 @@ public class EntityFactory {
      */
     public int getInitPopulation() {
         return initPopulation;
+    }
+
+    public void setInitPopulation(int initPopulation) {
+        this.initPopulation = initPopulation;
+        this.populationCounter = new Counter(initPopulation);
     }
 }

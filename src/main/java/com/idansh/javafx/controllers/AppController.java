@@ -127,6 +127,7 @@ public class AppController implements Initializable {
             moveToDetailsTab();
         }  catch (RuntimeException e) {
             showErrorAlert("Simulation load failed...\nReason:  " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -207,5 +208,13 @@ public class AppController implements Initializable {
      */
     public void showExecutions() {
         resultsComponentController.showExecutions();
+    }
+
+
+    /**
+     *  Send the received entity amount input to the engine to be saved for the simulation run process.
+     */
+    public void setEntityAmount(String entityName, int amount) {
+        simulationManager.setEntityAmount(entityName, amount);
     }
 }
