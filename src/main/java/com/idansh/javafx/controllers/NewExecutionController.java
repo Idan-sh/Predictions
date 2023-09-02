@@ -5,6 +5,7 @@ import com.idansh.dto.environment.EnvironmentVariableDTO;
 import com.idansh.dto.simulation.LoadedSimulationDTO;
 import com.idansh.javafx.helpers.TextFormatterHelper;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -14,8 +15,10 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -32,14 +35,10 @@ public class NewExecutionController {
 
     // Entities amounts section
     @FXML
-    private Label entitiesTitleLabel;
-    @FXML
     private VBox entitiesVBox;
     private Map<EntityDTO, TextField> entityDTOTextFieldMap;
 
     // Environment variables' values section
-    @FXML
-    private Label environmentTitleLabel;
     @FXML
     private VBox environmentVBox;
     private Map<EnvironmentVariableDTO, TextField> environmentVariableDTOTextFieldMap;
@@ -179,19 +178,26 @@ public class NewExecutionController {
         entityDTOTextFieldMap = new HashMap<>();
         environmentVariableDTOTextFieldMap = new HashMap<>();
 
-        // Show titles for entity amounts and environment variables' values input
-        entitiesTitleLabel.setVisible(true);
-        environmentTitleLabel.setVisible(true);
-
         // Clear previously added children
         entitiesVBox.getChildren().clear();
         environmentVBox.getChildren().clear();
+
+        // Create and show titles for entity amounts and environment variables' values input
+        createAndShowTitleLabels();
 
         // Create text fields for entity amounts input
         loadedSimulationDTO.getEntityDTOList().forEach(this::displayEntity);
 
         // Create text fields for environment variables' values
         loadedSimulationDTO.getEnvironmentVariablesListDTO().getEnvironmentVariableInputDTOs().forEach(this::displayEnvironmentVariable);
+    }
+
+    public void createAndShowTitleLabels() {
+        Label entitiesTitleLabel = new Label("Please enter entity amounts:");
+        entitiesVBox.getChildren().add(entitiesTitleLabel);
+
+        Label environmentTitleLabel = new Label("Environment Variables Values (randomized, changing is optional):");
+        environmentVBox.getChildren().add(environmentTitleLabel);
     }
 
 

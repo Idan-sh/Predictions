@@ -6,15 +6,15 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<HBox xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.idansh.javafx.controllers.ResultsController">
+<HBox alignment="CENTER" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.idansh.javafx.controllers.ResultsController">
    <children>
       <ScrollPane fitToHeight="true" fitToWidth="true" pannable="true" HBox.hgrow="ALWAYS">
          <content>
-            <TableView fx:id="executionListTableView" onContextMenuRequested="#selectTableItem" onMouseClicked="#selectTableItem" prefHeight="200.0" prefWidth="200.0">
+            <TableView fx:id="executionListTableView" onContextMenuRequested="#selectTableItem" onMouseClicked="#selectTableItem">
               <columns>
-                <TableColumn fx:id="idTableColumn" prefWidth="75.0" text="ID" />
-                  <TableColumn fx:id="endTableColumn" prefWidth="75.0" text="End" />
-                  <TableColumn fx:id="statusTableColumn" prefWidth="75.0" text="Status" />
+                <TableColumn fx:id="idTableColumn" minWidth="20.0" prefWidth="50.0" text="ID" />
+                  <TableColumn fx:id="endTableColumn" minWidth="40.0" prefWidth="140.0" text="End" />
+                  <TableColumn fx:id="statusTableColumn" minWidth="50.0" prefWidth="100.0" text="Status" />
               </columns>
             </TableView>
          </content>

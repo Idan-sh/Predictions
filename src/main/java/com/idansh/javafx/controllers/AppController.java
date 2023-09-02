@@ -39,6 +39,8 @@ public class AppController implements Initializable {
     private GridPane newExecutionComponent;
     @FXML
     private NewExecutionController newExecutionComponentController;
+    @FXML
+    private Tab newExecutionTab;
 
 
     // Third window - Results
