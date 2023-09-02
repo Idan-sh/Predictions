@@ -1,6 +1,7 @@
 package com.idansh.dto.simulation;
 
 import com.idansh.dto.entity.EntityDTO;
+import com.idansh.engine.helpers.SimulationTime;
 
 import java.sql.Time;
 import java.time.LocalDateTime;
@@ -12,16 +13,13 @@ import java.util.List;
  */
 public class SimulationResultDTO {
     private final int id;
-    private final LocalDateTime startDate;
-    private final long startTimeInMillis, endTimeInMillis;
+    private final SimulationTime simulationTime;
     private final int completedTicks, maxTicks;
     private final List<EntityDTO> entityDTOList;
 
-    public SimulationResultDTO(int id, LocalDateTime startDate, long startTimeInMillis, long endTimeInMillis, int completedTicks, int maxTicks) {
+    public SimulationResultDTO(int id, SimulationTime simulationTime, int completedTicks, int maxTicks) {
         this.id = id;
-        this.startDate= startDate;
-        this.startTimeInMillis = startTimeInMillis;
-        this.endTimeInMillis = endTimeInMillis;
+        this.simulationTime = simulationTime;
         this.completedTicks = completedTicks;
         this.maxTicks = maxTicks;
         this.entityDTOList = new ArrayList<>();
@@ -30,10 +28,6 @@ public class SimulationResultDTO {
     public void addEntityDTO(EntityDTO entityDTO) {
         entityDTOList.add(entityDTO);
 
-    }
-
-    public LocalDateTime getStartDate() {
-        return startDate;
     }
 
     public int getId() {
@@ -52,11 +46,7 @@ public class SimulationResultDTO {
         return maxTicks;
     }
 
-    public long getStartTimeInMillis() {
-        return startTimeInMillis;
-    }
-
-    public long getEndTimeInMillis() {
-        return endTimeInMillis;
+    public SimulationTime getSimulationTime() {
+        return simulationTime;
     }
 }

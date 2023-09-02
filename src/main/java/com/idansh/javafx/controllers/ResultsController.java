@@ -1,6 +1,5 @@
 package com.idansh.javafx.controllers;
 
-import com.idansh.dto.simulation.LoadedSimulationDTO;
 import com.idansh.dto.simulation.RunningSimulationDTO;
 import com.idansh.dto.simulation.SimulationResultDTO;
 import com.idansh.javafx.helpers.ResultsTableItem;
@@ -9,15 +8,13 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TreeItem;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.net.URL;
-import java.sql.Time;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 /**
  * FXML Controller class for the third screen of the application.
@@ -36,6 +33,8 @@ public class ResultsController implements Initializable {
     @FXML
     private TableColumn<ResultsTableItem, String> startTableColumn;
     @FXML
+    private TableColumn<ResultsTableItem, String> endTableColumn;
+    @FXML
     private TableColumn<ResultsTableItem, String> statusTableColumn;
 
     // Execution Details Components:
@@ -50,6 +49,7 @@ public class ResultsController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         idTableColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         startTableColumn.setCellValueFactory(new PropertyValueFactory<>("startDateString"));
+        endTableColumn.setCellValueFactory(new PropertyValueFactory<>("endDateString"));
         statusTableColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
     }
 
@@ -73,9 +73,7 @@ public class ResultsController implements Initializable {
                         executionListTableView.getItems().add(
                                 new ResultsTableItem(
                                         itemResult.getId(),
-                                        itemResult.getStartDate(),
-                                        itemResult.getStartTimeInMillis(),
-                                        itemResult.getEndTimeInMillis(),
+                                        itemResult.getSimulationTime(),
                                         COMPLETED,
                                         itemResult.getCompletedTicks(),
                                         itemResult.getMaxTicks()
@@ -86,9 +84,7 @@ public class ResultsController implements Initializable {
                         executionListTableView.getItems().add(
                                 new ResultsTableItem(
                                         itemRunning.getId(),
-                                        itemRunning.getStartDate(),
-                                        itemRunning.getStartTimeInMillis(),
-                                        -1,
+                                        itemRunning.getSimulationTime(),
                                         IN_PROGRESS,
                                         itemRunning.getCompletedTicks(),
                                         itemRunning.getMaxTicks()
@@ -103,37 +99,32 @@ public class ResultsController implements Initializable {
 
 
     /**
-     * Activates on user table item click.
-     * Shows more information about the chosen execution.
+     * Activates on user simulation execution item click.
+     * Shows more information about the chosen execution -
+     *      shows how many ticks were completed,
+     *      and how much time had passed since the beginning of the simulation (in seconds).
      */
     public void selectTableItem() {
         BiFunction<Integer, Integer, String> ticksFormatter =
                 (completedTicks, maxTicks) -> String.format("Ticks Reached: %d/%d", completedTicks, maxTicks);
-        BiFunction<Long, Long, String> timerFormatter =
-                (startTime, endTime) -> String.format("Time Passed: %.3f Seconds", (endTime - startTime) / 1000f);
+        Function<Float, String> timerFormatter = (timePassed) -> String.format("Time Passed: %.3f Seconds", timePassed);
 
         ResultsTableItem selectedItem = executionListTableView.getSelectionModel().getSelectedItem();
 
-        // todo- output data to another component, this will query the engine every 200-300 ms
-        //  and request the most recent details of the simulation chosen. TASK thread will be appointed.
+        if(selectedItem != null) {
+            // todo- output data to another component, this will query the engine every 200-300 ms
+            //  and request the most recent details of the simulation chosen. TASK thread will be appointed.
 
-        // ### for the time being, only shows the completed simulations: ###
-        // Remove previously shown items
-        progressListView.getItems().clear();
+            // Remove previously shown items
+            progressListView.getItems().clear();
 
-        // Check if the selected execution is running or completed
-        if(selectedItem.getStatus().equals(COMPLETED)) {
+            // Add completed ticks and time passed to the list view
             progressListView.getItems().addAll(ticksFormatter.apply(
                             selectedItem.getCompletedTicks(),
                             selectedItem.getMaxTicks()
                     ),
-                    timerFormatter.apply(
-                            selectedItem.getStartTimeInMillis(),
-                            selectedItem.getEndTimeInMillis()
-                    )
+                    timerFormatter.apply(selectedItem.getSimulationTime().getSecondsPassed())
             );
-        } else {
-            // todo- finish in progress item
         }
     }
 }

@@ -4,6 +4,7 @@ import com.idansh.dto.entity.EntityDTO;
 import com.idansh.dto.environment.EnvironmentVariablesListDTO;
 import com.idansh.dto.rule.RuleDTO;
 import com.idansh.dto.rule.TerminationRuleDTO;
+import com.idansh.engine.helpers.SimulationTime;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,19 +20,17 @@ public class RunningSimulationDTO {
     private final List<RuleDTO> ruleDTOList;
     private final List<TerminationRuleDTO> terminationRuleDTOList;
     private final EnvironmentVariablesListDTO environmentVariablesListDTO;
-    private final LocalDateTime startDate;
-    private final long startTimeInMillis;
+    private final SimulationTime simulationTime;
     private final int completedTicks, maxTicks;
 
 
-    public RunningSimulationDTO(int id, EnvironmentVariablesListDTO environmentVariablesListDTO, LocalDateTime startDate, long startTimeInMillis, int completedTicks, int maxTicks) {
+    public RunningSimulationDTO(int id, EnvironmentVariablesListDTO environmentVariablesListDTO, SimulationTime simulationTime, int completedTicks, int maxTicks) {
         this.id = id;
         this.entityDTOList = new ArrayList<>();
         this.ruleDTOList = new ArrayList<>();
         this.terminationRuleDTOList = new ArrayList<>();
         this.environmentVariablesListDTO = environmentVariablesListDTO;
-        this.startDate = startDate;
-        this.startTimeInMillis = startTimeInMillis;
+        this.simulationTime = simulationTime;
         this.completedTicks = completedTicks;
         this.maxTicks = maxTicks;
     }
@@ -69,8 +68,8 @@ public class RunningSimulationDTO {
         return id;
     }
 
-    public LocalDateTime getStartDate() {
-        return startDate;
+    public SimulationTime getSimulationTime() {
+        return simulationTime;
     }
 
     public int getCompletedTicks() {
@@ -79,9 +78,5 @@ public class RunningSimulationDTO {
 
     public int getMaxTicks() {
         return maxTicks;
-    }
-
-    public long getStartTimeInMillis() {
-        return startTimeInMillis;
     }
 }

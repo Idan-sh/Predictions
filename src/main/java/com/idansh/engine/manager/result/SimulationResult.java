@@ -1,26 +1,22 @@
 package com.idansh.engine.manager.result;
 
 import com.idansh.engine.entity.EntityManager;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import com.idansh.engine.helpers.SimulationTime;
 
 /**
  * Holds information on a single simulation that was completed.
  */
 public class SimulationResult {
-    private final int id;                   // a unique ID identifier of the simulation
-    private final LocalDateTime startDate;  // The date and time of when the simulation started
-    private final long startTimeInMillis, endTimeInMillis;   // The time of when the simulation started and finished in milliseconds
+    private final int id;
+    private final SimulationTime simulationTime;
     private final int completedTicks, maxTicks;
     private final String endReason;
     private final EntityManager entityManager;
 
-    public SimulationResult(int id, LocalDateTime startDate, long startTimeInMillis, String endReason ,EntityManager entityManager, int completedTicks, int maxTicks) {
+
+    public SimulationResult(int id, SimulationTime simulationTime, String endReason , EntityManager entityManager, int completedTicks, int maxTicks) {
         this.id = id;
-        this.startDate = startDate;
-        this.startTimeInMillis = startTimeInMillis;
-        this.endTimeInMillis = System.currentTimeMillis();
+        this.simulationTime = simulationTime;
         this.endReason = endReason;
         this.entityManager = entityManager;
         this.completedTicks = completedTicks;
@@ -39,16 +35,6 @@ public class SimulationResult {
         return endReason;
     }
 
-    public String getDateTimeString()
-    {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy | HH:mm:ss");
-        return dateTimeFormatter.format(startDate);
-    }
-
-    public LocalDateTime getStartDate() {
-        return startDate;
-    }
-
     public int getCompletedTicks() {
         return completedTicks;
     }
@@ -57,11 +43,7 @@ public class SimulationResult {
         return maxTicks;
     }
 
-    public long getStartTimeInMillis() {
-        return startTimeInMillis;
-    }
-
-    public long getEndTimeInMillis() {
-        return endTimeInMillis;
+    public SimulationTime getSimulationTime() {
+        return simulationTime;
     }
 }

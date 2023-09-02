@@ -6,12 +6,12 @@ import com.idansh.engine.environment.EnvironmentVariablesManager;
 import com.idansh.engine.helpers.Countdown;
 import com.idansh.engine.helpers.Counter;
 import com.idansh.engine.helpers.SimulationIdGenerator;
+import com.idansh.engine.helpers.SimulationTime;
 import com.idansh.engine.manager.result.SimulationResult;
 import com.idansh.engine.property.creator.factory.PropertyFactory;
 import com.idansh.engine.rule.Rule;
 import com.idansh.engine.rule.TerminationRule;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -26,8 +26,7 @@ public class World {
     public final EnvironmentVariablesManager environmentVariablesManager;           // Contains all the environment variables factories
     private final Counter tickCounter;                                              // The current iteration of the simulation
     private final Timer timer;                                                      // Timer for the termination rule SECONDS
-    private final LocalDateTime startDate;                                          // Date and time of when the simulation started running
-    private final long startTimeInMillis;                                            // Time in milliseconds since epoch to the start of the running process
+    private final SimulationTime simulationTime;                                    // Holds the simulation's start and end times
     private int id;                                                                 // The ID of the simulation, will be assigned on world run
 
 
@@ -42,8 +41,7 @@ public class World {
         this.entityManager = new EntityManager();
         this.tickCounter = new Counter(0);
         this.timer = new Timer();
-        this.startDate = LocalDateTime.now();
-        this.startTimeInMillis = System.currentTimeMillis();
+        this.simulationTime = new SimulationTime();
     }
 
     /**
@@ -71,8 +69,7 @@ public class World {
         this.environmentVariablesManager = new EnvironmentVariablesManager(world.environmentVariablesManager);
         this.tickCounter = new Counter(0);
         this.timer = new Timer();
-        this.startDate = LocalDateTime.now();
-        this.startTimeInMillis = System.currentTimeMillis();
+        this.simulationTime = new SimulationTime();
     }
 
     public ActiveEnvironmentVariables getActiveEnvironmentVariables() {
@@ -145,10 +142,10 @@ public class World {
                 // remove the world from the current running simulations
                 runningSimulations.remove(this.getId());
 
+                simulationTime.setEndTimes();
                 return new SimulationResult(
                         id,
-                        startDate,
-                        startTimeInMillis,
+                        simulationTime,
                         "Timer Expired",
                         entityManager,
                         getTickCount(),
@@ -170,10 +167,10 @@ public class World {
         // remove the world from the current running simulations
         runningSimulations.remove(this.getId());
 
+        simulationTime.setEndTimes();
         return new SimulationResult(
                 id,
-                startDate,
-                startTimeInMillis,
+                simulationTime,
                 "Ticks Reached",
                 entityManager,
                 getTickCount(),
@@ -197,12 +194,8 @@ public class World {
         return tickCounter.getCount();
     }
 
-    public LocalDateTime getStartDate() {
-        return startDate;
-    }
-
-    public long getStartTimeInMillis() {
-        return startTimeInMillis;
+    public SimulationTime getSimulationTime() {
+        return simulationTime;
     }
 }
 

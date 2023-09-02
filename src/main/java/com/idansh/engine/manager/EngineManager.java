@@ -200,9 +200,7 @@ public class EngineManager {
                     // Create simulation result DTO
                     SimulationResultDTO simulationResultDTO = new SimulationResultDTO(
                             simulationResult.getId(),
-                            simulationResult.getStartDate(),
-                            simulationResult.getStartTimeInMillis(),
-                            simulationResult.getEndTimeInMillis(),
+                            simulationResult.getSimulationTime(),
                             simulationResult.getCompletedTicks(),
                             simulationResult.getMaxTicks()
                     );
@@ -259,8 +257,7 @@ public class EngineManager {
                             new RunningSimulationDTO(
                                     id,
                                     getEnvironmentVariablesListDTO(world),
-                                    world.getStartDate(),
-                                    world.getStartTimeInMillis(),
+                                    world.getSimulationTime(),
                                     world.getTickCount(),
                                     world.getTerminationRules().get(TerminationRule.Type.TICKS).getValue()
                                     );
