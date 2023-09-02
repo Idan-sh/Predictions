@@ -11,6 +11,7 @@ import com.idansh.engine.property.creator.factory.PropertyFactory;
 import com.idansh.engine.rule.Rule;
 import com.idansh.engine.rule.TerminationRule;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -25,7 +26,10 @@ public class World {
     public final EnvironmentVariablesManager environmentVariablesManager;           // Contains all the environment variables factories
     private final Counter tickCounter;                                              // The current iteration of the simulation
     private final Timer timer;                                                      // Timer for the termination rule SECONDS
+    private final LocalDateTime startDate;                                          // Date and time of when the simulation started running
+    private final long startTimeInMillis;                                            // Time in milliseconds since epoch to the start of the running process
     private int id;                                                                 // The ID of the simulation, will be assigned on world run
+
 
     /**
      * Initialize the simulated world.
@@ -38,11 +42,14 @@ public class World {
         this.entityManager = new EntityManager();
         this.tickCounter = new Counter(0);
         this.timer = new Timer();
+        this.startDate = LocalDateTime.now();
+        this.startTimeInMillis = System.currentTimeMillis();
     }
 
     /**
      * Deep copies a world, setting it up from another run.
      * Only copy world that not previously ran.
+     * @apiNote Does not copy the ID or the Active Environment Variables, creates them when the world is activated.
      */
     public World(World world) {
         // Check if the world ran, or if it's a newly created one
@@ -62,10 +69,10 @@ public class World {
         );
 
         this.environmentVariablesManager = new EnvironmentVariablesManager(world.environmentVariablesManager);
-
         this.tickCounter = new Counter(0);
-
         this.timer = new Timer();
+        this.startDate = LocalDateTime.now();
+        this.startTimeInMillis = System.currentTimeMillis();
     }
 
     public ActiveEnvironmentVariables getActiveEnvironmentVariables() {
@@ -138,7 +145,15 @@ public class World {
                 // remove the world from the current running simulations
                 runningSimulations.remove(this.getId());
 
-                return new SimulationResult("Timer Expired", id, entityManager);
+                return new SimulationResult(
+                        id,
+                        startDate,
+                        startTimeInMillis,
+                        "Timer Expired",
+                        entityManager,
+                        getTickCount(),
+                        terminationRules.get(TerminationRule.Type.TICKS).getValue()
+                );
             }
 
             // Run on every entity in the population and check if a rule can be invoked on it
@@ -155,7 +170,15 @@ public class World {
         // remove the world from the current running simulations
         runningSimulations.remove(this.getId());
 
-        return new SimulationResult("Ticks Reached", id, entityManager);
+        return new SimulationResult(
+                id,
+                startDate,
+                startTimeInMillis,
+                "Ticks Reached",
+                entityManager,
+                getTickCount(),
+                terminationRules.get(TerminationRule.Type.TICKS).getValue()
+        );
     }
 
     public Map<TerminationRule.Type, TerminationRule> getTerminationRules() {
@@ -172,6 +195,14 @@ public class World {
 
     public int getTickCount() {
         return tickCounter.getCount();
+    }
+
+    public LocalDateTime getStartDate() {
+        return startDate;
+    }
+
+    public long getStartTimeInMillis() {
+        return startTimeInMillis;
     }
 }
 

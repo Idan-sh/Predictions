@@ -5,6 +5,7 @@ import com.idansh.dto.environment.EnvironmentVariablesListDTO;
 import com.idansh.dto.rule.RuleDTO;
 import com.idansh.dto.rule.TerminationRuleDTO;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,19 +14,26 @@ import java.util.List;
  * to receive the current state of the simulation.
  */
 public class RunningSimulationDTO {
+    private final int id;
     private final List<EntityDTO> entityDTOList;
     private final List<RuleDTO> ruleDTOList;
     private final List<TerminationRuleDTO> terminationRuleDTOList;
     private final EnvironmentVariablesListDTO environmentVariablesListDTO;
-    private final int id;
+    private final LocalDateTime startDate;
+    private final long startTimeInMillis;
+    private final int completedTicks, maxTicks;
 
 
-    public RunningSimulationDTO(EnvironmentVariablesListDTO environmentVariablesListDTO, int id) {
+    public RunningSimulationDTO(int id, EnvironmentVariablesListDTO environmentVariablesListDTO, LocalDateTime startDate, long startTimeInMillis, int completedTicks, int maxTicks) {
+        this.id = id;
         this.entityDTOList = new ArrayList<>();
         this.ruleDTOList = new ArrayList<>();
         this.terminationRuleDTOList = new ArrayList<>();
         this.environmentVariablesListDTO = environmentVariablesListDTO;
-        this.id = id;
+        this.startDate = startDate;
+        this.startTimeInMillis = startTimeInMillis;
+        this.completedTicks = completedTicks;
+        this.maxTicks = maxTicks;
     }
 
 
@@ -59,5 +67,21 @@ public class RunningSimulationDTO {
 
     public int getId() {
         return id;
+    }
+
+    public LocalDateTime getStartDate() {
+        return startDate;
+    }
+
+    public int getCompletedTicks() {
+        return completedTicks;
+    }
+
+    public int getMaxTicks() {
+        return maxTicks;
+    }
+
+    public long getStartTimeInMillis() {
+        return startTimeInMillis;
     }
 }

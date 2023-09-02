@@ -54,7 +54,10 @@ public class NewExecutionController {
      */
     public void startButtonListener() {
         if(!mainController.isSimulationLoaded()){
-            mainController.showErrorAlert("Please load a simulation before trying to run!");
+            mainController.showErrorAlert(
+                    "Cannot Start Simulation!",
+                    "Please load a simulation from an XML file before trying to run!"
+            );
             return;
         }
 
@@ -63,7 +66,7 @@ public class NewExecutionController {
             getEntitiesInput();
             getEnvironmentVariablesInput();
         } catch (IllegalArgumentException e) {
-            mainController.showErrorAlert(e.getMessage());
+            mainController.showErrorAlert("Invalid Input Received!", e.getMessage());
             return;
         }
 
@@ -155,7 +158,7 @@ public class NewExecutionController {
      */
     public void clearButtonListener() {
         if(!mainController.isSimulationLoaded()){
-            mainController.showErrorAlert("Please load a simulation before trying to clear!");
+            mainController.showErrorAlert("Cannot Clear!", "Please load a simulation from an XML file before trying to clear!");
             return;
         }
 

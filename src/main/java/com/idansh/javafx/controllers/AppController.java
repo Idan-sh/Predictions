@@ -87,10 +87,13 @@ public class AppController implements Initializable {
      */
     public void runCurrentLoadedSimulation() {
         try{
-            simulationManager.runSimulation(loadedSimulationDTO.getEnvironmentVariablesListDTO());
+            int finishedSimulationID = simulationManager.runSimulation(loadedSimulationDTO.getEnvironmentVariablesListDTO());
+            showInformationAlert(
+                    "Simulation Completed Successfully",
+                    "completed simulation ID: " + finishedSimulationID
+            );
         } catch (RuntimeException e) {
-            showErrorAlert("Simulation Stopped.\nReason: " + e.getMessage());
-            e.printStackTrace();
+            showErrorAlert("Simulation Stopped!", e.getMessage());
         }
     }
 
@@ -118,7 +121,11 @@ public class AppController implements Initializable {
         // Try to load the simulation from the received file
         try {
             simulationManager.loadSimulationFromFile(selectedFile);
-            showInformationAlert("Successfully loaded simulation");
+            showInformationAlert(
+                    "Successfully Loaded Simulation",
+                    "Showing details of the loaded simulation...\n" +
+                            "To run the loaded simulation, go to the \"New Execution\" tab."
+            );
             isSimulationLoaded = true;
 
             simulationPathTextField.setText(selectedFile.getPath());    // Set the file's path into the TextField
@@ -129,8 +136,7 @@ public class AppController implements Initializable {
             newExecutionComponentController.displayDetails(loadedSimulationDTO);               // Display the various variables that the user can interact with
             moveToDetailsTab();
         }  catch (RuntimeException e) {
-            showErrorAlert("Simulation load failed...\nReason:  " + e.getMessage());
-            e.printStackTrace();
+            showErrorAlert("Simulation Load Failed!", e.getMessage());
         }
     }
 
@@ -170,10 +176,10 @@ public class AppController implements Initializable {
      * Displays an error alert (popup), with a given error message.
      * @param errorMessage an error message to display to inform the user on what error occurred.
      */
-    public void showErrorAlert(String errorMessage) {
+    public void showErrorAlert(String errorTitle, String errorMessage) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Predictions - Error");
-        alert.setHeaderText("Error  :(");
+        alert.setHeaderText(errorTitle);
         alert.setContentText(errorMessage);
         alert.show();
     }
@@ -183,10 +189,10 @@ public class AppController implements Initializable {
      * Displays an information alert (popup), with a given information message.
      * @param infoMessage an information message to display to inform the user on an even that happened.
      */
-    public void showInformationAlert(String infoMessage) {
+    public void showInformationAlert(String title, String infoMessage) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Predictions - Information");
-        alert.setHeaderText("Message");
+        alert.setHeaderText(title);
         alert.setContentText(infoMessage);
         alert.show();
     }

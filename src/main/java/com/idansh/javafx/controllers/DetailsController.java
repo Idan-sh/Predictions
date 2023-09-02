@@ -110,7 +110,7 @@ public class DetailsController {
                         break;
                 }
             } catch (IllegalArgumentException e) {
-                mainController.showErrorAlert(e.getMessage());
+                mainController.showErrorAlert("An Error Occurred :(", e.getMessage());
             }
         }
     }

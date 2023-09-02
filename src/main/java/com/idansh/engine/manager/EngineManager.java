@@ -8,7 +8,6 @@ import com.idansh.dto.rule.RuleDTO;
 import com.idansh.dto.rule.TerminationRuleDTO;
 import com.idansh.dto.simulation.LoadedSimulationDTO;
 import com.idansh.dto.simulation.RunningSimulationDTO;
-import com.idansh.dto.simulation.SimulationEndTDO;
 import com.idansh.dto.simulation.SimulationResultDTO;
 import com.idansh.engine.helpers.Range;
 import com.idansh.engine.manager.result.SimulationResult;
@@ -116,17 +115,6 @@ public class EngineManager {
 
 
     /**
-     * Finds a simulation result from the past simulations and returns its information/details.
-     * @param simulationId the ID of the simulation to get.
-     * @return DTO containing its information/details.
-     */
-    public SimulationResultDTO getPastSimulationDetailsById(int simulationId) {
-        SimulationResult simulationResult = pastSimulations.get(simulationId);
-        return new SimulationResultDTO(simulationResult.getDateTime(), simulationResult.getDateTimeString(), simulationResult.getId());
-    }
-
-
-    /**
      * Adds a newly finished simulation to the past simulations' collection.
      * @param simulationResult a simulation result that contains information/details of the last simulation ran.
      */
@@ -148,8 +136,9 @@ public class EngineManager {
      * Start running the current simulation that was loaded.
      * Loads user received input for environment variables.
      * @param environmentVariablesListDTO contains data of environment variables to update in the simulation.
+     * @return ID of the simulation which ended.
      */
-    public void runSimulation(EnvironmentVariablesListDTO environmentVariablesListDTO) {
+    public int runSimulation(EnvironmentVariablesListDTO environmentVariablesListDTO) {
         World runningWorldInstance = new World(loadedWorld);
 
         runningWorldInstance.entityManager.initEntityPopulation();
@@ -160,6 +149,8 @@ public class EngineManager {
 
         // Save the simulation result
         addSimulationResult(simulationResult);
+
+        return simulationResult.getId();
     }
 
 
@@ -208,9 +199,13 @@ public class EngineManager {
                 (id, simulationResult) -> {
                     // Create simulation result DTO
                     SimulationResultDTO simulationResultDTO = new SimulationResultDTO(
-                            simulationResult.getDateTime(),
-                            simulationResult.getDateTimeString(),
-                            simulationResult.getId());
+                            simulationResult.getId(),
+                            simulationResult.getStartDate(),
+                            simulationResult.getStartTimeInMillis(),
+                            simulationResult.getEndTimeInMillis(),
+                            simulationResult.getCompletedTicks(),
+                            simulationResult.getMaxTicks()
+                    );
 
                     simulationResult.getEntityManager().getEntityFactories().forEach(
                             (entityName, entityFactory) -> {
@@ -238,10 +233,11 @@ public class EngineManager {
                                             );
                                         }
                                 );
+                                // Add the created Entity DTO to the Simulation Result DTO
                                 simulationResultDTO.addEntityDTO(entityDTO);
                             }
                     );
-                    // Add simulation result DTO to the return list
+                    // Add simulation result DTO to the Past Simulations list
                     retPastSimulations.add(simulationResultDTO);
                 }
         );
@@ -261,9 +257,13 @@ public class EngineManager {
                 (id, world) -> {
                     RunningSimulationDTO runningSimulationDTO =
                             new RunningSimulationDTO(
+                                    id,
                                     getEnvironmentVariablesListDTO(world),
-                                    id
-                            );
+                                    world.getStartDate(),
+                                    world.getStartTimeInMillis(),
+                                    world.getTickCount(),
+                                    world.getTerminationRules().get(TerminationRule.Type.TICKS).getValue()
+                                    );
 
                     // Add Entities:
                     world.entityManager.getEntityFactories().forEach(

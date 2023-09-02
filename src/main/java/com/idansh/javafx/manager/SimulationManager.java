@@ -46,13 +46,14 @@ public class SimulationManager {
      * Runs the current loaded simulation.
      * @param environmentVariablesListDTO DTO containing a list of all the updated environment variables
      *                                   to run the simulation with.
+     * @return ID of the completed simulation.
      */
-    public void runSimulation(EnvironmentVariablesListDTO environmentVariablesListDTO) {
+    public int runSimulation(EnvironmentVariablesListDTO environmentVariablesListDTO) {
         if(!engineHandler.isSimulationLoaded()) {
             throw new RuntimeException("No simulation loaded! Please load before trying to run!");
         }
 
-        engineHandler.runSimulation(environmentVariablesListDTO);
+        return engineHandler.runSimulation(environmentVariablesListDTO);
     }
 
 
