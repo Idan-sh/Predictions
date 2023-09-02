@@ -2,7 +2,7 @@ package com.idansh.javafx.controllers;
 
 import com.idansh.dto.entity.EntityDTO;
 import com.idansh.dto.environment.EnvironmentVariableDTO;
-import com.idansh.dto.simulation.CurrentSimulationDTO;
+import com.idansh.dto.simulation.LoadedSimulationDTO;
 import com.idansh.javafx.helpers.TextFormatterHelper;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -167,7 +167,13 @@ public class NewExecutionController {
         );
     }
 
-    public void displayDetails(CurrentSimulationDTO currentSimulationDTO) {
+
+    /**
+     * Displays input text fields with labels for user input of entity amounts,
+     * and for environment variables' values.
+     * @param loadedSimulationDTO The current loaded simulation in the program.
+     */
+    public void displayDetails(LoadedSimulationDTO loadedSimulationDTO) {
         entityDTOTextFieldMap = new HashMap<>();
         environmentVariableDTOTextFieldMap = new HashMap<>();
 
@@ -175,10 +181,15 @@ public class NewExecutionController {
         entitiesTitleLabel.setVisible(true);
         environmentTitleLabel.setVisible(true);
 
-        // Create text fields for entity amounts input
-        currentSimulationDTO.getEntityDTOList().forEach(this::displayEntity);
+        // Clear previously added children
+        entitiesVBox.getChildren().clear();
+        environmentVBox.getChildren().clear();
 
-        currentSimulationDTO.getEnvironmentVariablesListDTO().getEnvironmentVariableInputDTOs().forEach(this::displayEnvironmentVariable);
+        // Create text fields for entity amounts input
+        loadedSimulationDTO.getEntityDTOList().forEach(this::displayEntity);
+
+        // Create text fields for environment variables' values
+        loadedSimulationDTO.getEnvironmentVariablesListDTO().getEnvironmentVariableInputDTOs().forEach(this::displayEnvironmentVariable);
     }
 
 

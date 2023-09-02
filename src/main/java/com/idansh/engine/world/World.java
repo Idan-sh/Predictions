@@ -5,6 +5,7 @@ import com.idansh.engine.environment.ActiveEnvironmentVariables;
 import com.idansh.engine.environment.EnvironmentVariablesManager;
 import com.idansh.engine.helpers.Countdown;
 import com.idansh.engine.helpers.Counter;
+import com.idansh.engine.helpers.SimulationIdGenerator;
 import com.idansh.engine.manager.result.SimulationResult;
 import com.idansh.engine.property.creator.factory.PropertyFactory;
 import com.idansh.engine.rule.Rule;
@@ -24,7 +25,7 @@ public class World {
     public final EnvironmentVariablesManager environmentVariablesManager;           // Contains all the environment variables factories
     private final Counter tickCounter;                                              // The current iteration of the simulation
     private final Timer timer;                                                      // Timer for the termination rule SECONDS
-
+    private int id;                                                                 // The ID of the simulation, will be assigned on world run
 
     /**
      * Initialize the simulated world.
@@ -87,6 +88,7 @@ public class World {
     public SimulationResult run() {
         // Timer countdown for the termination rule SECONDS
         Countdown countdown = new Countdown();
+        id = SimulationIdGenerator.getID();
 
         // If a termination rule of SECONDS was set, starts a timer.
         if(terminationRules.containsKey(TerminationRule.Type.SECONDS))
@@ -96,7 +98,7 @@ public class World {
         while((!terminationRules.containsKey(TerminationRule.Type.TICKS)) || (terminationRules.containsKey(TerminationRule.Type.TICKS) && tickCounter.getCount() < terminationRules.get(TerminationRule.Type.TICKS).getValue())) {
             // Checks if the timer expired
             if(countdown.isFinished()) {
-                return new SimulationResult("Timer Expired", entityManager);
+                return new SimulationResult("Timer Expired", id, entityManager);
             }
 
             // Run on every entity in the population and check if a rule can be invoked on it
@@ -110,7 +112,7 @@ public class World {
             tickCounter.increaseCount();
         }
 
-        return new SimulationResult("Ticks Reached", entityManager);
+        return new SimulationResult("Ticks Reached", id, entityManager);
     }
 
     public Map<TerminationRule.Type, TerminationRule> getTerminationRules() {
@@ -119,6 +121,10 @@ public class World {
 
     public Map<String, Rule> getRulesMap() {
         return rulesMap;
+    }
+
+    public int getId() {
+        return id;
     }
 }
 

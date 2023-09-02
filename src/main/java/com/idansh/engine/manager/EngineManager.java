@@ -6,7 +6,8 @@ import com.idansh.dto.property.PropertyDTO;
 import com.idansh.dto.range.RangeDTO;
 import com.idansh.dto.rule.RuleDTO;
 import com.idansh.dto.rule.TerminationRuleDTO;
-import com.idansh.dto.simulation.CurrentSimulationDTO;
+import com.idansh.dto.simulation.LoadedSimulationDTO;
+import com.idansh.dto.simulation.RunningSimulationDTO;
 import com.idansh.dto.simulation.SimulationEndTDO;
 import com.idansh.dto.simulation.SimulationResultDTO;
 import com.idansh.engine.helpers.Range;
@@ -17,7 +18,6 @@ import com.idansh.engine.world.World;
 import com.idansh.engine.jaxb.unmarshal.reader.Reader;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -25,11 +25,13 @@ import java.util.*;
  * Some methods will return a DTO that contains data from the simulation (without the logic of the engine elements).
  */
 public class EngineManager {
-    private World currWorld;
+    private World loadedWorld;
+    private final Map<Integer, World> runningSimulations;
     private final Map<Integer, SimulationResult> pastSimulations;
 
     public EngineManager() {
-        currWorld = null;
+        loadedWorld = null;
+        runningSimulations = new HashMap<>();
         pastSimulations = new HashMap<>();
     }
 
@@ -37,12 +39,12 @@ public class EngineManager {
     /**
      * @return returns to the UI a DTO that contains information on the current loaded simulated world.
      */
-    public CurrentSimulationDTO getCurrentSimulationDetails() {
-        CurrentSimulationDTO currentSimulationDTO = new CurrentSimulationDTO(getEnvironmentVariablesListDTO());
+    public LoadedSimulationDTO getLoadedSimulationDetails() {
+        LoadedSimulationDTO loadedSimulationDTO =
+                new LoadedSimulationDTO(getEnvironmentVariablesListDTO(loadedWorld));
 
         // Add Entities:
-        currWorld.entityManager.getEntityFactories().forEach(
-
+        loadedWorld.entityManager.getEntityFactories().forEach(
                 (entityFactoryName, entityFactory) -> {
                     // Create entity DTO
                     EntityDTO entityDTO = new EntityDTO(
@@ -72,12 +74,12 @@ public class EngineManager {
                                 entityDTO.addPropertyDTOtoList(propertyDTO);
                             }
                     );
-                    currentSimulationDTO.addEntityDTO(entityDTO);
+                    loadedSimulationDTO.addEntityDTO(entityDTO);
                 }
         );
 
         // Add Rules:
-        currWorld.getRulesMap().forEach(
+        loadedWorld.getRulesMap().forEach(
                 (ruleName, rule) -> {
                     // Create rule DTO
                     RuleDTO ruleDTO = new RuleDTO(
@@ -92,23 +94,23 @@ public class EngineManager {
                             a -> ruleDTO.addActionName(a.getActionTypeString())
                     );
 
-                    currentSimulationDTO.addRuleDTO(ruleDTO);
+                    loadedSimulationDTO.addRuleDTO(ruleDTO);
                 }
         );
 
         // Add Termination Rules:
-        currWorld.getTerminationRules().forEach(
+        loadedWorld.getTerminationRules().forEach(
                 (terminationRuleType, terminationRule) -> {
                     TerminationRuleDTO terminationRuleDTO = new TerminationRuleDTO(
                             TerminationRule.Type.getTypeString(terminationRuleType),
                             terminationRule.getValue()
                     );
 
-                    currentSimulationDTO.addTerminationRuleDTO(terminationRuleDTO);
+                    loadedSimulationDTO.addTerminationRuleDTO(terminationRuleDTO);
                 }
         );
 
-        return currentSimulationDTO;
+        return loadedSimulationDTO;
     }
 
 
@@ -137,7 +139,7 @@ public class EngineManager {
      * @param file XML file with world data.
      */
     public void loadSimulationFromFile(File file) {
-            currWorld = Reader.readWorld(file);
+            loadedWorld = Reader.readWorld(file);
     }
 
 
@@ -149,8 +151,14 @@ public class EngineManager {
     public SimulationEndTDO runSimulation(EnvironmentVariablesListDTO environmentVariablesListDTO) {
         updateEnvironmentVariablesFromInput(environmentVariablesListDTO);
 
+        // Add the running world to the current running simulations
+        runningSimulations.put(loadedWorld.getId(), loadedWorld);
+
         // Run the simulation
-        SimulationResult simulationResult = currWorld.run();
+        SimulationResult simulationResult = loadedWorld.run();
+
+        // remove the world from the current running simulations
+        runningSimulations.remove(loadedWorld.getId());
 
         // Save the simulation result
         addSimulationResult(simulationResult);
@@ -166,7 +174,7 @@ public class EngineManager {
     private void updateEnvironmentVariablesFromInput(EnvironmentVariablesListDTO environmentVariablesListDTO) {
         environmentVariablesListDTO.getEnvironmentVariableInputDTOs().forEach(
                 e -> {
-                    PropertyFactory environmentVariable = currWorld.environmentVariablesManager.getEnvironmentVariable(e.getName());
+                    PropertyFactory environmentVariable = loadedWorld.environmentVariablesManager.getEnvironmentVariable(e.getName());
                     environmentVariable.updateValue(e.getValue());
                 }
         );
@@ -178,10 +186,10 @@ public class EngineManager {
      * @return EnvironmentVariablesSetDTO containing a list of all active environment variables,
      * with their names and values.
      */
-    public EnvironmentVariablesListDTO getEnvironmentVariablesListDTO() {
+    public EnvironmentVariablesListDTO getEnvironmentVariablesListDTO(World world) {
         EnvironmentVariablesListDTO environmentVariablesListDTO = new EnvironmentVariablesListDTO();
 
-        currWorld.getActiveEnvironmentVariables().getEnvironmentVariables().forEach(
+        world.getActiveEnvironmentVariables().getEnvironmentVariables().forEach(
                 (name, envVar) -> {
                     Range range = envVar.getRange();
                     environmentVariablesListDTO.addEnvironmentVariableInput(
@@ -247,11 +255,101 @@ public class EngineManager {
 
 
     /**
+     * Get a list of all currently running simulations.
+     * @return a DTO List of running simulations.
+     */
+    public List<RunningSimulationDTO> getRunningSimulations() {
+        List<RunningSimulationDTO> runningSimulationsList = new ArrayList<>();
+
+        runningSimulations.forEach(
+                (id, world) -> {
+                    RunningSimulationDTO runningSimulationDTO =
+                            new RunningSimulationDTO(
+                                    getEnvironmentVariablesListDTO(world),
+                                    id
+                            );
+
+                    // Add Entities:
+                    world.entityManager.getEntityFactories().forEach(
+                            (entityFactoryName, entityFactory) -> {
+                                // Create entity DTO
+                                EntityDTO entityDTO = new EntityDTO(
+                                        entityFactoryName,
+                                        entityFactory.getPopulationCount(),
+                                        entityFactory.getPopulationCount());
+
+                                // Create properties for the entity DTO
+                                entityFactory.getPropertiesToAssign().forEach(
+                                        (propertyFactoryName, propertyFactory) -> {
+                                            Range range = propertyFactory.getRange();
+                                            RangeDTO rangeDTO;
+
+                                            // Check if range exists, if so then create DTO from it
+                                            if(range != null)
+                                                rangeDTO = new RangeDTO(range.getBottom(), range.getTop());
+                                            else
+                                                rangeDTO = null;
+
+                                            PropertyDTO propertyDTO = new PropertyDTO(
+                                                    propertyFactoryName,
+                                                    propertyFactory.getType().getTypeString(),
+                                                    rangeDTO,
+                                                    propertyFactory.isRandomGenerated(),
+                                                    propertyFactory.isRandomGenerated() ? null : propertyFactory.createProperty().getValue()    // If the value is not random, then get the fixed initial value
+                                            );
+                                            entityDTO.addPropertyDTOtoList(propertyDTO);
+                                        }
+                                );
+                                runningSimulationDTO.addEntityDTO(entityDTO);
+                            }
+                    );
+
+                    // Add Rules:
+                    world.getRulesMap().forEach(
+                            (ruleName, rule) -> {
+                                // Create rule DTO
+                                RuleDTO ruleDTO = new RuleDTO(
+                                        ruleName,
+                                        rule.getActivation().getTicks(),
+                                        rule.getActivation().getProbability(),
+                                        rule.getActionsSet().size()
+                                );
+
+                                // Add actions' names to the DTO
+                                rule.getActionsSet().forEach(
+                                        a -> ruleDTO.addActionName(a.getActionTypeString())
+                                );
+
+                                runningSimulationDTO.addRuleDTO(ruleDTO);
+                            }
+                    );
+
+                    // Add Termination Rules:
+                    world.getTerminationRules().forEach(
+                            (terminationRuleType, terminationRule) -> {
+                                TerminationRuleDTO terminationRuleDTO = new TerminationRuleDTO(
+                                        TerminationRule.Type.getTypeString(terminationRuleType),
+                                        terminationRule.getValue()
+                                );
+
+                                runningSimulationDTO.addTerminationRuleDTO(terminationRuleDTO);
+                            }
+                    );
+
+                    runningSimulationsList.add(runningSimulationDTO);
+                }
+        );
+
+        return runningSimulationsList;
+    }
+
+
+    /**
      * Checks whether of not a simulation is currently loaded into the program.
      * @return true if a simulation is loaded, false otherwise.
      */
     public boolean isSimulationLoaded() {
-        return currWorld != null;
+        return loadedWorld != null;
     }
 
 

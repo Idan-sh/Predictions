@@ -1,4 +1,4 @@
-package com.idansh.engine.manager.result;
+package com.idansh.engine.helpers;
 
 /**
  * Generates a unique ID for each simulation ran.

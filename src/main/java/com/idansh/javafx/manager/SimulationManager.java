@@ -2,14 +2,11 @@ package com.idansh.javafx.manager;
 
 
 import com.idansh.dto.environment.EnvironmentVariablesListDTO;
-import com.idansh.dto.simulation.CurrentSimulationDTO;
+import com.idansh.dto.simulation.LoadedSimulationDTO;
 import com.idansh.dto.simulation.SimulationResultDTO;
-import com.idansh.javafx.display.ConsoleOut;
 
 import java.io.File;
 import java.util.List;
-
-import static java.lang.System.exit;
 
 /**
  * Handles the simulations.
@@ -36,12 +33,12 @@ public class SimulationManager {
      * Gets from the engine the current loaded simulation's details.
      * @return DTO containing details of the current loaded simulation.
      */
-    public CurrentSimulationDTO getCurrentSimulationDetails() {
+    public LoadedSimulationDTO getLoadedSimulationDetails() {
         if(!engineHandler.isSimulationLoaded()) {
             throw new RuntimeException("No simulation loaded! Please load before trying to show details!");
         }
 
-        return engineHandler.getCurrentSimulationDetails();
+        return engineHandler.getLoadedSimulationDetails();
     }
 
 

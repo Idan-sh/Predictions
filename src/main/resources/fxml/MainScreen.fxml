@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Tab?>
@@ -29,9 +30,15 @@
                      <font>
                         <Font size="12.0" />
                      </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
                   </Button>
                   <TextField fx:id="simulationPathTextField" editable="false" prefWidth="300.0" text="No Simulation Loaded" HBox.hgrow="ALWAYS" />
-                  <Button alignment="CENTER" contentDisplay="CENTER" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" text="Queue Managmet" textAlignment="CENTER" />
+                  <Button alignment="CENTER" contentDisplay="CENTER" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" text="Queue Managmet" textAlignment="CENTER">
+                     <cursor>
+                        <Cursor fx:constant="OPEN_HAND" />
+                     </cursor></Button>
                </children>
                <VBox.margin>
                   <Insets bottom="10.0" top="10.0" />
@@ -46,7 +53,7 @@
    <center>
       <TabPane fx:id="appTabPane" tabClosingPolicy="UNAVAILABLE" tabMinHeight="30.0" tabMinWidth="120.0" BorderPane.alignment="CENTER">
          <tabs>
-            <Tab closable="false" text="Details">
+            <Tab fx:id="detailsTab" closable="false" text="Details">
                <content>
                   <fx:include fx:id="detailsComponent" source="Details.fxml" />
                </content></Tab>
@@ -55,7 +62,7 @@
                   <fx:include fx:id="newExecutionComponent" source="NewExecution.fxml" />
                </content>
             </Tab>
-            <Tab fx:id="resultsTab" closable="false" text="Results">
+            <Tab fx:id="resultsTab" closable="false" onSelectionChanged="#showExecutions" text="Results">
                <content>
                   <fx:include fx:id="resultsComponent" source="Results.fxml" />
                </content>

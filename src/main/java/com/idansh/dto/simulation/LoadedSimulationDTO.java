@@ -11,13 +11,14 @@ import java.util.List;
 /**
  * Contains details/information of a current simulation loaded into the program.
  */
-public class CurrentSimulationDTO {
-    List<EntityDTO> entityDTOList;
-    List<RuleDTO> ruleDTOList;
-    List<TerminationRuleDTO> terminationRuleDTOList;
-    EnvironmentVariablesListDTO environmentVariablesListDTO;
+public class LoadedSimulationDTO {
+    private final List<EntityDTO> entityDTOList;
+    private final List<RuleDTO> ruleDTOList;
+    private final List<TerminationRuleDTO> terminationRuleDTOList;
+    private final EnvironmentVariablesListDTO environmentVariablesListDTO;
 
-    public CurrentSimulationDTO(EnvironmentVariablesListDTO environmentVariablesListDTO) {
+
+    public LoadedSimulationDTO(EnvironmentVariablesListDTO environmentVariablesListDTO) {
         this.entityDTOList = new ArrayList<>();
         this.ruleDTOList = new ArrayList<>();
         this.terminationRuleDTOList = new ArrayList<>();

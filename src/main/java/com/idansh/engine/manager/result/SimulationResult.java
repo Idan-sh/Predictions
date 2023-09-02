@@ -14,9 +14,9 @@ public class SimulationResult {
     private final String endReason;
     private final EntityManager entityManager;
 
-    public SimulationResult(String endReason, EntityManager entityManager) {
+    public SimulationResult(String endReason, int id, EntityManager entityManager) {
         this.dateTime = LocalDateTime.now();
-        this.id = SimulationIdGenerator.getID();
+        this.id = id;
         this.endReason = endReason;
         this.entityManager = entityManager;
     }

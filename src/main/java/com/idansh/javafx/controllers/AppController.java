@@ -1,9 +1,6 @@
 package com.idansh.javafx.controllers;
 
-import com.idansh.dto.environment.EnvironmentVariableDTO;
-import com.idansh.dto.environment.EnvironmentVariablesListDTO;
-import com.idansh.dto.simulation.CurrentSimulationDTO;
-import com.idansh.javafx.display.ConsoleOut;
+import com.idansh.dto.simulation.LoadedSimulationDTO;
 import com.idansh.javafx.manager.SimulationManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -14,6 +11,7 @@ import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -33,6 +31,8 @@ public class AppController implements Initializable {
     private HBox detailsComponent;
     @FXML
     private DetailsController detailsComponentController;
+    @FXML
+    private Tab detailsTab;
 
     // Second window - New Execution
     @FXML
@@ -43,7 +43,7 @@ public class AppController implements Initializable {
 
     // Third window - Results
     @FXML
-    private ScrollPane resultsComponent;
+    private HBox resultsComponent;
     @FXML
     private ResultsController resultsComponentController;
     @FXML
@@ -61,7 +61,7 @@ public class AppController implements Initializable {
 
     // Simulation manager object that handles the simulation itself
     private SimulationManager simulationManager;
-    private CurrentSimulationDTO currentSimulationDTO;
+    private LoadedSimulationDTO loadedSimulationDTO;
     private boolean isSimulationLoaded = false;
 
     /**
@@ -85,7 +85,7 @@ public class AppController implements Initializable {
      */
     public void runCurrentLoadedSimulation() {
         try{
-            simulationManager.runSimulation(currentSimulationDTO.getEnvironmentVariablesListDTO());
+            simulationManager.runSimulation(loadedSimulationDTO.getEnvironmentVariablesListDTO());
         } catch (RuntimeException e) {
             showErrorAlert("Simulation Stopped.\nReason: " + e.getMessage());
         }
@@ -121,9 +121,10 @@ public class AppController implements Initializable {
             simulationPathTextField.setText(selectedFile.getPath());    // Set the file's path into the TextField
 
             // Get the current simulation's details, save it for variable updating, and output its details to the screen
-            currentSimulationDTO = simulationManager.getCurrentSimulationDetails();
-            detailsComponentController.displayCurrentSimulationDetails(currentSimulationDTO);   // Display the current simulation's details
-            newExecutionComponentController.displayDetails(currentSimulationDTO);               // Display the various variables that the user can interact with
+            loadedSimulationDTO = simulationManager.getLoadedSimulationDetails();
+            detailsComponentController.displayCurrentSimulationDetails(loadedSimulationDTO);   // Display the current loaded simulation's details
+            newExecutionComponentController.displayDetails(loadedSimulationDTO);               // Display the various variables that the user can interact with
+            moveToDetailsTab();
         }  catch (RuntimeException e) {
             showErrorAlert("Simulation load failed...\nReason:  " + e.getMessage());
         }
@@ -136,6 +137,14 @@ public class AppController implements Initializable {
      */
     public boolean isSimulationLoaded() {
         return isSimulationLoaded;
+    }
+
+
+    /**
+     * Chooses and shows the Details tab.
+     */
+    public void moveToDetailsTab() {
+        appTabPane.getSelectionModel().select(detailsTab);
     }
 
 
@@ -176,5 +185,27 @@ public class AppController implements Initializable {
         alert.setHeaderText("Message");
         alert.setContentText(infoMessage);
         alert.show();
+    }
+
+
+    /**
+     * Get a list of all simulation executions, past and present.
+     * @return Executions of the type SimulationResultDTO or CurrentSimulationDTO.
+     */
+    public List<Object> getSimulationExecutions() {
+        // Create executions list and add all past executions to it
+        List<Object> executionsList = new ArrayList<>(simulationManager.getPastSimulationsResults());
+
+        // todo- add current executions
+
+        return executionsList;
+    }
+
+
+    /**
+     * Show the executions screen in the Results tab.
+     */
+    public void showExecutions() {
+        resultsComponentController.showExecutions();
     }
 }

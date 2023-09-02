@@ -1,11 +1,9 @@
 package com.idansh.javafx.manager;
 
 import com.idansh.dto.entity.EntityDTO;
-import com.idansh.dto.environment.EnvironmentVariableDTO;
 import com.idansh.dto.environment.EnvironmentVariablesListDTO;
 import com.idansh.dto.property.PropertyDTO;
-import com.idansh.dto.range.RangeDTO;
-import com.idansh.dto.simulation.CurrentSimulationDTO;
+import com.idansh.dto.simulation.LoadedSimulationDTO;
 import com.idansh.dto.simulation.SimulationEndTDO;
 import com.idansh.dto.simulation.SimulationResultDTO;
 import com.idansh.engine.manager.EngineManager;
@@ -51,8 +49,8 @@ public class EngineHandler {
      * Gets CurrentSimulationDTO from the engine with details of the current simulation,
      * prints the simulation details to the screen.
      */
-    public CurrentSimulationDTO getCurrentSimulationDetails() {
-        return engineManager.getCurrentSimulationDetails();
+    public LoadedSimulationDTO getLoadedSimulationDetails() {
+        return engineManager.getLoadedSimulationDetails();
     }
 
 
@@ -71,13 +69,7 @@ public class EngineHandler {
      * @throws RuntimeException In case that no simulations were previously ran.
      */
     public List<SimulationResultDTO> getPastSimulationsResults() {
-        List<SimulationResultDTO> pastSimulationsResults = engineManager.getPastSimulationsResults();
-
-        if(pastSimulationsResults.size() == 0) {
-            throw new RuntimeException("Please run a simulation before trying to shot past simulations!");
-        }
-
-        return pastSimulationsResults;
+        return engineManager.getPastSimulationsResults();
     }
 
 

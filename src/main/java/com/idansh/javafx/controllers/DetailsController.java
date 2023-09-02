@@ -5,7 +5,7 @@ import com.idansh.dto.environment.EnvironmentVariableDTO;
 import com.idansh.dto.property.PropertyDTO;
 import com.idansh.dto.rule.RuleDTO;
 import com.idansh.dto.rule.TerminationRuleDTO;
-import com.idansh.dto.simulation.CurrentSimulationDTO;
+import com.idansh.dto.simulation.LoadedSimulationDTO;
 import javafx.fxml.FXML;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -41,9 +41,9 @@ public class DetailsController {
      * Each DTO class (environment, entity, etc.) in the simulation result will be shown as a TreeItem,
      * which can be chosen to view more information about the selected item.
      *
-     * @param currentSimulationDTO DTO containing full details of the current loaded simulation.
+     * @param loadedSimulationDTO DTO containing full details of the current loaded simulation.
      */
-    public void displayCurrentSimulationDetails(CurrentSimulationDTO currentSimulationDTO) {
+    public void displayCurrentSimulationDetails(LoadedSimulationDTO loadedSimulationDTO) {
         // Create the main root of the tree view
         TreeItem<Object> mainRoot = new TreeItem<>(MAIN_ROOT_NAME);
         breakdownTreeView.setRoot(mainRoot);
@@ -55,21 +55,21 @@ public class DetailsController {
         TreeItem<Object> environmentVariablesRoot = new TreeItem<>(ENVIRONMENT_VARIABLES_ROOT_NAME);
 
         // Add all entities to the entities root
-        currentSimulationDTO.getEntityDTOList().forEach(
+        loadedSimulationDTO.getEntityDTOList().forEach(
                 entityDTO -> entitiesRoot.getChildren().add(new TreeItem<>(entityDTO))
         );
 
         // Add all rules to the rules root
-        currentSimulationDTO.getRuleDTOList().forEach(
+        loadedSimulationDTO.getRuleDTOList().forEach(
                 ruleDTO -> rulesRoot.getChildren().add(new TreeItem<>(ruleDTO))
         );
 
         // Add all termination rules to the termination rules root
-        currentSimulationDTO.getTerminationRuleDTOList().forEach(
+        loadedSimulationDTO.getTerminationRuleDTOList().forEach(
                 terminationRuleDTO -> terminationRulesRoot.getChildren().add(new TreeItem<>(terminationRuleDTO))
         );
 
-        currentSimulationDTO.getEnvironmentVariablesListDTO().getEnvironmentVariableInputDTOs().forEach(
+        loadedSimulationDTO.getEnvironmentVariablesListDTO().getEnvironmentVariableInputDTOs().forEach(
                 environmentVariableDTO -> environmentVariablesRoot.getChildren().add(new TreeItem<>(environmentVariableDTO))
         );
 

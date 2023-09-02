@@ -1,6 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-
-<ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.idansh.javafx.controllers.ResultsController" />
+<HBox xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.idansh.javafx.controllers.ResultsController">
+   <children>
+      <ScrollPane fitToHeight="true" fitToWidth="true" pannable="true" HBox.hgrow="ALWAYS">
+         <content>
+            <TableView fx:id="executionListTableView" onContextMenuRequested="#selectTableItem" onMouseClicked="#selectTableItem" prefHeight="200.0" prefWidth="200.0">
+              <columns>
+                <TableColumn fx:id="idTableColumn" prefWidth="75.0" text="ID" />
+                  <TableColumn fx:id="endTableColumn" prefWidth="75.0" text="End" />
+                  <TableColumn fx:id="statusTableColumn" prefWidth="75.0" text="Status" />
+              </columns>
+            </TableView>
+         </content>
+      </ScrollPane>
+      <ScrollPane fitToHeight="true" fitToWidth="true" pannable="true" HBox.hgrow="ALWAYS">
+         <content>
+            <VBox />
+         </content>
+      </ScrollPane>
+   </children>
+</HBox>

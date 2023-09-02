@@ -5,7 +5,6 @@ import com.idansh.dto.environment.EnvironmentVariableDTO;
 import com.idansh.dto.property.PropertyDTO;
 import com.idansh.dto.rule.RuleDTO;
 import com.idansh.dto.rule.TerminationRuleDTO;
-import com.idansh.dto.simulation.CurrentSimulationDTO;
 import com.idansh.dto.simulation.SimulationEndTDO;
 import com.idansh.dto.simulation.SimulationResultDTO;
 
