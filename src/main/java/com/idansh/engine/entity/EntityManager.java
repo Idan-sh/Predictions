@@ -17,9 +17,7 @@ public class EntityManager {
         this.population = new CopyOnWriteArrayList<>();
 
         entityManager.getEntityFactories().forEach(
-                (name, entityFactory) -> {
-
-                }
+                (name, entityFactory) -> this.entityFactories.put(name, new EntityFactory(entityFactory))
         );
     }
 

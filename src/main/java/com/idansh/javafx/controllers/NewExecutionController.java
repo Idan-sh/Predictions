@@ -192,6 +192,11 @@ public class NewExecutionController {
         loadedSimulationDTO.getEnvironmentVariablesListDTO().getEnvironmentVariableInputDTOs().forEach(this::displayEnvironmentVariable);
     }
 
+
+    /**
+     * Creates and shows title labels on the top of the entities VBox
+     * and the environment variables VBox.
+     */
     public void createAndShowTitleLabels() {
         Label entitiesTitleLabel = new Label("Please enter entity amounts:");
         entitiesVBox.getChildren().add(entitiesTitleLabel);
