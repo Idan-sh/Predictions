@@ -56,4 +56,10 @@ public interface PropertyFactory {
      * Has to be of the same type of the property.
      */
     void updateValue(Object newValue);
+
+
+    /**
+     * Deep copies a property factory.
+     */
+    PropertyFactory copy();
 }

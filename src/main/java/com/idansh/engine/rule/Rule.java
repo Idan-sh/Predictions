@@ -20,6 +20,14 @@ public class Rule {
         this.tickCounter = new Counter(0);
     }
 
+    public Rule(Rule rule) {
+        this.name = rule.name;
+        this.activation = new RuleActivation(rule.getActivation());
+        this.actionsSet = new HashSet<>();
+        this.actionsSet.addAll(rule.getActionsSet()); // Shallow copy
+        this.tickCounter = new Counter(0);
+    }
+
     public String getName() {
         return name;
     }

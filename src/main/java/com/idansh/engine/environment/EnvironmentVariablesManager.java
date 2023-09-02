@@ -15,7 +15,14 @@ public class EnvironmentVariablesManager {
     private final Map<String, PropertyFactory> envVariablesToCreate;
 
     public EnvironmentVariablesManager() {
-        envVariablesToCreate = new HashMap<>();
+        this.envVariablesToCreate = new HashMap<>();
+    }
+
+    public EnvironmentVariablesManager(EnvironmentVariablesManager environmentVariablesManager) {
+       this.envVariablesToCreate = new HashMap<>();
+       environmentVariablesManager.envVariablesToCreate.forEach(
+               (name, propertyFactory) -> this.envVariablesToCreate.put(name, propertyFactory.copy())
+       );
     }
 
     /**

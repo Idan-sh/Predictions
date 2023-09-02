@@ -40,6 +40,34 @@ public class World {
         this.timer = new Timer();
     }
 
+    /**
+     * Deep copies a world, setting it up from another run.
+     * Only copy world that not previously ran.
+     */
+    public World(World world) {
+        // Check if the world ran, or if it's a newly created one
+        if(world.getTickCount() != 0)
+            throw new IllegalArgumentException("Cannot copy world that ran! Please only copy a world object that was only initialized...");
+
+        this.entityManager = new EntityManager(world.entityManager);
+
+        this.terminationRules = new HashMap<>();
+        world.getTerminationRules().forEach(
+                (type, terminationRule) -> this.terminationRules.put(type, new TerminationRule(type, terminationRule.getValue()))
+        );
+
+        this.rulesMap = new HashMap<>();
+        world.getRulesMap().forEach(
+                (name, rule) -> this.rulesMap.put(name, new Rule(rule))
+        );
+
+        this.environmentVariablesManager = new EnvironmentVariablesManager(world.environmentVariablesManager);
+
+        this.tickCounter = new Counter(0);
+
+        this.timer = new Timer();
+    }
+
     public ActiveEnvironmentVariables getActiveEnvironmentVariables() {
         return activeEnvironmentVariables;
     }
@@ -85,7 +113,16 @@ public class World {
         rulesMap.put(rule.getName(), rule);
     }
 
-    public SimulationResult run() {
+    /**
+     * Start running the simulated world.
+     * @param runningSimulations Map of all currently running simulations. Will add the world when it runs to the map,
+     *                           and will remove itself after the running process is finished.
+     * @return The details on the simulation result.
+     */
+    public SimulationResult run(Map<Integer, World> runningSimulations) {
+        // Add the running world to the current running simulations
+        runningSimulations.put(this.getId(), this);
+
         // Timer countdown for the termination rule SECONDS
         Countdown countdown = new Countdown();
         id = SimulationIdGenerator.getID();
@@ -98,6 +135,9 @@ public class World {
         while((!terminationRules.containsKey(TerminationRule.Type.TICKS)) || (terminationRules.containsKey(TerminationRule.Type.TICKS) && tickCounter.getCount() < terminationRules.get(TerminationRule.Type.TICKS).getValue())) {
             // Checks if the timer expired
             if(countdown.isFinished()) {
+                // remove the world from the current running simulations
+                runningSimulations.remove(this.getId());
+
                 return new SimulationResult("Timer Expired", id, entityManager);
             }
 
@@ -112,6 +152,9 @@ public class World {
             tickCounter.increaseCount();
         }
 
+        // remove the world from the current running simulations
+        runningSimulations.remove(this.getId());
+
         return new SimulationResult("Ticks Reached", id, entityManager);
     }
 
@@ -125,6 +168,10 @@ public class World {
 
     public int getId() {
         return id;
+    }
+
+    public int getTickCount() {
+        return tickCounter.getCount();
     }
 }
 

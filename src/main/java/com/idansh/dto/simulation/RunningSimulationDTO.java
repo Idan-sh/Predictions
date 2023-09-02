@@ -8,6 +8,10 @@ import com.idansh.dto.rule.TerminationRuleDTO;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * UI will query this DTO every a certain time period,
+ * to receive the current state of the simulation.
+ */
 public class RunningSimulationDTO {
     private final List<EntityDTO> entityDTOList;
     private final List<RuleDTO> ruleDTOList;

@@ -43,6 +43,12 @@ public class RuleActivation {
         this.ticks = 1;
     }
 
+
+    public RuleActivation(RuleActivation ruleActivation) {
+        this.ticks = ruleActivation.getTicks();
+        this.probability = ruleActivation.getProbability();
+    }
+
     public int getTicks() {
         return ticks;
     }

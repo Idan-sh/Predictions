@@ -28,6 +28,17 @@ public class EntityFactory {
         this.propertiesToAssign = new HashMap<>();
     }
 
+    public EntityFactory(EntityFactory entityFactory) {
+        this.name = entityFactory.getName();
+        this.populationCounter = new Counter(entityFactory.getPopulationCount());
+        this.initPopulation = entityFactory.getInitPopulation();
+        this.propertiesToAssign = new HashMap<>();
+
+        entityFactory.getPropertiesToAssign().forEach(
+                (name, propertyFactory) -> this.propertiesToAssign.put(name, propertyFactory.copy())
+        );
+    }
+
     public String getName() {
         return name;
     }

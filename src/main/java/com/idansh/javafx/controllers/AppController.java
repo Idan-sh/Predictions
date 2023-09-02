@@ -88,6 +88,7 @@ public class AppController implements Initializable {
             simulationManager.runSimulation(loadedSimulationDTO.getEnvironmentVariablesListDTO());
         } catch (RuntimeException e) {
             showErrorAlert("Simulation Stopped.\nReason: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -197,7 +198,7 @@ public class AppController implements Initializable {
         // Create executions list and add all past executions to it
         List<Object> executionsList = new ArrayList<>(simulationManager.getPastSimulationsResults());
 
-        // todo- add current executions
+        // todo- add current executions, after threads is done
 
         return executionsList;
     }

@@ -25,7 +25,7 @@ import java.util.*;
  * Some methods will return a DTO that contains data from the simulation (without the logic of the engine elements).
  */
 public class EngineManager {
-    private World loadedWorld;
+    private World loadedWorld;  // The currently loaded world. This world will not run but only be used to create instances for running
     private final Map<Integer, World> runningSimulations;
     private final Map<Integer, SimulationResult> pastSimulations;
 
@@ -150,17 +150,13 @@ public class EngineManager {
      * @param environmentVariablesListDTO contains data of environment variables to update in the simulation.
      */
     public void runSimulation(EnvironmentVariablesListDTO environmentVariablesListDTO) {
-        loadedWorld.entityManager.initEntityPopulation();
+        World runningWorldInstance = new World(loadedWorld);
+
+        runningWorldInstance.entityManager.initEntityPopulation();
         updateEnvironmentVariablesFromInput(environmentVariablesListDTO);
 
-        // Add the running world to the current running simulations
-        runningSimulations.put(loadedWorld.getId(), loadedWorld);
-
         // Run the simulation
-        SimulationResult simulationResult = loadedWorld.run();
-
-        // remove the world from the current running simulations
-        runningSimulations.remove(loadedWorld.getId());
+        SimulationResult simulationResult = runningWorldInstance.run(runningSimulations);
 
         // Save the simulation result
         addSimulationResult(simulationResult);

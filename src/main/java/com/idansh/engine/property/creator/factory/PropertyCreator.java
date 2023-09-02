@@ -96,4 +96,12 @@ public class PropertyCreator<T> implements PropertyFactory{
     public boolean isRandomGenerated() {
         return !(valueGenerator instanceof FixedValueGenerator);
     }
+
+    @Override
+    public PropertyFactory copy() {
+        if(range != null)
+            return new PropertyCreator<>(name, type, valueGenerator, range);
+
+        return new PropertyCreator<>(name, type, valueGenerator);
+    }
 }

@@ -12,6 +12,17 @@ public class EntityManager {
         this.population = new CopyOnWriteArrayList<>(); // Note: using a thread-safe collection that can handle concurrent modifications and iterations (we try to kill entity instances while iterating on the population list)
     }
 
+    public EntityManager(EntityManager entityManager) {
+        this.entityFactories = new HashMap<>();
+        this.population = new CopyOnWriteArrayList<>();
+
+        entityManager.getEntityFactories().forEach(
+                (name, entityFactory) -> {
+
+                }
+        );
+    }
+
 
     /**
      * Adds a new EntityFactory to the simulated world, from which entities will be created.
