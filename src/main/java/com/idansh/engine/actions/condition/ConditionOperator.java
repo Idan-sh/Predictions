@@ -21,7 +21,26 @@ public enum ConditionOperator {
                 return MORE_THAN;
 
             default:
-                throw new IllegalArgumentException("invalid condition operator \"" + operatorString + "\" received!");
+                throw new IllegalArgumentException("invalid condition operator string \"" + operatorString + "\" received!");
+        }
+    }
+
+    public static String getConditionOperatorString(ConditionOperator conditionOperator) {
+        switch(conditionOperator) {
+            case EQUAL:
+                return "=";
+
+            case NOT_EQUAL:
+                return "!=";
+
+            case LESS_THAN:
+                return "lt";
+
+            case MORE_THAN:
+                return "bt";
+
+            default:
+                throw new IllegalArgumentException("invalid condition operator \"" + conditionOperator + "\" received!");
         }
     }
 }

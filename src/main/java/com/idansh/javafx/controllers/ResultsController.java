@@ -1,5 +1,6 @@
 package com.idansh.javafx.controllers;
 
+import com.idansh.dto.entity.EntityDTO;
 import com.idansh.dto.simulation.RunningSimulationDTO;
 import com.idansh.dto.simulation.SimulationResultDTO;
 import com.idansh.javafx.helpers.ResultsTableItem;
@@ -40,6 +41,12 @@ public class ResultsController implements Initializable {
     // Execution Details Components:
     @FXML
     private ListView<String> progressListView;
+    @FXML
+    private TableView<EntityDTO> entityAmountsTableView;
+    @FXML
+    private TableColumn<EntityDTO, String> nameTableColumn;
+    @FXML
+    private TableColumn<EntityDTO, Integer> amountTableColumn;
 
     public void setMainController(AppController mainController) {
         this.mainController = mainController;
@@ -47,10 +54,15 @@ public class ResultsController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Setup Execution List TableView:
         idTableColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         startTableColumn.setCellValueFactory(new PropertyValueFactory<>("startDateString"));
         endTableColumn.setCellValueFactory(new PropertyValueFactory<>("endDateString"));
         statusTableColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
+
+        // Setup Entity Amounts TableView:
+        nameTableColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        amountTableColumn.setCellValueFactory(new PropertyValueFactory<>("currAmountInPopulation"));
     }
 
 
@@ -73,6 +85,7 @@ public class ResultsController implements Initializable {
                         executionListTableView.getItems().add(
                                 new ResultsTableItem(
                                         itemResult.getId(),
+                                        itemResult.getEntityDTOList(),
                                         itemResult.getSimulationTime(),
                                         COMPLETED,
                                         itemResult.getCompletedTicks(),
@@ -84,6 +97,7 @@ public class ResultsController implements Initializable {
                         executionListTableView.getItems().add(
                                 new ResultsTableItem(
                                         itemRunning.getId(),
+                                        itemRunning.getEntityDTOList(),
                                         itemRunning.getSimulationTime(),
                                         IN_PROGRESS,
                                         itemRunning.getCompletedTicks(),
@@ -125,6 +139,9 @@ public class ResultsController implements Initializable {
                     ),
                     timerFormatter.apply(selectedItem.getSimulationTime().getSecondsPassed())
             );
+
+            // Add entity amounts to the table
+            entityAmountsTableView.getItems().addAll(selectedItem.getEntitiesList());
         }
     }
 }

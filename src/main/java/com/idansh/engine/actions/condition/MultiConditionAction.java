@@ -1,5 +1,6 @@
 package com.idansh.engine.actions.condition;
 
+import com.idansh.engine.actions.Action;
 import com.idansh.engine.entity.Entity;
 import com.idansh.engine.world.World;
 
@@ -19,7 +20,20 @@ public class MultiConditionAction extends ConditionAction{
                     return AND;
 
                 default:
-                    throw new IllegalArgumentException("invalid logic operand \"" + logicOpStr + "\" received!");
+                    throw new IllegalArgumentException("invalid logic operand string \"" + logicOpStr + "\" received!");
+            }
+        }
+
+        private static String getLogicOpString(LogicOp logicOp) {
+            switch (logicOp) {
+                case OR:
+                    return "or";
+
+                case AND:
+                    return "and";
+
+                default:
+                    throw new IllegalArgumentException("invalid logic operand \"" + logicOp + "\" received!");
             }
         }
     }
@@ -91,5 +105,14 @@ public class MultiConditionAction extends ConditionAction{
                     invokeActionsSet(entity, true); // Invoke the "then" actions set
 
         }
+    }
+
+
+    @Override
+    public Action copy(World worldContext) {
+        ThenOrElseActions thenActions = new ThenOrElseActions(getThenActions(), worldContext);
+        ThenOrElseActions elseActions = new ThenOrElseActions(getElseActions(), worldContext);
+
+        return new MultiConditionAction(worldContext, getEntityContext(), LogicOp.getLogicOpString(logicOp), thenActions, elseActions, isMainCondition());
     }
 }

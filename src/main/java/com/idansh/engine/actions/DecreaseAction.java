@@ -36,6 +36,12 @@ public class DecreaseAction extends Action {
     }
 
 
+    @Override
+    public Action copy(World worldContext) {
+        return new DecreaseAction(worldContext, getEntityContext(), propertyName, amount);
+    }
+
+
     /**
      * Inverts a number, from positive to negative or from negative to positive.
      * @param valueToInvert number of the type Integer or Float (non-primitive).

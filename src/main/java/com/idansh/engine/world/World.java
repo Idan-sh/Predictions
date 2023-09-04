@@ -63,7 +63,7 @@ public class World {
 
         this.rulesMap = new HashMap<>();
         world.getRulesMap().forEach(
-                (name, rule) -> this.rulesMap.put(name, new Rule(rule))
+                (name, rule) -> this.rulesMap.put(name, new Rule(rule, this))
         );
 
         this.environmentVariablesManager = new EnvironmentVariablesManager(world.environmentVariablesManager);

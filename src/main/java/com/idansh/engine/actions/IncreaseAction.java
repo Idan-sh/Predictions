@@ -36,6 +36,12 @@ public class IncreaseAction extends Action {
 
 
     @Override
+    public Action copy(World worldContext) {
+        return new IncreaseAction(worldContext, getEntityContext(), propertyName, amount);
+    }
+
+
+    @Override
     public String getActionTypeString() {
         return "increase";
     }

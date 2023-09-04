@@ -77,4 +77,10 @@ public abstract class Action {
      * @return The type of action.
      */
     public abstract String getActionTypeString();
+
+
+    /**
+     * Deep copies this Action instance, using a new worldContext for the action's activation.
+     */
+    public abstract Action copy(World worldContext);
 }

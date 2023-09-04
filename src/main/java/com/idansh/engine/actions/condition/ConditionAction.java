@@ -46,4 +46,12 @@ public abstract class ConditionAction extends Action {
     public void setActivated(boolean activated) {
         isActivated = activated;
     }
+
+    public ThenOrElseActions getThenActions() {
+        return thenActions;
+    }
+
+    public ThenOrElseActions getElseActions() {
+        return elseActions;
+    }
 }

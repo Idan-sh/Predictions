@@ -63,7 +63,12 @@ public class CalculationAction extends Action {
                     propertyToSave.setValue((Integer) val1 / (Integer) val2);
                 break;
         }
+    }
 
+
+    @Override
+    public Action copy(World worldContext) {
+        return new CalculationAction(worldContext, getEntityContext(), propertyName, arg1, arg2, type);
     }
 
 

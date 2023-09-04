@@ -22,6 +22,10 @@ public class KillAction extends Action {
             worldContext.entityManager.killEntity(entity);
     }
 
+    @Override
+    public Action copy(World worldContext) {
+        return new KillAction(worldContext, getEntityContext());
+    }
 
     @Override
     public String getActionTypeString() {

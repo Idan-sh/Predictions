@@ -1,5 +1,6 @@
 package com.idansh.engine.actions.condition;
 
+import com.idansh.engine.actions.Action;
 import com.idansh.engine.entity.Entity;
 import com.idansh.engine.expression.api.Expression;
 import com.idansh.engine.world.World;
@@ -71,6 +72,15 @@ public class SingleConditionAction extends ConditionAction{
                     invokeActionsSet(entity, res);
                 break;
         }
+    }
+
+
+    @Override
+    public Action copy(World worldContext) {
+        ThenOrElseActions thenActions = new ThenOrElseActions(getThenActions(), worldContext);
+        ThenOrElseActions elseActions = new ThenOrElseActions(getElseActions(), worldContext);
+
+        return new SingleConditionAction(worldContext, getEntityContext(), propertyName, ConditionOperator.getConditionOperatorString(operator), expression, thenActions, elseActions, isMainCondition());
     }
 
 

@@ -40,10 +40,10 @@
               </rowConstraints>
                <children>
                   <ListView fx:id="progressListView" />
-                  <TableView GridPane.columnIndex="1">
+                  <TableView fx:id="entityAmountsTableView" GridPane.columnIndex="1">
                     <columns>
-                      <TableColumn prefWidth="75.0" text="Name" />
-                      <TableColumn prefWidth="75.0" text="Amount" />
+                      <TableColumn fx:id="nameTableColumn" prefWidth="75.0" text="Name" />
+                      <TableColumn fx:id="amountTableColumn" prefWidth="75.0" text="Amount" />
                     </columns>
                      <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

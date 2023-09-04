@@ -34,6 +34,11 @@ public class SetAction extends Action {
 
 
     @Override
+    public Action copy(World worldContext) {
+        return new SetAction(worldContext, getEntityContext(), propertyName, amount);
+    }
+
+    @Override
     public String getActionTypeString() {
         return "set";
     }

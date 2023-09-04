@@ -3,8 +3,11 @@ package com.idansh.engine.rule;
 import com.idansh.engine.actions.Action;
 import com.idansh.engine.entity.Entity;
 import com.idansh.engine.helpers.Counter;
+import com.idansh.engine.world.World;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class Rule {
@@ -20,12 +23,18 @@ public class Rule {
         this.tickCounter = new Counter(0);
     }
 
-    public Rule(Rule rule) {
+    public Rule(Rule rule, World worldContext) {
         this.name = rule.name;
         this.activation = new RuleActivation(rule.getActivation());
         this.actionsSet = new HashSet<>();
-        this.actionsSet.addAll(rule.getActionsSet()); // Shallow copy
+        copyActionsSet(rule, worldContext);
         this.tickCounter = new Counter(0);
+    }
+
+    private void copyActionsSet(Rule rule, World worldContext) {
+        for(Action action : rule.getActionsSet()) {
+            this.actionsSet.add(action.copy(worldContext));
+        }
     }
 
     public String getName() {

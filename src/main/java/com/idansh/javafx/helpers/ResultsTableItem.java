@@ -1,10 +1,12 @@
 package com.idansh.javafx.helpers;
 
+import com.idansh.dto.entity.EntityDTO;
 import com.idansh.engine.helpers.SimulationTime;
 
 import java.sql.Time;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 /**
  * Defines an item in the table view of the simulation executions in the "Results" tab.
@@ -14,10 +16,12 @@ public class ResultsTableItem {
     private final SimulationTime simulationTime;
     private final String startDateString, endDateString;
     private final int completedTicks, maxTicks;
+    private List<EntityDTO> entitiesList;
     private final String status;
 
-    public ResultsTableItem(int id, SimulationTime simulationTime, String status, int completedTicks, int maxTicks) {
+    public ResultsTableItem(int id, List<EntityDTO> entitiesList, SimulationTime simulationTime, String status, int completedTicks, int maxTicks) {
         this.id = id;
+        this.entitiesList = entitiesList;
         this.simulationTime = simulationTime;
         this.completedTicks = completedTicks;
         this.maxTicks = maxTicks;
@@ -53,5 +57,9 @@ public class ResultsTableItem {
 
     public String getEndDateString() {
         return endDateString;
+    }
+
+    public List<EntityDTO> getEntitiesList() {
+        return entitiesList;
     }
 }
