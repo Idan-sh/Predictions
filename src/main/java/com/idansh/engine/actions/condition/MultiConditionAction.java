@@ -72,36 +72,34 @@ public class MultiConditionAction extends ConditionAction{
             throw new RuntimeException("no inner conditions were set inside multi-condition action!");
 
         for (ConditionAction conditionAction : innerConditions) {
-                // Try to activate the inner condition
-                conditionAction.invoke(entity);
+            // Try to activate the inner condition
+            conditionAction.invoke(entity);
 
-                // Check if the inner condition was activated, add the result to the list
-                if (conditionAction.isActivated()) {
-                    innerConditionsResults.add(true);
+            // Check if the inner condition was activated, add the result to the list
+            if (conditionAction.isActivated()) {
+                innerConditionsResults.add(true);
 
-                    // Reset condition activation for future use
-                    conditionAction.setActivated(false);
-                } else
-                    innerConditionsResults.add(false);
+                // Reset condition activation for future use
+                conditionAction.setActivated(false);
+            } else
+                innerConditionsResults.add(false);
         }
 
         switch (logicOp) {
             case OR:
-                // Check if one of the inner conditions resulted as "true", invoke the proper actions set
-                invokeActionsSet(entity, innerConditionsResults.contains(true));
+                // Check if at least one of the inner conditions resulted as "true", if so activate this condition
+                setActivated(innerConditionsResults.contains(true));
+                break;
 
             case AND:
-                for(Boolean innerConditionRes : innerConditionsResults) {
-                    // Check if the current condition result is false, if so the AND logic is also false
-                    if (!innerConditionRes) {
-                        invokeActionsSet(entity, false); // Invoke the "else" actions set
-                        return;
-                    }
-                }
-
-                // There was no inner condition of value false
-                invokeActionsSet(entity, true); // Invoke the "then" actions set
+                // Check if at least one of the inner conditions resulted as "false",
+                // if so deactivate this condition, otherwise activate it
+                setActivated(!innerConditionsResults.contains(false));
+                break;
         }
+
+        // Invoke "then" actions if both the multi-condition was activated and the condition is a main condition, otherwise invoke "else" actions
+        invokeActionsSet(entity, isActivated() && isMainCondition());
     }
 
 

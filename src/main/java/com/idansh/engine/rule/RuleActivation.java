@@ -80,6 +80,6 @@ public class RuleActivation {
      * @return true if the rule activation was activated, false otherwise.
      */
     public boolean isActivated(Counter tickCounter) {
-        return ticks == tickCounter.getCount() && isProbabilityActivated();
+        return (ticks == tickCounter.getCount() && isProbabilityActivated());
     }
 }
