@@ -1,5 +1,6 @@
 package com.idansh.engine.rule;
 
+import com.idansh.engine.helpers.Counter;
 import com.idansh.engine.helpers.RandomValue;
 
 /**
@@ -70,5 +71,15 @@ public class RuleActivation {
      */
     public boolean isProbabilityActivated() {
         return probability >= generatedProbability;
+    }
+
+
+    /**
+     * Checks if the rule should be activated.
+     * @param tickCounter the counter of the ticks since the last activation attempt (according to the activation's ticks).
+     * @return true if the rule activation was activated, false otherwise.
+     */
+    public boolean isActivated(Counter tickCounter) {
+        return ticks == tickCounter.getCount() && isProbabilityActivated();
     }
 }

@@ -77,8 +77,13 @@ public class SingleConditionAction extends ConditionAction{
 
     @Override
     public Action copy(World worldContext) {
-        ThenOrElseActions thenActions = new ThenOrElseActions(getThenActions(), worldContext);
-        ThenOrElseActions elseActions = new ThenOrElseActions(getElseActions(), worldContext);
+        ThenOrElseActions thenActions = null, elseActions = null;
+
+        // Single condition can be nested inside a multi condition, and not have "Then" or "Else" actions
+        if (isMainCondition()) {
+            thenActions = new ThenOrElseActions(getThenActions(), worldContext);
+            elseActions = new ThenOrElseActions(getElseActions(), worldContext);
+        }
 
         return new SingleConditionAction(worldContext, getEntityContext(), propertyName, ConditionOperator.getConditionOperatorString(operator), expression, thenActions, elseActions, isMainCondition());
     }

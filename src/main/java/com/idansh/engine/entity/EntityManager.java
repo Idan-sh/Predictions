@@ -7,9 +7,10 @@ public class EntityManager {
     private final Map<String, EntityFactory> entityFactories;   // Each entity factory will define instructions on how to instantiate a single entity with a unique name
     private final List<Entity> population;
 
+
     public EntityManager() {
         this.entityFactories = new HashMap<>();
-        this.population = new CopyOnWriteArrayList<>(); // Note: using a thread-safe collection that can handle concurrent modifications and iterations (we try to kill entity instances while iterating on the population list)
+        this.population = new ArrayList<>(); // Note: using a thread-safe collection that can handle concurrent modifications and iterations (we try to kill entity instances while iterating on the population list)
     }
 
     public EntityManager(EntityManager entityManager) {
@@ -80,9 +81,7 @@ public class EntityManager {
         if(!population.contains(entityToKill))
             return;
 
-        // Remove the entity from the population and decrease the population counter for the main entity
-        entityFactories.get(entityToKill.getName()).decreasePopulationCounter();
-        population.remove(entityToKill);
+        entityToKill.kill();
     }
 
     public List<Entity> getPopulation() {
@@ -91,5 +90,18 @@ public class EntityManager {
 
     public Map<String, EntityFactory> getEntityFactories() {
         return entityFactories;
+    }
+
+    /**
+     * Removes all dead entities from the population,
+     * and decreases the population counter for the dead entity instance's main entity.
+     */
+    public void removeDeadEntitiesFromPopulation() {
+        for (Entity entity : population) {
+            if (!entity.isAlive()) {
+                entityFactories.get(entity.getName()).decreasePopulationCounter();
+                population.remove(entity);
+            }
+        }
     }
 }

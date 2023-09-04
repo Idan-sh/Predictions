@@ -93,6 +93,7 @@ public class AppController implements Initializable {
                     "completed simulation ID: " + finishedSimulationID
             );
         } catch (RuntimeException e) {
+            e.printStackTrace();
             showErrorAlert("Simulation Stopped!", e.getMessage());
         }
     }

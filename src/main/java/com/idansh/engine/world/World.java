@@ -1,5 +1,6 @@
 package com.idansh.engine.world;
 
+import com.idansh.engine.entity.Entity;
 import com.idansh.engine.entity.EntityManager;
 import com.idansh.engine.environment.ActiveEnvironmentVariables;
 import com.idansh.engine.environment.EnvironmentVariablesManager;
@@ -44,6 +45,7 @@ public class World {
         this.simulationTime = new SimulationTime();
     }
 
+
     /**
      * Deep copies a world, setting it up from another run.
      * Only copy world that not previously ran.
@@ -72,9 +74,6 @@ public class World {
         this.simulationTime = new SimulationTime();
     }
 
-    public ActiveEnvironmentVariables getActiveEnvironmentVariables() {
-        return activeEnvironmentVariables;
-    }
 
     /**
      * Adds a new environment variable factory to the simulated world,
@@ -117,6 +116,7 @@ public class World {
         rulesMap.put(rule.getName(), rule);
     }
 
+
     /**
      * Start running the simulated world.
      * @param runningSimulations Map of all currently running simulations. Will add the world when it runs to the map,
@@ -137,33 +137,40 @@ public class World {
 
         // Check if the current tick has reached the termination rule tick defined, if one does not exist keeps going until reached the timer defined
         while((!terminationRules.containsKey(TerminationRule.Type.TICKS)) || (terminationRules.containsKey(TerminationRule.Type.TICKS) && tickCounter.getCount() < terminationRules.get(TerminationRule.Type.TICKS).getValue())) {
-            // Checks if the timer expired
-            if(countdown.isFinished()) {
-                // remove the world from the current running simulations
-                runningSimulations.remove(this.getId());
+            // Checks if the timer expired, if so end simulation
+            if (countdown.isFinished())
+                return endSimulation(runningSimulations, "Timer Expired");
 
-                simulationTime.setEndTimes();
-                return new SimulationResult(
-                        id,
-                        simulationTime,
-                        "Timer Expired",
-                        entityManager,
-                        getTickCount(),
-                        terminationRules.get(TerminationRule.Type.TICKS).getValue()
-                );
+            // Remove all previously killed entities from the population
+            entityManager.removeDeadEntitiesFromPopulation();
+
+            // Increase the tick counter of each rule
+            rulesMap.values().forEach(Rule::increaseTickCounter);
+
+            // Try to invoke each rule of the simulation on each entity instance in the population
+            for (Entity entity : entityManager.getPopulation()) {
+                rulesMap.values().forEach((rule) -> rule.invoke(entity));
             }
 
-            // Run on every entity in the population and check if a rule can be invoked on it
-            entityManager.getPopulation().forEach(
-                    entity -> {
-                        // Invoke all rules
-                        rulesMap.forEach((ruleName, rule) -> rule.invoke(entity));
-                    }
-            );
+            // Try to reset the tick counter of each rule
+            rulesMap.values().forEach(Rule::resetTickCounter);
 
-            tickCounter.increaseCount();
+            tickCounter.increaseCount();  // Increase the tick counter of the simulation
         }
 
+        // Ticks reached, end simulation
+        return endSimulation(runningSimulations, "Ticks Reached");
+    }
+
+
+    /**
+     * End a simulation with a String that defines why the simulation ended.
+     * Only ends simulations on intended events, on errors the simulation will end according to the exception thrown.
+     * @param runningSimulations map of all currently running simulation, to remove this simulation from the map.
+     * @param endReason string that defines the reason of why the simulation ended, which Termination Rule was activated.
+     * @return the simulation's result details.
+     */
+    private SimulationResult endSimulation(Map<Integer, World> runningSimulations, String endReason) {
         // remove the world from the current running simulations
         runningSimulations.remove(this.getId());
 
@@ -171,12 +178,13 @@ public class World {
         return new SimulationResult(
                 id,
                 simulationTime,
-                "Ticks Reached",
+                endReason,
                 entityManager,
                 getTickCount(),
                 terminationRules.get(TerminationRule.Type.TICKS).getValue()
         );
     }
+
 
     public Map<TerminationRule.Type, TerminationRule> getTerminationRules() {
         return terminationRules;
@@ -196,6 +204,10 @@ public class World {
 
     public SimulationTime getSimulationTime() {
         return simulationTime;
+    }
+
+    public ActiveEnvironmentVariables getActiveEnvironmentVariables() {
+        return activeEnvironmentVariables;
     }
 }
 

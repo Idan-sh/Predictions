@@ -68,22 +68,22 @@ public class MultiConditionAction extends ConditionAction{
     public void invoke(Entity entity) {
         List<Boolean> innerConditionsResults = new ArrayList<>();
 
-        innerConditions.forEach(
-                conditionAction -> {
-                    // Try to activate the inner condition
-                    conditionAction.invoke(entity);
+        if(innerConditions.size() == 0)
+            throw new RuntimeException("no inner conditions were set inside multi-condition action!");
 
-                    // Check if the inner condition was activated, add the result to the list
-                    if(conditionAction.isActivated()) {
-                        innerConditionsResults.add(true);
+        for (ConditionAction conditionAction : innerConditions) {
+                // Try to activate the inner condition
+                conditionAction.invoke(entity);
 
-                        // Reset condition activation for future use
-                        conditionAction.setActivated(false);
-                    }
-                    else
-                        innerConditionsResults.add(false);
-                }
-        );
+                // Check if the inner condition was activated, add the result to the list
+                if (conditionAction.isActivated()) {
+                    innerConditionsResults.add(true);
+
+                    // Reset condition activation for future use
+                    conditionAction.setActivated(false);
+                } else
+                    innerConditionsResults.add(false);
+        }
 
         switch (logicOp) {
             case OR:
@@ -91,28 +91,45 @@ public class MultiConditionAction extends ConditionAction{
                 invokeActionsSet(entity, innerConditionsResults.contains(true));
 
             case AND:
-                boolean flag = true; // Flag that checks if there is a false inner condition
                 for(Boolean innerConditionRes : innerConditionsResults) {
                     // Check if the current condition result is false, if so the AND logic is also false
                     if (!innerConditionRes) {
                         invokeActionsSet(entity, false); // Invoke the "else" actions set
-                        flag = false;
+                        return;
                     }
                 }
 
                 // There was no inner condition of value false
-                if(flag)
-                    invokeActionsSet(entity, true); // Invoke the "then" actions set
-
+                invokeActionsSet(entity, true); // Invoke the "then" actions set
         }
     }
 
 
     @Override
     public Action copy(World worldContext) {
-        ThenOrElseActions thenActions = new ThenOrElseActions(getThenActions(), worldContext);
-        ThenOrElseActions elseActions = new ThenOrElseActions(getElseActions(), worldContext);
+        ThenOrElseActions thenActions = null, elseActions = null;
 
-        return new MultiConditionAction(worldContext, getEntityContext(), LogicOp.getLogicOpString(logicOp), thenActions, elseActions, isMainCondition());
+        // Multi condition can be nested inside another multi condition, and not have "Then" or "Else" actions
+        if(isMainCondition()) {
+            thenActions = new ThenOrElseActions(getThenActions(), worldContext);
+            elseActions = new ThenOrElseActions(getElseActions(), worldContext);
+        }
+
+        MultiConditionAction retMultiConditionAction =
+                new MultiConditionAction(
+                        worldContext,
+                        getEntityContext(),
+                        LogicOp.getLogicOpString(logicOp),
+                        thenActions,
+                        elseActions,
+                        isMainCondition()
+                );
+
+        // Copy inner conditions
+        for (ConditionAction conditionAction : innerConditions) {
+            retMultiConditionAction.addInnerCondition((ConditionAction) conditionAction.copy(worldContext));  // We know the inner conditions are of condition action, so we can convert them
+        }
+
+        return retMultiConditionAction;
     }
 }

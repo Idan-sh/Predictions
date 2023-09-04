@@ -131,6 +131,7 @@ public class ResultsController implements Initializable {
 
             // Remove previously shown items
             progressListView.getItems().clear();
+            entityAmountsTableView.getItems().clear();
 
             // Add completed ticks and time passed to the list view
             progressListView.getItems().addAll(ticksFormatter.apply(

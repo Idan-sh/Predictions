@@ -14,11 +14,13 @@ public class Entity {
     private final String name;                  // The name of this entity's type (e.g. "Smoker")
     private final Counter populationCounter;    // The amount of entities of this type currently in the world
     private final Map<String, Property> properties;  // Properties that define this entity, key is a unique name
+    private boolean isAlive;
 
     public Entity(String name, Counter populationCounter) {
         this.populationCounter = populationCounter;
         this.name = name;
         this.properties = new HashMap<>();
+        this.isAlive = true;
     }
 
     public String getName() {
@@ -45,5 +47,19 @@ public class Entity {
      */
     public void addProperty(Property property) {
         properties.put(property.getName(), property);
+    }
+
+
+    /**
+     * Sets the entity to be killed.
+     * On the next simulation tick this entity needs to be removed from the population.
+     */
+    public void kill() {
+        isAlive = false;
+    }
+
+
+    public boolean isAlive() {
+        return isAlive;
     }
 }

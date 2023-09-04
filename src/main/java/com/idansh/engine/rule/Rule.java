@@ -70,21 +70,33 @@ public class Rule {
     public void invoke(Entity entity) {
         activation.generateProbability();
 
-        tickCounter.increaseCount();
-
-        // Check if the amount of ticks in the simulation have passed
-        if((activation.getTicks() == tickCounter.getCount())) {
-            tickCounter.resetCount();   // Reset counter every tick amount set.
-
-            // Check if the probability was activated
-            if(activation.isProbabilityActivated())
-                actionsSet.forEach(
-                        action -> {
-                            // Invoke only actions that are within the received entity's context
-                            if(entity.getName().equals(action.getEntityContext()))
-                                action.invoke(entity);
-                        }
-                );
+        // Check if the rule's activation is activated
+        if (activation.isActivated(tickCounter)) {
+            for (Action action : actionsSet) {
+                // Invoke only actions that are within the received entity's context
+                if (entity.getName().equals(action.getEntityContext()))
+                    action.invoke(entity);
+            }
         }
+    }
+
+
+    /**
+     * On each tick of the simulation, also tick each rule,
+     * to allow each rule to properly check its activation rule.
+     */
+    public void increaseTickCounter() {
+        tickCounter.increaseCount();
+    }
+
+
+    /**
+     * Checks if the tick counter of the rule has reached the activation's ticks,
+     * if so then resets it back to 0.
+     * Call this method after invoking the rule on all the population of the world.
+     */
+    public void resetTickCounter() {
+        if (activation.isActivated(tickCounter))
+            tickCounter.resetCount();   // Reset counter every tick amount set.
     }
 }
