@@ -54,6 +54,7 @@ public class ResultsController implements Initializable {
     private ChoiceBox<PropertyDTO> propertyChoiceBox;
     @FXML
     private TreeView<String> propertyDetailsTreeView;
+    private int chosenExecutionID;
 
 
     public void setMainController(AppController mainController) {
@@ -143,12 +144,14 @@ public class ResultsController implements Initializable {
         if(selectedItem != null) {
             // todo- output data to another component, this will query the engine every 200-300 ms
             //  and request the most recent details of the simulation chosen. TASK thread will be appointed.
+            chosenExecutionID = selectedItem.getId();
 
             // Remove previously shown items
             progressListView.getItems().clear();
             entityAmountsTableView.getItems().clear();
             entityChoiceBox.getItems().clear();
             propertyChoiceBox.getItems().clear();
+            propertyDetailsTreeView.getRoot().getChildren().clear();
 
             // Add completed ticks and time passed to the list view
             progressListView.getItems().addAll(ticksFormatter.apply(
@@ -173,8 +176,10 @@ public class ResultsController implements Initializable {
      * @param entityDTO the entityDTO which was chosen by the user.
      */
     public void onEntitySelect(EntityDTO entityDTO) {
-        propertyChoiceBox.getItems().clear();
-        propertyChoiceBox.getItems().addAll(entityDTO.getPropertyDTOList());
+        if(entityDTO != null) {
+            propertyChoiceBox.getItems().clear();
+            propertyChoiceBox.getItems().addAll(entityDTO.getPropertyDTOList());
+        }
     }
 
 
@@ -184,18 +189,23 @@ public class ResultsController implements Initializable {
      * @param propertyDTO the propertyDTO which was chosen by the user.
      */
     public void onPropertySelect(PropertyDTO propertyDTO) {
-        TreeItem<String> root = propertyDetailsTreeView.getRoot();
+        if(propertyDTO != null) {
+            TreeItem<String> root = propertyDetailsTreeView.getRoot();
 
-        root.getChildren().clear();  // Clear previously added items
+            root.getChildren().clear();  // Clear previously added items
 
-        TreeItem<String> histogramItem = new TreeItem<>("Final Population's Property Values");
+            TreeItem<String> histogramItem = new TreeItem<>("Final Population's Property Values");
+            mainController.getPropertyValues(chosenExecutionID, propertyDTO).forEach(
+                    (value, amount) -> histogramItem.getChildren().add(new TreeItem<>("Value: " + value + ", Amount in population: " + amount)) // todo - fix bug when loading a new file after this was already shown
+            );
 
-        TreeItem<String> consistencyItem = new TreeItem<>("Consistency");
-        // todo - calculate consistency of the property
+            TreeItem<String> consistencyItem = new TreeItem<>("Consistency");
+            // todo - calculate consistency of the property
 
-        TreeItem<String> averageValueItem = new TreeItem<>("Average Value in Final Population");
-        // todo - calculate average value of the property
+            TreeItem<String> averageValueItem = new TreeItem<>("Average Value in Final Population");
+            // todo - calculate average value of the property
 
-        root.getChildren().addAll(histogramItem, consistencyItem, averageValueItem);
+            root.getChildren().addAll(histogramItem, consistencyItem, averageValueItem);
+        }
     }
 }

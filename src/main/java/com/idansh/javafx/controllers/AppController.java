@@ -1,5 +1,7 @@
 package com.idansh.javafx.controllers;
 
+import com.idansh.dto.entity.EntityDTO;
+import com.idansh.dto.property.PropertyDTO;
 import com.idansh.dto.simulation.LoadedSimulationDTO;
 import com.idansh.javafx.manager.SimulationManager;
 import javafx.fxml.FXML;
@@ -13,6 +15,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
@@ -226,5 +229,14 @@ public class AppController implements Initializable {
      */
     public void setEntityAmount(String entityName, int amount) {
         simulationManager.setEntityAmount(entityName, amount);
+    }
+
+    /**
+     * Gets from the simulation manager a map of:
+     * 1. key: the property's value
+     * 2. value: the amount of entities in the population with this value
+     */
+    public Map<Object, Integer> getPropertyValues(int simulationResultID, PropertyDTO propertyDTO) {
+        return simulationManager.getPropertyValues(simulationResultID, propertyDTO);
     }
 }

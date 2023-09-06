@@ -2,11 +2,13 @@ package com.idansh.javafx.manager;
 
 
 import com.idansh.dto.environment.EnvironmentVariablesListDTO;
+import com.idansh.dto.property.PropertyDTO;
 import com.idansh.dto.simulation.LoadedSimulationDTO;
 import com.idansh.dto.simulation.SimulationResultDTO;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Handles the simulations.
@@ -68,4 +70,13 @@ public class SimulationManager {
     public void setEntityAmount(String entityName, int amount) {
         engineHandler.setEntityAmount(entityName, amount);
     }
-}
+
+
+    /**
+     * Gets from the engine handler a map of:
+     * 1. key: the property's value
+     * 2. value: the amount of entities in the population with this value
+     */
+    public Map<Object, Integer> getPropertyValues(int simulationResultID, PropertyDTO propertyDTO) {
+        return engineHandler.getPropertyValues(simulationResultID, propertyDTO);
+    }}

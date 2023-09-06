@@ -1,12 +1,14 @@
 package com.idansh.javafx.manager;
 
 import com.idansh.dto.environment.EnvironmentVariablesListDTO;
+import com.idansh.dto.property.PropertyDTO;
 import com.idansh.dto.simulation.LoadedSimulationDTO;
 import com.idansh.dto.simulation.SimulationResultDTO;
 import com.idansh.engine.manager.EngineManager;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Connects the UI with the engine components through the various DTOs.
@@ -66,5 +68,15 @@ public class EngineHandler {
 
     public void setEntityAmount(String entityName, int amount) {
         engineManager.setEntityAmount(entityName, amount);
+    }
+
+
+    /**
+     * Gets from the engine a map of:
+     * 1. key: the property's value
+     * 2. value: the amount of entities in the population with this value
+     */
+    public Map<Object, Integer> getPropertyValues(int simulationResultID, PropertyDTO propertyDTO) {
+        return engineManager.getPropertyValues(simulationResultID, propertyDTO);
     }
 }
