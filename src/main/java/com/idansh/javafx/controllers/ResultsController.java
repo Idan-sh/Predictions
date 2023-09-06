@@ -12,7 +12,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -190,22 +192,43 @@ public class ResultsController implements Initializable {
      */
     public void onPropertySelect(PropertyDTO propertyDTO) {
         if(propertyDTO != null) {
-            TreeItem<String> root = propertyDetailsTreeView.getRoot();
+            boolean isNumeric = propertyDTO.getValue() instanceof Float || propertyDTO.getValue() instanceof Integer;
+            Float sum = 0f;     // Sum of all property values
+            Integer count = 0;  // Counter of how many different property values exist
 
+            TreeItem<String> root = propertyDetailsTreeView.getRoot();
             root.getChildren().clear();  // Clear previously added items
 
+            // For each property value, show the number of instances with said value
             TreeItem<String> histogramItem = new TreeItem<>("Final Population's Property Values");
-            mainController.getPropertyValues(chosenExecutionID, propertyDTO).forEach(
-                    (value, amount) -> histogramItem.getChildren().add(new TreeItem<>("Value: " + value + ", Amount in population: " + amount)) // todo - fix bug when loading a new file after this was already shown
-            );
+            for (Map.Entry<Object, Integer> entry : mainController.getPropertyValues(chosenExecutionID, propertyDTO).entrySet()) {
+                if(isNumeric) {
+                    if ((entry.getKey() instanceof Integer))
+                        sum += (Integer) entry.getKey();
+                    else
+                        sum += (Float) entry.getKey();
 
+                    count++;
+                }
+
+                histogramItem.getChildren().add(new TreeItem<>("Value: " + entry.getKey() + ", Amount in population: " + entry.getValue()));
+            }
+
+            // Show the consistency of the property's value
             TreeItem<String> consistencyItem = new TreeItem<>("Consistency");
             // todo - calculate consistency of the property
 
-            TreeItem<String> averageValueItem = new TreeItem<>("Average Value in Final Population");
-            // todo - calculate average value of the property
+            // If property is numeric, show the average value of the property in the final population
+            if(isNumeric) {
+                float average = sum / count;
 
-            root.getChildren().addAll(histogramItem, consistencyItem, averageValueItem);
+                TreeItem<String> averageValueItem = new TreeItem<>("Average Value in Final Population");
+                averageValueItem.getChildren().add(new TreeItem<>(String.valueOf(average)));
+
+                root.getChildren().addAll(histogramItem, consistencyItem, averageValueItem);
+            } else {
+                root.getChildren().addAll(histogramItem, consistencyItem);
+            }
         }
     }
 }
