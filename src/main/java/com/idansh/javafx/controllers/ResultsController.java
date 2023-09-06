@@ -1,14 +1,13 @@
 package com.idansh.javafx.controllers;
 
 import com.idansh.dto.entity.EntityDTO;
+import com.idansh.dto.property.PropertyDTO;
 import com.idansh.dto.simulation.RunningSimulationDTO;
 import com.idansh.dto.simulation.SimulationResultDTO;
 import com.idansh.javafx.helpers.ResultsTableItem;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.net.URL;
@@ -48,6 +47,15 @@ public class ResultsController implements Initializable {
     @FXML
     private TableColumn<EntityDTO, Integer> amountTableColumn;
 
+    // Execution Results Components:
+    @FXML
+    private ChoiceBox<EntityDTO> entityChoiceBox;
+    @FXML
+    private ChoiceBox<PropertyDTO> propertyChoiceBox;
+    @FXML
+    private TreeView<String> propertyDetailsTreeView;
+
+
     public void setMainController(AppController mainController) {
         this.mainController = mainController;
     }
@@ -63,6 +71,13 @@ public class ResultsController implements Initializable {
         // Setup Entity Amounts TableView:
         nameTableColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         amountTableColumn.setCellValueFactory(new PropertyValueFactory<>("currAmountInPopulation"));
+
+        // Setup on action events for entity and property choice boxes:
+        entityChoiceBox.setOnAction(event -> onEntitySelect(entityChoiceBox.getValue()));
+        propertyChoiceBox.setOnAction(event -> onPropertySelect(propertyChoiceBox.getValue()));
+
+        // Setup Execution Results tree view:
+        propertyDetailsTreeView.setRoot(new TreeItem<>("root-item"));
     }
 
 
@@ -132,6 +147,8 @@ public class ResultsController implements Initializable {
             // Remove previously shown items
             progressListView.getItems().clear();
             entityAmountsTableView.getItems().clear();
+            entityChoiceBox.getItems().clear();
+            propertyChoiceBox.getItems().clear();
 
             // Add completed ticks and time passed to the list view
             progressListView.getItems().addAll(ticksFormatter.apply(
@@ -143,6 +160,42 @@ public class ResultsController implements Initializable {
 
             // Add entity amounts to the table
             entityAmountsTableView.getItems().addAll(selectedItem.getEntitiesList());
+
+            // Add entities to the execution results choice box
+            entityChoiceBox.getItems().addAll(selectedItem.getEntitiesList());
         }
+    }
+
+
+    /**
+     * When an entity is chosen from the execution results section's entities choice box,
+     * Shows all properties of chosen entity in the properties choice box.
+     * @param entityDTO the entityDTO which was chosen by the user.
+     */
+    public void onEntitySelect(EntityDTO entityDTO) {
+        propertyChoiceBox.getItems().clear();
+        propertyChoiceBox.getItems().addAll(entityDTO.getPropertyDTOList());
+    }
+
+
+    /**
+     * When a property is chosen from the execution results section's properties choice box,
+     * Shows various information on it in the Tree View of the execution results.
+     * @param propertyDTO the propertyDTO which was chosen by the user.
+     */
+    public void onPropertySelect(PropertyDTO propertyDTO) {
+        TreeItem<String> root = propertyDetailsTreeView.getRoot();
+
+        root.getChildren().clear();  // Clear previously added items
+
+        TreeItem<String> histogramItem = new TreeItem<>("Final Population's Property Values");
+
+        TreeItem<String> consistencyItem = new TreeItem<>("Consistency");
+        // todo - calculate consistency of the property
+
+        TreeItem<String> averageValueItem = new TreeItem<>("Average Value in Final Population");
+        // todo - calculate average value of the property
+
+        root.getChildren().addAll(histogramItem, consistencyItem, averageValueItem);
     }
 }

@@ -47,4 +47,9 @@ public class PropertyDTO {
     public Object getValue() {
         return value;
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }
