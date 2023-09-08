@@ -4,7 +4,6 @@ package com.idansh.javafx.manager;
 import com.idansh.dto.environment.EnvironmentVariablesListDTO;
 import com.idansh.dto.property.PropertyDTO;
 import com.idansh.dto.simulation.LoadedSimulationDTO;
-import com.idansh.dto.simulation.SimulationResultDTO;
 
 import java.io.File;
 import java.util.List;
@@ -48,22 +47,21 @@ public class SimulationManager {
      * Runs the current loaded simulation.
      * @param environmentVariablesListDTO DTO containing a list of all the updated environment variables
      *                                   to run the simulation with.
-     * @return ID of the completed simulation.
      */
-    public int runSimulation(EnvironmentVariablesListDTO environmentVariablesListDTO) {
+    public void startSimulation(EnvironmentVariablesListDTO environmentVariablesListDTO) {
         if(!engineHandler.isSimulationLoaded()) {
             throw new RuntimeException("No simulation loaded! Please load before trying to run!");
         }
 
-        return engineHandler.runSimulation(environmentVariablesListDTO);
+        engineHandler.runSimulation(environmentVariablesListDTO);
     }
 
 
     /**
      * Get all the past simulations' results from the engine.
      */
-    public List<SimulationResultDTO> getPastSimulationsResults() {
-        return engineHandler.getPastSimulationsResults();
+    public List<Object> getSimulationsList() {
+        return engineHandler.getSimulationsList();
     }
 
 

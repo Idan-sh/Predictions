@@ -3,7 +3,6 @@ package com.idansh.javafx.manager;
 import com.idansh.dto.environment.EnvironmentVariablesListDTO;
 import com.idansh.dto.property.PropertyDTO;
 import com.idansh.dto.simulation.LoadedSimulationDTO;
-import com.idansh.dto.simulation.SimulationResultDTO;
 import com.idansh.engine.manager.EngineManager;
 
 import java.io.File;
@@ -53,17 +52,16 @@ public class EngineHandler {
      * and allows the user to choose which simulation to show full details of.
      * @throws RuntimeException In case that no simulations were previously ran.
      */
-    public List<SimulationResultDTO> getPastSimulationsResults() {
-        return engineManager.getPastSimulationsResults();
+    public List<Object> getSimulationsList() {
+        return engineManager.getSimulationsList();
     }
 
 
     /**
      * Initiates the running process of the current loaded simulation in the engine.
-     * @return ID of the simulation which finished running.
      */
-    public int runSimulation(EnvironmentVariablesListDTO environmentVariablesListDTO) {
-        return engineManager.runSimulation(environmentVariablesListDTO);
+    public void runSimulation(EnvironmentVariablesListDTO environmentVariablesListDTO) {
+        engineManager.createAndPutSimulation(environmentVariablesListDTO);
     }
 
     public void setEntityAmount(String entityName, int amount) {

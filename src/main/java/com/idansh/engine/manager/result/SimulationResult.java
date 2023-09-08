@@ -2,6 +2,9 @@ package com.idansh.engine.manager.result;
 
 import com.idansh.engine.entity.EntityManager;
 import com.idansh.engine.helpers.SimulationTime;
+import com.idansh.engine.world.World;
+
+import java.util.List;
 
 /**
  * Holds information on a single simulation that was completed.

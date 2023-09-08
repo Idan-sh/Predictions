@@ -19,7 +19,8 @@ import java.util.*;
  * Main engine component that in charge of a single simulation,
  * and the various functions of the simulation.
  */
-public class World {
+public class World implements Runnable {
+    private int id;                                                                 // The ID of the simulation, will be assigned on world run
     public final EntityManager entityManager;                                       // Contains all the entities (population) of the simulation
     private final Map<TerminationRule.Type, TerminationRule> terminationRules;      // Rules on when to end the simulation
     private final Map<String, Rule> rulesMap;                                       // Rules that can activate during the simulation
@@ -28,7 +29,7 @@ public class World {
     private final Counter tickCounter;                                              // The current iteration of the simulation
     private final Timer timer;                                                      // Timer for the termination rule SECONDS
     private final SimulationTime simulationTime;                                    // Holds the simulation's start and end times
-    private int id;                                                                 // The ID of the simulation, will be assigned on world run
+    private SimulationResult simulationResult;
 
 
     /**
@@ -43,6 +44,7 @@ public class World {
         this.tickCounter = new Counter(0);
         this.timer = new Timer();
         this.simulationTime = new SimulationTime();
+        this.simulationResult = null;
     }
 
 
@@ -72,6 +74,9 @@ public class World {
         this.tickCounter = new Counter(0);
         this.timer = new Timer();
         this.simulationTime = new SimulationTime();
+        this.entityManager.initEntityPopulation();
+        this.simulationResult = null;
+        this.id = SimulationIdGenerator.getID();
     }
 
 
@@ -88,7 +93,7 @@ public class World {
      * Creates the environment variables for the simulation to use,
      * according to the environment variable factories defined.
      */
-    public void InitEnvironmentVariables() {
+    public void initEnvironmentVariables() {
         activeEnvironmentVariables = environmentVariablesManager.createActiveEnvironmentVariables();
     }
 
@@ -119,17 +124,12 @@ public class World {
 
     /**
      * Start running the simulated world.
-     * @param runningSimulations Map of all currently running simulations. Will add the world when it runs to the map,
-     *                           and will remove itself after the running process is finished.
-     * @return The details on the simulation result.
+     * Saves the details of the simulation result.
      */
-    public SimulationResult run(Map<Integer, World> runningSimulations) {
-        // Add the running world to the current running simulations
-        runningSimulations.put(this.getId(), this);
-
+    @Override
+    public void run() {
         // Timer countdown for the termination rule SECONDS
         Countdown countdown = new Countdown();
-        id = SimulationIdGenerator.getID();
 
         // If a termination rule of SECONDS was set, starts a timer.
         if(terminationRules.containsKey(TerminationRule.Type.SECONDS))
@@ -137,9 +137,11 @@ public class World {
 
         // Check if the current tick has reached the termination rule tick defined, if one does not exist keeps going until reached the timer defined
         while((!terminationRules.containsKey(TerminationRule.Type.TICKS)) || (terminationRules.containsKey(TerminationRule.Type.TICKS) && tickCounter.getCount() < terminationRules.get(TerminationRule.Type.TICKS).getValue())) {
+            // todo - send to the UI a RunningSimulationDTO that contains current info on the simulation, to be added into an histogram.
+
             // Checks if the timer expired, if so end simulation
             if (countdown.isFinished())
-                return endSimulation(runningSimulations, "Timer Expired");
+                simulationResult = endSimulation("Timer Expired");
 
             // Remove all previously killed entities from the population
             entityManager.removeDeadEntitiesFromPopulation();
@@ -159,21 +161,17 @@ public class World {
         }
 
         // Ticks reached, end simulation
-        return endSimulation(runningSimulations, "Ticks Reached");
+        simulationResult = endSimulation("Ticks Reached");
     }
 
 
     /**
      * End a simulation with a String that defines why the simulation ended.
      * Only ends simulations on intended events, on errors the simulation will end according to the exception thrown.
-     * @param runningSimulations map of all currently running simulation, to remove this simulation from the map.
      * @param endReason string that defines the reason of why the simulation ended, which Termination Rule was activated.
      * @return the simulation's result details.
      */
-    private SimulationResult endSimulation(Map<Integer, World> runningSimulations, String endReason) {
-        // remove the world from the current running simulations
-        runningSimulations.remove(this.getId());
-
+    private SimulationResult endSimulation(String endReason) {
         simulationTime.setEndTimes();
         return new SimulationResult(
                 id,
@@ -208,6 +206,14 @@ public class World {
 
     public ActiveEnvironmentVariables getActiveEnvironmentVariables() {
         return activeEnvironmentVariables;
+    }
+
+    public SimulationResult getSimulationResult() {
+        return simulationResult;
+    }
+
+    public boolean isSimulationFinished() {
+        return simulationResult != null;
     }
 }
 

@@ -1,6 +1,5 @@
 package com.idansh.javafx.controllers;
 
-import com.idansh.dto.entity.EntityDTO;
 import com.idansh.dto.property.PropertyDTO;
 import com.idansh.dto.simulation.LoadedSimulationDTO;
 import com.idansh.javafx.manager.SimulationManager;
@@ -88,13 +87,15 @@ public class AppController implements Initializable {
     /**
      * Runs the current loaded simulation.
      */
-    public void runCurrentLoadedSimulation() {
+    public void startCurrentLoadedSimulation() {
         try{
-            int finishedSimulationID = simulationManager.runSimulation(loadedSimulationDTO.getEnvironmentVariablesListDTO());
-            showInformationAlert(
-                    "Simulation Completed Successfully",
-                    "completed simulation ID: " + finishedSimulationID
-            );
+            simulationManager.startSimulation(loadedSimulationDTO.getEnvironmentVariablesListDTO());
+
+            // todo - show this alert when a status of a simulation is changed from running to finished
+//            showInformationAlert(
+//                    "Simulation Completed Successfully",
+//                    "completed simulation ID: " + -1
+//            );
         } catch (RuntimeException e) {
             e.printStackTrace();
             showErrorAlert("Simulation Stopped!", e.getMessage());
@@ -208,11 +209,7 @@ public class AppController implements Initializable {
      */
     public List<Object> getSimulationExecutions() {
         // Create executions list and add all past executions to it
-        List<Object> executionsList = new ArrayList<>(simulationManager.getPastSimulationsResults());
-
-        // todo- add running executions, after threads is done
-
-        return executionsList;
+        return simulationManager.getSimulationsList();
     }
 
 
@@ -220,6 +217,7 @@ public class AppController implements Initializable {
      * Show the executions screen in the Results tab.
      */
     public void showExecutions() {
+        // todo- call this method every time interval
         resultsComponentController.showExecutions();
     }
 

@@ -2,6 +2,8 @@ package com.idansh.engine.property.instance;
 
 import com.idansh.engine.helpers.Range;
 
+import java.util.List;
+
 /**
  * A property for an entity, base class without the value,
  * Extend to add value types.
@@ -25,10 +27,6 @@ public class Property {
         this.type = type;
         this.value = value;
         this.range = range;
-    }
-
-    public void updateValue(Object value) {
-        this.value = value;
     }
 
     public String getName() {

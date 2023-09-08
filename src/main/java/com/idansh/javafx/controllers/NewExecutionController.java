@@ -5,7 +5,6 @@ import com.idansh.dto.environment.EnvironmentVariableDTO;
 import com.idansh.dto.simulation.LoadedSimulationDTO;
 import com.idansh.javafx.helpers.TextFormatterHelper;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -15,10 +14,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -71,7 +68,7 @@ public class NewExecutionController {
         }
 
         // Run the current loaded simulation
-        mainController.runCurrentLoadedSimulation();
+        mainController.startCurrentLoadedSimulation();
 
         // Move to the Results tab to see the simulation in progress
         mainController.moveToResultsTab();

@@ -16,8 +16,8 @@ public class SimulationTime {
     private LocalDateTime endDate;
 
     // Time in milliseconds since epoch to the start of the running process
-    private final long startTimeInMillis;
-    private long endTimeInMillis;
+    private final Long startTimeInMillis;
+    private Long endTimeInMillis;
 
 
     /**
@@ -26,7 +26,10 @@ public class SimulationTime {
      */
     public SimulationTime() {
         this.startDate = LocalDateTime.now();
+        this.endDate = null;
+
         this.startTimeInMillis = System.currentTimeMillis();
+        this.endTimeInMillis = null;
     }
 
     /**
@@ -42,6 +45,10 @@ public class SimulationTime {
      *         Returns -1 in case the end times were not set.
      */
     public float getSecondsPassed() {
+        // Check if the timer was stopped
+        if(endTimeInMillis == null)
+            return (System.currentTimeMillis() - startTimeInMillis) / 1000f;
+
         return (endTimeInMillis - startTimeInMillis) / 1000f;
     }
 

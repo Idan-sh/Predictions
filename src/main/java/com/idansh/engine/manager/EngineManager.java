@@ -18,20 +18,22 @@ import com.idansh.engine.jaxb.unmarshal.reader.Reader;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * The UI will handle the engine through this class.
  * Some methods will return a DTO that contains data from the simulation (without the logic of the engine elements).
  */
 public class EngineManager {
-    private World loadedWorld;  // The currently loaded world. This world will not run but only be used to create instances for running
-    private final Map<Integer, World> runningSimulations;
-    private final Map<Integer, SimulationResult> pastSimulations;
+    private World loadedWorld;                              // The currently loaded world. This world will not run but only be used to create instances for running
+    private final ExecutorService threadPool;               // Thread management for simulation runs
+    private final Map<Integer, World> simulationsPool;      // Simulated worlds map: currently running simulations and finished simulations. Key = ID of the simulation, Value = simulated world
 
     public EngineManager() {
         loadedWorld = null;
-        runningSimulations = new HashMap<>();
-        pastSimulations = new HashMap<>();
+        threadPool = Executors.newCachedThreadPool();
+        simulationsPool = new HashMap<>();
     }
 
 
@@ -115,15 +117,6 @@ public class EngineManager {
 
 
     /**
-     * Adds a newly finished simulation to the past simulations' collection.
-     * @param simulationResult a simulation result that contains information/details of the last simulation ran.
-     */
-    private void addSimulationResult(SimulationResult simulationResult){
-        pastSimulations.put(simulationResult.getId(), simulationResult);
-    }
-
-
-    /**
      * Loads a simulation for XML file.
      * @param file XML file with world data.
      */
@@ -133,38 +126,39 @@ public class EngineManager {
 
 
     /**
-     * Start running the current simulation that was loaded.
-     * Loads user received input for environment variables.
+     * Create a runnable World object and add it to the thread pool,
+     * load user received input of environment variables into the runnable World,
+     * and execute the thread.
+     * This thread will run sometime in the future, according to the JVM thread pool choice.
      * @param environmentVariablesListDTO contains data of environment variables to update in the simulation.
-     * @return ID of the simulation which ended.
      */
-    public int runSimulation(EnvironmentVariablesListDTO environmentVariablesListDTO) {
-        World runningWorldInstance = new World(loadedWorld);
+    public void createAndPutSimulation(EnvironmentVariablesListDTO environmentVariablesListDTO) {
+        World runnableWorld = new World(loadedWorld);
 
-        runningWorldInstance.entityManager.initEntityPopulation();
-        updateEnvironmentVariablesFromInput(environmentVariablesListDTO);
+        updateEnvironmentVariablesFromInput(runnableWorld, environmentVariablesListDTO);
 
-        // Run the simulation
-        SimulationResult simulationResult = runningWorldInstance.run(runningSimulations);
+        // Add the simulation world to the simulations pool
+        simulationsPool.put(runnableWorld.getId(), runnableWorld);
 
-        // Save the simulation result
-        addSimulationResult(simulationResult);
-
-        return simulationResult.getId();
+        // Run the simulation thread at some time in the future
+        threadPool.execute(runnableWorld);
     }
 
 
     /**
-     * Updates the values of received environment variables in the simulated world.
+     * Updates the values of received environment variables of a simulated world.
+     * @param runningWorldInstance a World object that is initialized for a simulation run.
      * @param environmentVariablesListDTO DTO that contains data of multiple environment variables received from the user.
      */
-    private void updateEnvironmentVariablesFromInput(EnvironmentVariablesListDTO environmentVariablesListDTO) {
+    private void updateEnvironmentVariablesFromInput(World runningWorldInstance, EnvironmentVariablesListDTO environmentVariablesListDTO) {
         environmentVariablesListDTO.getEnvironmentVariableInputDTOs().forEach(
                 e -> {
-                    PropertyFactory environmentVariable = loadedWorld.environmentVariablesManager.getEnvironmentVariable(e.getName());
+                    PropertyFactory environmentVariable = runningWorldInstance.environmentVariablesManager.getEnvironmentVariable(e.getName());
                     environmentVariable.updateValue(e.getValue());
                 }
         );
+
+        runningWorldInstance.initEnvironmentVariables();
     }
 
 
@@ -190,57 +184,75 @@ public class EngineManager {
 
 
     /**
-     * Get SimulationResultDTO list containing information on past simulations' results.
+     * Get a list of all past and present simulations.
+     * Past simulations will be in the form of SimulationResultDTO,
+     * while currently running simulations will be in the form of RunningSimulationDTO.
      */
-    public List<SimulationResultDTO> getPastSimulationsResults() {
-        List<SimulationResultDTO> retPastSimulations = new ArrayList<>();
+    public List<Object> getSimulationsList() {
+        List<Object> retSimulations = new ArrayList<>();
 
-        pastSimulations.forEach(
-                (id, simulationResult) -> {
-                    // Create simulation result DTO
-                    SimulationResultDTO simulationResultDTO = new SimulationResultDTO(
-                            simulationResult.getId(),
-                            simulationResult.getSimulationTime(),
-                            simulationResult.getCompletedTicks(),
-                            simulationResult.getMaxTicks()
-                    );
-
-                    simulationResult.getEntityManager().getEntityFactories().forEach(
-                            (entityName, entityFactory) -> {
-                                EntityDTO entityDTO = new EntityDTO(
-                                        entityName,
-                                        entityFactory.getPopulationCount(),
-                                        entityFactory.getInitPopulation());
-
-                                // Add properties DTOs to the entity DTO
-                                entityFactory.getPropertiesToAssign().forEach(
-                                        (propertyFactoryName, propertyFactory) -> {
-                                            Range range = propertyFactory.getRange();
-                                            RangeDTO rangeDTO = null;
-
-                                            if(range != null)
-                                                rangeDTO = new RangeDTO(range.getBottom(), range.getTop());
-
-                                            entityDTO.addPropertyDTOtoList(
-                                                    new PropertyDTO(
-                                                            propertyFactoryName,
-                                                            propertyFactory.getType().getTypeString(),
-                                                            rangeDTO,
-                                                            propertyFactory.isRandomGenerated(),
-                                                            propertyFactory.getValue())
-                                            );
-                                        }
-                                );
-                                // Add the created Entity DTO to the Simulation Result DTO
-                                simulationResultDTO.addEntityDTO(entityDTO);
-                            }
-                    );
-                    // Add simulation result DTO to the Past Simulations list
-                    retPastSimulations.add(simulationResultDTO);
+        simulationsPool.forEach(
+                (id, world) -> {
+                    if (world.isSimulationFinished()) {
+                        retSimulations.add(getSimulationResultDTO(world));
+                    } else {
+                        retSimulations.add(getRunningSimulationDTO(world));
+                    }
                 }
         );
 
-        return retPastSimulations;
+        return retSimulations;
+    }
+
+
+    /**
+     * Given a finished simulation world, get the result as a DTO object.
+     * @param world instance of a simulated world that has finished working.
+     * @return DTO that contains information about the simulation and its result.
+     */
+    private SimulationResultDTO getSimulationResultDTO(World world) {
+        SimulationResult simulationResult = world.getSimulationResult();
+
+        // Create simulation result DTO
+        SimulationResultDTO simulationResultDTO = new SimulationResultDTO(
+                simulationResult.getId(),
+                simulationResult.getSimulationTime(),
+                simulationResult.getCompletedTicks(),
+                simulationResult.getMaxTicks()
+        );
+
+        simulationResult.getEntityManager().getEntityFactories().forEach(
+                (entityName, entityFactory) -> {
+                    EntityDTO entityDTO = new EntityDTO(
+                            entityName,
+                            entityFactory.getPopulationCount(),
+                            entityFactory.getInitPopulation());
+
+                    // Add properties DTOs to the entity DTO
+                    entityFactory.getPropertiesToAssign().forEach(
+                            (propertyFactoryName, propertyFactory) -> {
+                                Range range = propertyFactory.getRange();
+                                RangeDTO rangeDTO = null;
+
+                                if (range != null)
+                                    rangeDTO = new RangeDTO(range.getBottom(), range.getTop());
+
+                                entityDTO.addPropertyDTOtoList(
+                                        new PropertyDTO(
+                                                propertyFactoryName,
+                                                propertyFactory.getType().getTypeString(),
+                                                rangeDTO,
+                                                propertyFactory.isRandomGenerated(),
+                                                propertyFactory.getValue())
+                                );
+                            }
+                    );
+                    // Add the created Entity DTO to the Simulation Result DTO
+                    simulationResultDTO.addEntityDTO(entityDTO);
+                }
+        );
+
+        return simulationResultDTO;
     }
 
 
@@ -248,92 +260,84 @@ public class EngineManager {
      * Get a list of all currently running simulations.
      * @return a DTO List of running simulations.
      */
-    public List<RunningSimulationDTO> getRunningSimulations() {
-        List<RunningSimulationDTO> runningSimulationsList = new ArrayList<>();
+    private RunningSimulationDTO getRunningSimulationDTO(World world) {
+        RunningSimulationDTO runningSimulationDTO =
+                new RunningSimulationDTO(
+                        world.getId(),
+                        getEnvironmentVariablesListDTO(world),
+                        world.getSimulationTime(),
+                        world.getTickCount(),
+                        world.getTerminationRules().get(TerminationRule.Type.TICKS).getValue()
+                );
 
-        runningSimulations.forEach(
-                (id, world) -> {
-                    RunningSimulationDTO runningSimulationDTO =
-                            new RunningSimulationDTO(
-                                    id,
-                                    getEnvironmentVariablesListDTO(world),
-                                    world.getSimulationTime(),
-                                    world.getTickCount(),
-                                    world.getTerminationRules().get(TerminationRule.Type.TICKS).getValue()
-                                    );
+        // Add Entities:
+        world.entityManager.getEntityFactories().forEach(
+                (entityFactoryName, entityFactory) -> {
+                    // Create entity DTO
+                    EntityDTO entityDTO = new EntityDTO(
+                            entityFactoryName,
+                            entityFactory.getPopulationCount(),
+                            entityFactory.getPopulationCount());
 
-                    // Add Entities:
-                    world.entityManager.getEntityFactories().forEach(
-                            (entityFactoryName, entityFactory) -> {
-                                // Create entity DTO
-                                EntityDTO entityDTO = new EntityDTO(
-                                        entityFactoryName,
-                                        entityFactory.getPopulationCount(),
-                                        entityFactory.getPopulationCount());
+                    // Create properties for the entity DTO
+                    entityFactory.getPropertiesToAssign().forEach(
+                            (propertyFactoryName, propertyFactory) -> {
+                                Range range = propertyFactory.getRange();
+                                RangeDTO rangeDTO;
 
-                                // Create properties for the entity DTO
-                                entityFactory.getPropertiesToAssign().forEach(
-                                        (propertyFactoryName, propertyFactory) -> {
-                                            Range range = propertyFactory.getRange();
-                                            RangeDTO rangeDTO;
+                                // Check if range exists, if so then create DTO from it
+                                if (range != null)
+                                    rangeDTO = new RangeDTO(range.getBottom(), range.getTop());
+                                else
+                                    rangeDTO = null;
 
-                                            // Check if range exists, if so then create DTO from it
-                                            if(range != null)
-                                                rangeDTO = new RangeDTO(range.getBottom(), range.getTop());
-                                            else
-                                                rangeDTO = null;
-
-                                            PropertyDTO propertyDTO = new PropertyDTO(
-                                                    propertyFactoryName,
-                                                    propertyFactory.getType().getTypeString(),
-                                                    rangeDTO,
-                                                    propertyFactory.isRandomGenerated(),
-                                                    propertyFactory.isRandomGenerated() ? null : propertyFactory.createProperty().getValue()    // If the value is not random, then get the fixed initial value
-                                            );
-                                            entityDTO.addPropertyDTOtoList(propertyDTO);
-                                        }
+                                PropertyDTO propertyDTO = new PropertyDTO(
+                                        propertyFactoryName,
+                                        propertyFactory.getType().getTypeString(),
+                                        rangeDTO,
+                                        propertyFactory.isRandomGenerated(),
+                                        propertyFactory.isRandomGenerated() ? null : propertyFactory.createProperty().getValue()    // If the value is not random, then get the fixed initial value
                                 );
-                                runningSimulationDTO.addEntityDTO(entityDTO);
+                                entityDTO.addPropertyDTOtoList(propertyDTO);
                             }
                     );
-
-                    // Add Rules:
-                    world.getRulesMap().forEach(
-                            (ruleName, rule) -> {
-                                // Create rule DTO
-                                RuleDTO ruleDTO = new RuleDTO(
-                                        ruleName,
-                                        rule.getActivation().getTicks(),
-                                        rule.getActivation().getProbability(),
-                                        rule.getActionsSet().size()
-                                );
-
-                                // Add actions' names to the DTO
-                                rule.getActionsSet().forEach(
-                                        a -> ruleDTO.addActionName(a.getActionTypeString())
-                                );
-
-                                runningSimulationDTO.addRuleDTO(ruleDTO);
-                            }
-                    );
-
-                    // Add Termination Rules:
-                    world.getTerminationRules().forEach(
-                            (terminationRuleType, terminationRule) -> {
-                                TerminationRuleDTO terminationRuleDTO = new TerminationRuleDTO(
-                                        TerminationRule.Type.getTypeString(terminationRuleType),
-                                        terminationRule.getValue()
-                                );
-
-                                runningSimulationDTO.addTerminationRuleDTO(terminationRuleDTO);
-                            }
-                    );
-
-                    runningSimulationsList.add(runningSimulationDTO);
+                    runningSimulationDTO.addEntityDTO(entityDTO);
                 }
         );
 
-        return runningSimulationsList;
+        // Add Rules:
+        world.getRulesMap().forEach(
+                (ruleName, rule) -> {
+                    // Create rule DTO
+                    RuleDTO ruleDTO = new RuleDTO(
+                            ruleName,
+                            rule.getActivation().getTicks(),
+                            rule.getActivation().getProbability(),
+                            rule.getActionsSet().size()
+                    );
+
+                    // Add actions' names to the DTO
+                    rule.getActionsSet().forEach(
+                            a -> ruleDTO.addActionName(a.getActionTypeString())
+                    );
+
+                    runningSimulationDTO.addRuleDTO(ruleDTO);
+                }
+        );
+
+        // Add Termination Rules:
+        world.getTerminationRules().forEach(
+                (terminationRuleType, terminationRule) -> {
+                    TerminationRuleDTO terminationRuleDTO = new TerminationRuleDTO(
+                            TerminationRule.Type.getTypeString(terminationRuleType),
+                            terminationRule.getValue()
+                    );
+
+                    runningSimulationDTO.addTerminationRuleDTO(terminationRuleDTO);
+                }
+        );
+
+        return runningSimulationDTO;
     }
 
 
@@ -354,7 +358,7 @@ public class EngineManager {
     public Map<Object, Integer> getPropertyValues(int simulationResultID, PropertyDTO propertyDTO) {
         Map<Object, Integer> retValuesMap = new LinkedHashMap<>();
 
-        pastSimulations.get(simulationResultID).getEntityManager().getPopulation().forEach(
+        simulationsPool.get(simulationResultID).entityManager.getPopulation().forEach(
                 entity -> {
                     Object entityValue = entity.getPropertyByName(propertyDTO.getName()).getValue();
 

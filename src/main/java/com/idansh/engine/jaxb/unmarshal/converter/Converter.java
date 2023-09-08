@@ -42,7 +42,7 @@ public abstract class Converter {
                 p -> retWorld.addEnvironmentVariableFactory(environmentVariableConvert(p))
         );
 
-        retWorld.InitEnvironmentVariables();
+        retWorld.initEnvironmentVariables();
 
         // Iterates over all PRDEntities, converts each entity and adds it to the world
         prdWorld.getPRDEntities().getPRDEntity().forEach(
