@@ -81,6 +81,8 @@ public class ResultsController implements Initializable {
 
         // Setup Execution Results tree view:
         propertyDetailsTreeView.setRoot(new TreeItem<>("root-item"));
+
+        // todo- create thread that calls for showExecutions every 200ms
     }
 
 
@@ -143,7 +145,7 @@ public class ResultsController implements Initializable {
 
         ResultsTableItem selectedItem = executionListTableView.getSelectionModel().getSelectedItem();
 
-        if(selectedItem != null) {
+        if (selectedItem != null) {
             // todo- output data to another component, this will query the engine every 200-300 ms
             //  and request the most recent details of the simulation chosen. TASK thread will be appointed.
             chosenExecutionID = selectedItem.getId();
@@ -173,6 +175,15 @@ public class ResultsController implements Initializable {
 
 
     /**
+     * Chooses the last simulation execution in the executions list,
+     * shows that simulation execution's details.
+     */
+    public void chooseLastExecution() {
+        executionListTableView.getSelectionModel().select(executionListTableView.getItems().size() - 1);    // select the last added simulation execution
+        selectTableItem();  // show its details
+    }
+
+    /**
      * When an entity is chosen from the execution results section's entities choice box,
      * Shows all properties of chosen entity in the properties choice box.
      * @param entityDTO the entityDTO which was chosen by the user.
@@ -191,7 +202,7 @@ public class ResultsController implements Initializable {
      * @param propertyDTO the propertyDTO which was chosen by the user.
      */
     public void onPropertySelect(PropertyDTO propertyDTO) {
-        if(propertyDTO != null) {
+        if (propertyDTO != null) {
             boolean isNumeric = propertyDTO.getValue() instanceof Float || propertyDTO.getValue() instanceof Integer;
             Float sum = 0f;     // Sum of all property values
             Integer count = 0;  // Counter of how many different property values exist
@@ -202,7 +213,7 @@ public class ResultsController implements Initializable {
             // For each property value, show the number of instances with said value
             TreeItem<String> histogramItem = new TreeItem<>("Final Population's Property Values");
             for (Map.Entry<Object, Integer> entry : mainController.getPropertyValues(chosenExecutionID, propertyDTO).entrySet()) {
-                if(isNumeric) {
+                if (isNumeric) {
                     if ((entry.getKey() instanceof Integer))
                         sum += (Integer) entry.getKey();
                     else
@@ -219,7 +230,7 @@ public class ResultsController implements Initializable {
             // todo - calculate consistency of the property
 
             // If property is numeric, show the average value of the property in the final population
-            if(isNumeric) {
+            if (isNumeric) {
                 float average = sum / count;
 
                 TreeItem<String> averageValueItem = new TreeItem<>("Average Value in Final Population");

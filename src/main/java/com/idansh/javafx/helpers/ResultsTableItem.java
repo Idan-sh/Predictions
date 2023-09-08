@@ -16,7 +16,7 @@ public class ResultsTableItem {
     private final SimulationTime simulationTime;
     private final String startDateString, endDateString;
     private final int completedTicks, maxTicks;
-    private List<EntityDTO> entitiesList;
+    private final List<EntityDTO> entitiesList;
     private final String status;
 
     public ResultsTableItem(int id, List<EntityDTO> entitiesList, SimulationTime simulationTime, String status, int completedTicks, int maxTicks) {

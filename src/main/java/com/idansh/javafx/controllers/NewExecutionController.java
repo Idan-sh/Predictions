@@ -70,7 +70,10 @@ public class NewExecutionController {
         // Run the current loaded simulation
         mainController.startCurrentLoadedSimulation();
 
-        // Move to the Results tab to see the simulation in progress
+        // Show Currently running simulation executions in the Results tab
+        mainController.showExecutions();
+
+        // Move to the Results tab to see the simulations in progress
         mainController.moveToResultsTab();
     }
 

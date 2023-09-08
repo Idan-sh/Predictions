@@ -167,6 +167,7 @@ public class AppController implements Initializable {
      */
     public void moveToResultsTab() {
         appTabPane.getSelectionModel().select(resultsTab);
+        resultsComponentController.chooseLastExecution();
     }
 
 
