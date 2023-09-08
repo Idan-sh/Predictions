@@ -61,6 +61,10 @@ public class EngineHandler {
      * Initiates the running process of the current loaded simulation in the engine.
      */
     public void runSimulation(EnvironmentVariablesListDTO environmentVariablesListDTO) {
+        if(!isSimulationLoaded()) {
+            throw new RuntimeException("No simulation loaded! Please load before trying to run!");
+        }
+
         engineManager.createAndPutSimulation(environmentVariablesListDTO);
     }
 

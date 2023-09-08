@@ -2,7 +2,7 @@ package com.idansh.javafx.controllers;
 
 import com.idansh.dto.property.PropertyDTO;
 import com.idansh.dto.simulation.LoadedSimulationDTO;
-import com.idansh.javafx.manager.SimulationManager;
+import com.idansh.javafx.manager.EngineHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -12,7 +12,6 @@ import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -64,7 +63,7 @@ public class AppController implements Initializable {
 
 
     // Simulation manager object that handles the simulation itself
-    private SimulationManager simulationManager;
+    private EngineHandler engineHandler;
     private LoadedSimulationDTO loadedSimulationDTO;
     private boolean isSimulationLoaded = false;
 
@@ -79,7 +78,7 @@ public class AppController implements Initializable {
             detailsComponentController.setMainController(this);
             newExecutionComponentController.setMainController(this);
             resultsComponentController.setMainController(this);
-            simulationManager = new SimulationManager();
+            engineHandler = new EngineHandler();
         }
     }
 
@@ -89,7 +88,7 @@ public class AppController implements Initializable {
      */
     public void startCurrentLoadedSimulation() {
         try{
-            simulationManager.startSimulation(loadedSimulationDTO.getEnvironmentVariablesListDTO());
+            engineHandler.runSimulation(loadedSimulationDTO.getEnvironmentVariablesListDTO());
 
             // todo - show this alert when a status of a simulation is changed from running to finished
 //            showInformationAlert(
@@ -125,7 +124,7 @@ public class AppController implements Initializable {
 
         // Try to load the simulation from the received file
         try {
-            simulationManager.loadSimulationFromFile(selectedFile);
+            engineHandler.loadSimulationFromFile(selectedFile);
             showInformationAlert(
                     "Successfully Loaded Simulation",
                     "Showing details of the loaded simulation...\n" +
@@ -136,7 +135,7 @@ public class AppController implements Initializable {
             simulationPathTextField.setText(selectedFile.getPath());    // Set the file's path into the TextField
 
             // Get the current simulation's details, save it for variable updating, and output its details to the screen
-            loadedSimulationDTO = simulationManager.getLoadedSimulationDetails();
+            loadedSimulationDTO = engineHandler.getLoadedSimulationDetails();
             detailsComponentController.displayCurrentSimulationDetails(loadedSimulationDTO);   // Display the current loaded simulation's details
             newExecutionComponentController.displayDetails(loadedSimulationDTO);               // Display the various variables that the user can interact with
             moveToDetailsTab();
@@ -209,7 +208,7 @@ public class AppController implements Initializable {
      */
     public List<Object> getSimulationExecutions() {
         // Create executions list and add all past executions to it
-        return simulationManager.getSimulationsList();
+        return engineHandler.getSimulationsList();
     }
 
 
@@ -226,7 +225,7 @@ public class AppController implements Initializable {
      *  Send the received entity amount input to the engine to be saved for the simulation run process.
      */
     public void setEntityAmount(String entityName, int amount) {
-        simulationManager.setEntityAmount(entityName, amount);
+        engineHandler.setEntityAmount(entityName, amount);
     }
 
     /**
@@ -235,6 +234,6 @@ public class AppController implements Initializable {
      * 2. value: the amount of entities in the population with this value
      */
     public Map<Object, Integer> getPropertyValues(int simulationResultID, PropertyDTO propertyDTO) {
-        return simulationManager.getPropertyValues(simulationResultID, propertyDTO);
+        return engineHandler.getPropertyValues(simulationResultID, propertyDTO);
     }
 }
