@@ -26,9 +26,11 @@ public class ResultsController implements Initializable {
         public void run() {
             try {
                 while (!runningExecutionsIdSet.isEmpty()) {
-                    for (Integer id : runningExecutionsIdSet) {
-                        updateExecution(id);
-                        Platform.runLater(ResultsController.this::selectTableItem); // Tell the JAT to show the updated chosen execution info
+                    Iterator<Integer> idIterator = runningExecutionsIdSet.iterator();
+                    while (idIterator.hasNext()) {
+                        int id = idIterator.next();                                     // Get the ID of the simulation execution
+                        if (updateExecution(id)) idIterator.remove();                   // Update the simulation execution with the ID, if the simulation has ended, removes it from the runningExecutionsIdSet
+                        Platform.runLater(ResultsController.this::selectTableItem);     // Tell the JAT to show the updated chosen execution info
                     }
                     sleep(200);
                 }
@@ -146,8 +148,9 @@ public class ResultsController implements Initializable {
     /**
      * Update info of a simulation execution in the Executions List.
      * @param chosenExecutionID ID of the simulation to update.
+     * @return true if the chosen execution has finished, false otherwise.
      */
-    public void updateExecution(int chosenExecutionID) {
+    public boolean updateExecution(int chosenExecutionID) {
         ResultsTableItem resultsTableItem = executionsPool.get(chosenExecutionID);
 
         if(resultsTableItem == null)
@@ -167,8 +170,6 @@ public class ResultsController implements Initializable {
                     simulationResult.getCompletedTicks(),
                     simulationResult.getMaxTicks()
             ));
-            // This simulation execution has finished, remove it from the runningExecutionsIdSet
-            runningExecutionsIdSet.remove(simulationResult.getId());
 
             Platform.runLater(() ->
                 mainController.showInformationAlert(
@@ -177,6 +178,7 @@ public class ResultsController implements Initializable {
                 )
             );
 
+            return true;    // This simulation execution has finished, return true
         } else if (execution instanceof RunningSimulationDTO) {
             RunningSimulationDTO simulationResult = (RunningSimulationDTO) execution;
             resultsTableItem.update(new ResultsTableItem(
@@ -187,6 +189,8 @@ public class ResultsController implements Initializable {
                     simulationResult.getCompletedTicks(),
                     simulationResult.getMaxTicks()
             ));
+
+            return false;   // This simulation execution is still running, return false
         } else throw new IllegalArgumentException("Invalid execution type received: \""
                 + execution.getClass()
                 + "\", only accepts executions of type SimulationResultDTO or CurrentSimulationDTO");
