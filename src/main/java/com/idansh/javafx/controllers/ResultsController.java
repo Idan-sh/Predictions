@@ -10,6 +10,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 
 import java.net.URL;
 import java.util.*;
@@ -38,7 +40,7 @@ public class ResultsController implements Initializable {
                         int id = idIterator.next();                                     // Get the ID of the simulation execution
                         if (updateExecution(id)) idIterator.remove();                   // Update the simulation execution with the ID, if the simulation has ended, removes it from the runningExecutionsIdSet
 
-                        // todo - change this to make the UI data to listen to the data changes, instead of showing the whole screen and putting pressure on the JAT
+                        // todo - change this to make the UI data to listen to the data changes, instead of refreshing the whole screen and putting pressure on the JAT
                         Platform.runLater(ResultsController.this::selectTableItem);     // Tell the JAT to show the updated chosen execution info
                     }
                     sleep(200);     // Pause updating
@@ -77,6 +79,10 @@ public class ResultsController implements Initializable {
     private TableColumn<EntityDTO, String> nameTableColumn;
     @FXML
     private TableColumn<EntityDTO, Integer> amountTableColumn;
+    @FXML
+    private HBox simulationConrolHBox;
+    @FXML
+    private GridPane executionDetailsGridPane;
 
     // Execution Results Components:
     @FXML
@@ -85,6 +91,9 @@ public class ResultsController implements Initializable {
     private ChoiceBox<PropertyDTO> propertyChoiceBox;
     @FXML
     private TreeView<String> propertyDetailsTreeView;
+    @FXML
+    private HBox executionResultsHBox;
+
     private int chosenExecutionID;
 
 
@@ -213,10 +222,12 @@ public class ResultsController implements Initializable {
         Function<Float, String> timerFormatter = (timePassed) -> String.format("Time Passed: %.3f Seconds", timePassed);
 
         ResultsTableItem selectedItem = executionListTableView.getSelectionModel().getSelectedItem();
+        executionDetailsGridPane.setDisable(selectedItem == null);  // Disable details section if no execution was chosen
 
         if (selectedItem != null) {
-            // todo- output data to another component, this will query the engine every 200-300 ms
-            //  and request the most recent details of the simulation chosen. TASK thread will be appointed.
+            simulationConrolHBox.setDisable(selectedItem.getStatus().equals(COMPLETED));    // Disable the simulation control buttons if the execution chosen has finished, otherwise enable them
+            executionResultsHBox.setDisable(selectedItem.getStatus().equals(IN_PROGRESS));  // Disable the simulation results section if the execution chosen is still in progress, otherwise enable it
+
             chosenExecutionID = selectedItem.getId();
 
             // Remove previously shown items

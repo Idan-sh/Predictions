@@ -63,7 +63,7 @@
                         </Label>
                      </children>
                   </HBox>
-                  <GridPane minHeight="-Infinity" minWidth="-Infinity" VBox.vgrow="NEVER">
+                  <GridPane fx:id="executionDetailsGridPane" disable="true" minHeight="-Infinity" minWidth="-Infinity" VBox.vgrow="NEVER">
                     <columnConstraints>
                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -83,7 +83,7 @@
                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                            </columnResizePolicy>
                         </TableView>
-                        <HBox alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" spacing="10.0" style="-fx-border-color: #bfbfbf;" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.valignment="TOP" GridPane.vgrow="ALWAYS">
+                        <HBox fx:id="simulationConrolHBox" alignment="CENTER" disable="true" minHeight="-Infinity" minWidth="-Infinity" spacing="10.0" style="-fx-border-color: #bfbfbf;" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.valignment="TOP" GridPane.vgrow="ALWAYS">
                            <children>
                               <Label alignment="CENTER" contentDisplay="CENTER" minWidth="-Infinity" text="Simulation Controls:" textAlignment="CENTER" wrapText="true" HBox.hgrow="NEVER">
                                  <font>
@@ -124,7 +124,7 @@
                         </Label>
                      </children>
                   </HBox>
-                  <HBox VBox.vgrow="ALWAYS">
+                  <HBox fx:id="executionResultsHBox" disable="true" VBox.vgrow="ALWAYS">
                      <children>
                         <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0">
                            <children>
