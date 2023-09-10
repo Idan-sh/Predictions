@@ -21,6 +21,13 @@ import java.util.function.Function;
  * this screen will be in charge of showing the result of previous ran simulations.
  */
 public class ResultsController implements Initializable {
+    /**
+     * a Thread that when being run will go through every currently running execution,
+     * and update its data by pulling it from the engine.
+     * After all currently running executions are finished, the thread will die,
+     * so every time a new execution is added into the system, it will be checked if the thread is running,
+     * and if not - a new one will be created.
+     */
     private class UpdaterThread extends Thread {
         @Override
         public void run() {
@@ -30,9 +37,11 @@ public class ResultsController implements Initializable {
                     while (idIterator.hasNext()) {
                         int id = idIterator.next();                                     // Get the ID of the simulation execution
                         if (updateExecution(id)) idIterator.remove();                   // Update the simulation execution with the ID, if the simulation has ended, removes it from the runningExecutionsIdSet
+
+                        // todo - change this to make the UI data to listen to the data changes, instead of showing the whole screen and putting pressure on the JAT
                         Platform.runLater(ResultsController.this::selectTableItem);     // Tell the JAT to show the updated chosen execution info
                     }
-                    sleep(200);
+                    sleep(200);     // Pause updating
                 }
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
@@ -40,7 +49,7 @@ public class ResultsController implements Initializable {
         }
     }
 
-    private final String COMPLETED = "Completed", IN_PROGRESS = "In Progress", NOT_AVAILABLE = "N/A";
+    private final String COMPLETED = "Completed", IN_PROGRESS = "In Progress";
 
     private AppController mainController;
     private Set<Integer> runningExecutionsIdSet;
@@ -86,8 +95,8 @@ public class ResultsController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // Setup Execution List TableView:
-        idTableColumn.setCellValueFactory(cellData -> cellData.getValue().idProperty().asString());
-        startTableColumn.setCellValueFactory(cellData -> cellData.getValue().startTimeProperty());
+        idTableColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        startTableColumn.setCellValueFactory(new PropertyValueFactory<>("startTime"));
         endTableColumn.setCellValueFactory(cellData -> cellData.getValue().endTimeProperty());
         statusTableColumn.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
 
@@ -102,10 +111,10 @@ public class ResultsController implements Initializable {
         // Setup Execution Results tree view:
         propertyDetailsTreeView.setRoot(new TreeItem<>("root-item"));
 
+        // Setup running executions data:
         executionsPool = new HashMap<>();
         runningExecutionsIdSet = new HashSet<>();
-
-        updaterThread = new UpdaterThread();
+        updaterThread = new UpdaterThread();        // Will update the running executions' info
     }
 
 
@@ -162,15 +171,13 @@ public class ResultsController implements Initializable {
         // Check if the execution is still running or if it has finished
         if (execution instanceof SimulationResultDTO) {
             SimulationResultDTO simulationResult = (SimulationResultDTO) execution;
-            resultsTableItem.update(new ResultsTableItem(
-                    simulationResult.getId(),
-                    simulationResult.getEntityDTOList(),
+            resultsTableItem.update(
                     simulationResult.getSimulationTime(),
                     COMPLETED,
-                    simulationResult.getCompletedTicks(),
-                    simulationResult.getMaxTicks()
-            ));
+                    simulationResult.getCompletedTicks()
+            );
 
+            // Tell JAT to output popup alert that this simulation execution has finished
             Platform.runLater(() ->
                 mainController.showInformationAlert(
                         "Simulation Completed Successfully",
@@ -181,14 +188,11 @@ public class ResultsController implements Initializable {
             return true;    // This simulation execution has finished, return true
         } else if (execution instanceof RunningSimulationDTO) {
             RunningSimulationDTO simulationResult = (RunningSimulationDTO) execution;
-            resultsTableItem.update(new ResultsTableItem(
-                    simulationResult.getId(),
-                    simulationResult.getEntityDTOList(),
+            resultsTableItem.update(
                     simulationResult.getSimulationTime(),
                     IN_PROGRESS,
-                    simulationResult.getCompletedTicks(),
-                    simulationResult.getMaxTicks()
-            ));
+                    simulationResult.getCompletedTicks()
+            );
 
             return false;   // This simulation execution is still running, return false
         } else throw new IllegalArgumentException("Invalid execution type received: \""
@@ -268,7 +272,8 @@ public class ResultsController implements Initializable {
      */
     public void onPropertySelect(PropertyDTO propertyDTO) {
         if (propertyDTO != null) {
-            boolean isNumeric = propertyDTO.getValue() instanceof Float || propertyDTO.getValue() instanceof Integer;
+            boolean isNumeric = propertyDTO.getType().equals("float") || propertyDTO.getType().equals("decimal");
+
             Float sum = 0f;     // Sum of all property values
             Integer count = 0;  // Counter of how many different property values exist
 

@@ -16,18 +16,21 @@ import java.util.List;
  * Defines an item in the table view of the simulation executions in the "Results" tab.
  */
 public class ResultsTableItem {
-    private final IntegerProperty id;
-    private final StringProperty startTime;
+    private final int id;
+    private final String startTime;
     private final StringProperty endTime;
     private final StringProperty status;
 
     private SimulationTime simulationTime;
-    private int completedTicks, maxTicks;
-    private List<EntityDTO> entitiesList;
+    private final List<EntityDTO> entitiesList;
+
+    private int completedTicks;
+    private final int maxTicks;
+
 
     public ResultsTableItem(int id, List<EntityDTO> entitiesList, SimulationTime simulationTime, String status, int completedTicks, int maxTicks) {
-        this.id = new SimpleIntegerProperty(id);
-        this.startTime = new SimpleStringProperty(simulationTime.getStartDateString());
+        this.id = id;
+        this.startTime = simulationTime.getStartDateString();
         this.endTime = new SimpleStringProperty(simulationTime.getEndDateString());
         this.entitiesList = entitiesList;
         this.simulationTime = simulationTime;
@@ -36,20 +39,20 @@ public class ResultsTableItem {
         this.status = new SimpleStringProperty(status);
     }
 
-    public void update(ResultsTableItem resultsTableItem) {
-        this.id.set(resultsTableItem.getId());
-        this.startTime.set(resultsTableItem.getStartTime());
-        this.endTime.set(resultsTableItem.getEndTime());
-        this.status.set(resultsTableItem.getStatus());
 
-        this.entitiesList = resultsTableItem.getEntitiesList();
-        this.simulationTime = resultsTableItem.getSimulationTime();
-        this.completedTicks = resultsTableItem.getCompletedTicks();
-        this.maxTicks = resultsTableItem.getMaxTicks();
+    /**
+     * Update the running execution table item with newly given data.
+     */
+    public void update(SimulationTime simulationTime, String status, int completedTicks) {
+        this.endTime.set(simulationTime.getEndDateString());
+        this.status.set(status);
+
+        this.simulationTime = simulationTime;
+        this.completedTicks = completedTicks;
     }
 
     public int getId() {
-        return id.get();
+        return id;
     }
 
     public String getStatus() {
@@ -73,20 +76,13 @@ public class ResultsTableItem {
     }
 
     public String getStartTime() {
-        return startTime.get();
+        return startTime;
     }
 
     public String getEndTime() {
         return endTime.get();
     }
 
-    public IntegerProperty idProperty() {
-        return id;
-    }
-
-    public StringProperty startTimeProperty() {
-        return startTime;
-    }
 
     public StringProperty endTimeProperty() {
         return endTime;
