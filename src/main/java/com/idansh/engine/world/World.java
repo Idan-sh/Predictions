@@ -137,8 +137,6 @@ public class World implements Runnable {
 
         // Check if the current tick has reached the termination rule tick defined, if one does not exist keeps going until reached the timer defined
         while((!terminationRules.containsKey(TerminationRule.Type.TICKS)) || (terminationRules.containsKey(TerminationRule.Type.TICKS) && tickCounter.getCount() < terminationRules.get(TerminationRule.Type.TICKS).getValue())) {
-            // todo - send to the UI a RunningSimulationDTO that contains current info on the simulation, to be added into an histogram.
-
             // Checks if the timer expired, if so end simulation
             if (countdown.isFinished())
                 simulationResult = endSimulation("Timer Expired");

@@ -2,6 +2,10 @@ package com.idansh.javafx.helpers;
 
 import com.idansh.dto.entity.EntityDTO;
 import com.idansh.engine.helpers.SimulationTime;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 import java.sql.Time;
 import java.time.LocalDateTime;
@@ -12,31 +16,44 @@ import java.util.List;
  * Defines an item in the table view of the simulation executions in the "Results" tab.
  */
 public class ResultsTableItem {
-    private final int id;
-    private final SimulationTime simulationTime;
-    private final String startDateString, endDateString;
-    private final int completedTicks, maxTicks;
-    private final List<EntityDTO> entitiesList;
-    private final String status;
+    private final IntegerProperty id;
+    private final StringProperty startTime;
+    private final StringProperty endTime;
+    private final StringProperty status;
+
+    private SimulationTime simulationTime;
+    private int completedTicks, maxTicks;
+    private List<EntityDTO> entitiesList;
 
     public ResultsTableItem(int id, List<EntityDTO> entitiesList, SimulationTime simulationTime, String status, int completedTicks, int maxTicks) {
-        this.id = id;
+        this.id = new SimpleIntegerProperty(id);
+        this.startTime = new SimpleStringProperty(simulationTime.getStartDateString());
+        this.endTime = new SimpleStringProperty(simulationTime.getEndDateString());
         this.entitiesList = entitiesList;
         this.simulationTime = simulationTime;
         this.completedTicks = completedTicks;
         this.maxTicks = maxTicks;
-        this.status = status;
-        this.startDateString = simulationTime.getStartDateString();
-        this.endDateString = simulationTime.getEndDateString();
+        this.status = new SimpleStringProperty(status);
+    }
+
+    public void update(ResultsTableItem resultsTableItem) {
+        this.id.set(resultsTableItem.getId());
+        this.startTime.set(resultsTableItem.getStartTime());
+        this.endTime.set(resultsTableItem.getEndTime());
+        this.status.set(resultsTableItem.getStatus());
+
+        this.entitiesList = resultsTableItem.getEntitiesList();
+        this.simulationTime = resultsTableItem.getSimulationTime();
+        this.completedTicks = resultsTableItem.getCompletedTicks();
+        this.maxTicks = resultsTableItem.getMaxTicks();
     }
 
     public int getId() {
-        return id;
+        return id.get();
     }
 
-
     public String getStatus() {
-        return status;
+        return status.get();
     }
 
     public SimulationTime getSimulationTime() {
@@ -51,15 +68,31 @@ public class ResultsTableItem {
         return maxTicks;
     }
 
-    public String getStartDateString() {
-        return startDateString;
-    }
-
-    public String getEndDateString() {
-        return endDateString;
-    }
-
     public List<EntityDTO> getEntitiesList() {
         return entitiesList;
+    }
+
+    public String getStartTime() {
+        return startTime.get();
+    }
+
+    public String getEndTime() {
+        return endTime.get();
+    }
+
+    public IntegerProperty idProperty() {
+        return id;
+    }
+
+    public StringProperty startTimeProperty() {
+        return startTime;
+    }
+
+    public StringProperty endTimeProperty() {
+        return endTime;
+    }
+
+    public StringProperty statusProperty() {
+        return status;
     }
 }

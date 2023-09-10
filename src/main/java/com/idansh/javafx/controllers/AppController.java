@@ -12,7 +12,6 @@ import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.net.URL;
-import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -88,13 +87,8 @@ public class AppController implements Initializable {
      */
     public void startCurrentLoadedSimulation() {
         try{
-            engineHandler.runSimulation(loadedSimulationDTO.getEnvironmentVariablesListDTO());
-
-            // todo - show this alert when a status of a simulation is changed from running to finished
-//            showInformationAlert(
-//                    "Simulation Completed Successfully",
-//                    "completed simulation ID: " + -1
-//            );
+            int simulationID = engineHandler.runSimulation(loadedSimulationDTO.getEnvironmentVariablesListDTO());
+            resultsComponentController.addExecution(simulationID);
         } catch (RuntimeException e) {
             e.printStackTrace();
             showErrorAlert("Simulation Stopped!", e.getMessage());
@@ -204,21 +198,12 @@ public class AppController implements Initializable {
 
 
     /**
-     * Get a list of all simulation executions, past and present.
+     * Get a running/finished simulation execution from the engine.
+     * @param chosenSimulationID ID of the simulation execution to get from the engine.
      * @return Executions of the type SimulationResultDTO or CurrentSimulationDTO.
      */
-    public List<Object> getSimulationExecutions() {
-        // Create executions list and add all past executions to it
-        return engineHandler.getSimulationsList();
-    }
-
-
-    /**
-     * Show the executions screen in the Results tab.
-     */
-    public void showExecutions() {
-        // todo- call this method every time interval
-        resultsComponentController.showExecutions();
+    public Object getSimulationExecutionDTO(int chosenSimulationID) {
+        return engineHandler.getSimulationExecutionDTO(chosenSimulationID);
     }
 
 

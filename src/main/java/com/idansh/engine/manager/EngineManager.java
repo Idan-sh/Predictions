@@ -131,8 +131,9 @@ public class EngineManager {
      * and execute the thread.
      * This thread will run sometime in the future, according to the JVM thread pool choice.
      * @param environmentVariablesListDTO contains data of environment variables to update in the simulation.
+     * @return ID of the simulation created.
      */
-    public void createAndPutSimulation(EnvironmentVariablesListDTO environmentVariablesListDTO) {
+    public int createAndPutSimulation(EnvironmentVariablesListDTO environmentVariablesListDTO) {
         World runnableWorld = new World(loadedWorld);
 
         updateEnvironmentVariablesFromInput(runnableWorld, environmentVariablesListDTO);
@@ -142,6 +143,8 @@ public class EngineManager {
 
         // Run the simulation thread at some time in the future
         threadPool.execute(runnableWorld);
+
+        return runnableWorld.getId();
     }
 
 
@@ -184,24 +187,29 @@ public class EngineManager {
 
 
     /**
-     * Get a list of all past and present simulations.
+     * Get a simulation execution, past and present.
      * Past simulations will be in the form of SimulationResultDTO,
      * while currently running simulations will be in the form of RunningSimulationDTO.
+     * @param chosenExecutionID ID of the simulation execution to get.
+     * @return a DTO in an Object form, that contains information on a currently running simulation execution,
+     * or a finished simulation execution.
      */
-    public List<Object> getSimulationsList() {
-        List<Object> retSimulations = new ArrayList<>();
+    public Object getSimulationExecutionDTO(int chosenExecutionID) {
+        Object retExecution;
 
-        simulationsPool.forEach(
-                (id, world) -> {
-                    if (world.isSimulationFinished()) {
-                        retSimulations.add(getSimulationResultDTO(world));
-                    } else {
-                        retSimulations.add(getRunningSimulationDTO(world));
-                    }
-                }
-        );
+        World world = simulationsPool.get(chosenExecutionID);
 
-        return retSimulations;
+        if(world == null) {
+            throw new IllegalArgumentException("cannot find simulation execution with ID " + chosenExecutionID + " in the running/finished simulation executions pool.");
+        }
+
+        if (world.isSimulationFinished()) {
+            retExecution = getSimulationResultDTO(world);
+        } else {
+            retExecution = getRunningSimulationDTO(world);
+        }
+
+        return retExecution;
     }
 
 

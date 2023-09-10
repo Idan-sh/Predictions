@@ -6,7 +6,6 @@ import com.idansh.dto.simulation.LoadedSimulationDTO;
 import com.idansh.engine.manager.EngineManager;
 
 import java.io.File;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -48,24 +47,23 @@ public class EngineHandler {
 
 
     /**
-     * Gets past simulations' results from the engine, prints simple information of each result,
-     * and allows the user to choose which simulation to show full details of.
-     * @throws RuntimeException In case that no simulations were previously ran.
+     * Get from the engine a simulation execution with the given ID.
      */
-    public List<Object> getSimulationsList() {
-        return engineManager.getSimulationsList();
+    public Object getSimulationExecutionDTO(int chosenSimulationID) {
+        return engineManager.getSimulationExecutionDTO(chosenSimulationID);
     }
 
 
     /**
      * Initiates the running process of the current loaded simulation in the engine.
+     * @return ID of the newly created simulation.
      */
-    public void runSimulation(EnvironmentVariablesListDTO environmentVariablesListDTO) {
+    public int runSimulation(EnvironmentVariablesListDTO environmentVariablesListDTO) {
         if(!isSimulationLoaded()) {
             throw new RuntimeException("No simulation loaded! Please load before trying to run!");
         }
 
-        engineManager.createAndPutSimulation(environmentVariablesListDTO);
+        return engineManager.createAndPutSimulation(environmentVariablesListDTO);
     }
 
     public void setEntityAmount(String entityName, int amount) {

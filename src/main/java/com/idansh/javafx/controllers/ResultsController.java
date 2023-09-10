@@ -5,16 +5,14 @@ import com.idansh.dto.property.PropertyDTO;
 import com.idansh.dto.simulation.RunningSimulationDTO;
 import com.idansh.dto.simulation.SimulationResultDTO;
 import com.idansh.javafx.helpers.ResultsTableItem;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.net.URL;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -23,9 +21,29 @@ import java.util.function.Function;
  * this screen will be in charge of showing the result of previous ran simulations.
  */
 public class ResultsController implements Initializable {
-    private AppController mainController;
+    private class UpdaterThread extends Thread {
+        @Override
+        public void run() {
+            try {
+                while (!runningExecutionsIdSet.isEmpty()) {
+                    for (Integer id : runningExecutionsIdSet) {
+                        updateExecution(id);
+                        Platform.runLater(ResultsController.this::selectTableItem); // Tell the JAT to show the updated chosen execution info
+                    }
+                    sleep(200);
+                }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
 
     private final String COMPLETED = "Completed", IN_PROGRESS = "In Progress", NOT_AVAILABLE = "N/A";
+
+    private AppController mainController;
+    private Set<Integer> runningExecutionsIdSet;
+    private Map<Integer, ResultsTableItem> executionsPool;
+    private Thread updaterThread;
 
     // Execution List Components:
     @FXML
@@ -66,10 +84,10 @@ public class ResultsController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // Setup Execution List TableView:
-        idTableColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-        startTableColumn.setCellValueFactory(new PropertyValueFactory<>("startDateString"));
-        endTableColumn.setCellValueFactory(new PropertyValueFactory<>("endDateString"));
-        statusTableColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
+        idTableColumn.setCellValueFactory(cellData -> cellData.getValue().idProperty().asString());
+        startTableColumn.setCellValueFactory(cellData -> cellData.getValue().startTimeProperty());
+        endTableColumn.setCellValueFactory(cellData -> cellData.getValue().endTimeProperty());
+        statusTableColumn.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
 
         // Setup Entity Amounts TableView:
         nameTableColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -82,53 +100,96 @@ public class ResultsController implements Initializable {
         // Setup Execution Results tree view:
         propertyDetailsTreeView.setRoot(new TreeItem<>("root-item"));
 
-        // todo- create thread that calls for showExecutions every 200ms
+        executionsPool = new HashMap<>();
+        runningExecutionsIdSet = new HashSet<>();
+
+        updaterThread = new UpdaterThread();
     }
 
 
     /**
-     * Shows a table view of all the current and previous simulation executions.
-     * Displays the ID, End time, and status of each simulation execution.
+     * Adds a newly created simulation execution to a table view of all the current and previous simulation executions.
+     * Displays the ID, End time, and status of the simulation execution.
+     * @param chosenExecutionID ID of the simulation execution to add to the UI.
+     * @throws IllegalArgumentException when ID received is not of a running/finished simulation execution.
      */
-    public void showExecutions() {
-        // Clear previously added items
-        executionListTableView.getItems().clear();
+    public void addExecution(int chosenExecutionID) {
+        // Get info on the execution, the execution should be of the type SimulationResultDTO or CurrentSimulationDTO
+        Object execution = mainController.getSimulationExecutionDTO(chosenExecutionID);
 
-        // Get a List of all executions currently in the program.
-        // Each list item should be of the type SimulationResultDTO or CurrentSimulationDTO.
-        List<Object> executionsList = mainController.getSimulationExecutions();
+        // Newly created execution is still running
+        if (execution instanceof RunningSimulationDTO) {
+            RunningSimulationDTO runningSimulation = (RunningSimulationDTO) execution;
+            ResultsTableItem resultsTableItem = new ResultsTableItem(
+                    runningSimulation.getId(),
+                    runningSimulation.getEntityDTOList(),
+                    runningSimulation.getSimulationTime(),
+                    IN_PROGRESS,
+                    runningSimulation.getCompletedTicks(),
+                    runningSimulation.getMaxTicks()
+            );
+            executionListTableView.getItems().add(resultsTableItem);
+            executionsPool.put(runningSimulation.getId(), resultsTableItem);
+            runningExecutionsIdSet.add(runningSimulation.getId());
+        } else throw new IllegalArgumentException("Invalid execution type received: \""
+                + execution.getClass()
+                + "\", only accepts executions of type SimulationResultDTO or CurrentSimulationDTO");
 
-        executionsList.forEach(
-                item -> {
-                    if(item instanceof SimulationResultDTO) {
-                        SimulationResultDTO itemResult = (SimulationResultDTO) item;
-                        executionListTableView.getItems().add(
-                                new ResultsTableItem(
-                                        itemResult.getId(),
-                                        itemResult.getEntityDTOList(),
-                                        itemResult.getSimulationTime(),
-                                        COMPLETED,
-                                        itemResult.getCompletedTicks(),
-                                        itemResult.getMaxTicks()
-                                        )
-                        );
-                    } else if(item instanceof RunningSimulationDTO) {
-                        RunningSimulationDTO itemRunning = (RunningSimulationDTO) item;
-                        executionListTableView.getItems().add(
-                                new ResultsTableItem(
-                                        itemRunning.getId(),
-                                        itemRunning.getEntityDTOList(),
-                                        itemRunning.getSimulationTime(),
-                                        IN_PROGRESS,
-                                        itemRunning.getCompletedTicks(),
-                                        itemRunning.getMaxTicks()
-                                )
-                        );
-                    } else throw new IllegalArgumentException("Invalid execution type received: \""
-                            + item.getClass()
-                            + "\", only accepts executions of type SimulationResultDTO or CurrentSimulationDTO");
-                }
-        );
+        // Check if there is an updater already running, if not then create and start one
+        if(!updaterThread.isAlive()) {
+            updaterThread = new UpdaterThread();
+            updaterThread.start();
+        }
+    }
+
+
+    /**
+     * Update info of a simulation execution in the Executions List.
+     * @param chosenExecutionID ID of the simulation to update.
+     */
+    public void updateExecution(int chosenExecutionID) {
+        ResultsTableItem resultsTableItem = executionsPool.get(chosenExecutionID);
+
+        if(resultsTableItem == null)
+            throw new IllegalArgumentException("Cannot update simulation execution with ID " + chosenExecutionID + ", simulation execution with this ID does not exist.");
+
+        // Get updated info on the received execution, the new execution data should be of the type SimulationResultDTO or CurrentSimulationDTO
+        Object execution = mainController.getSimulationExecutionDTO(chosenExecutionID);
+
+        // Check if the execution is still running or if it has finished
+        if (execution instanceof SimulationResultDTO) {
+            SimulationResultDTO simulationResult = (SimulationResultDTO) execution;
+            resultsTableItem.update(new ResultsTableItem(
+                    simulationResult.getId(),
+                    simulationResult.getEntityDTOList(),
+                    simulationResult.getSimulationTime(),
+                    COMPLETED,
+                    simulationResult.getCompletedTicks(),
+                    simulationResult.getMaxTicks()
+            ));
+            // This simulation execution has finished, remove it from the runningExecutionsIdSet
+            runningExecutionsIdSet.remove(simulationResult.getId());
+
+            Platform.runLater(() ->
+                mainController.showInformationAlert(
+                        "Simulation Completed Successfully",
+                        "completed simulation ID: " + chosenExecutionID
+                )
+            );
+
+        } else if (execution instanceof RunningSimulationDTO) {
+            RunningSimulationDTO simulationResult = (RunningSimulationDTO) execution;
+            resultsTableItem.update(new ResultsTableItem(
+                    simulationResult.getId(),
+                    simulationResult.getEntityDTOList(),
+                    simulationResult.getSimulationTime(),
+                    IN_PROGRESS,
+                    simulationResult.getCompletedTicks(),
+                    simulationResult.getMaxTicks()
+            ));
+        } else throw new IllegalArgumentException("Invalid execution type received: \""
+                + execution.getClass()
+                + "\", only accepts executions of type SimulationResultDTO or CurrentSimulationDTO");
     }
 
 
