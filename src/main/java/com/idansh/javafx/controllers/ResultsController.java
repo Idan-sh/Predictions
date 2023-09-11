@@ -40,7 +40,6 @@ public class ResultsController implements Initializable {
                         int id = idIterator.next();                                     // Get the ID of the simulation execution
                         if (updateExecution(id)) idIterator.remove();                   // Update the simulation execution with the ID, if the simulation has ended, removes it from the runningExecutionsIdSet
 
-                        // todo - change this to make the UI data to listen to the data changes, instead of refreshing the whole screen and putting pressure on the JAT
                         Platform.runLater(ResultsController.this::selectTableItem);     // Tell the JAT to show the updated chosen execution info
                     }
                     sleep(200);     // Pause updating
@@ -183,7 +182,8 @@ public class ResultsController implements Initializable {
             resultsTableItem.update(
                     simulationResult.getSimulationTime(),
                     COMPLETED,
-                    simulationResult.getCompletedTicks()
+                    simulationResult.getCompletedTicks(),
+                    simulationResult.getEntityDTOList()
             );
 
             // Tell JAT to output popup alert that this simulation execution has finished
@@ -200,7 +200,8 @@ public class ResultsController implements Initializable {
             resultsTableItem.update(
                     simulationResult.getSimulationTime(),
                     IN_PROGRESS,
-                    simulationResult.getCompletedTicks()
+                    simulationResult.getCompletedTicks(),
+                    simulationResult.getEntityDTOList()
             );
 
             return false;   // This simulation execution is still running, return false
@@ -246,10 +247,10 @@ public class ResultsController implements Initializable {
             );
 
             // Add entity amounts to the table
-            entityAmountsTableView.getItems().addAll(selectedItem.getEntitiesList());
+            entityAmountsTableView.getItems().addAll(selectedItem.getEntityDTOList());
 
             // Add entities to the execution results choice box
-            entityChoiceBox.getItems().addAll(selectedItem.getEntitiesList());
+            entityChoiceBox.getItems().addAll(selectedItem.getEntityDTOList());
         }
     }
 

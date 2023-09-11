@@ -2,14 +2,9 @@ package com.idansh.javafx.helpers;
 
 import com.idansh.dto.entity.EntityDTO;
 import com.idansh.engine.helpers.SimulationTime;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import java.sql.Time;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -22,17 +17,19 @@ public class ResultsTableItem {
     private final StringProperty status;
 
     private SimulationTime simulationTime;
-    private final List<EntityDTO> entitiesList;
+    private List<EntityDTO> entityDTOList;
 
     private int completedTicks;
     private final int maxTicks;
 
 
-    public ResultsTableItem(int id, List<EntityDTO> entitiesList, SimulationTime simulationTime, String status, int completedTicks, int maxTicks) {
+    public ResultsTableItem(int id, List<EntityDTO> entityDTOList, SimulationTime simulationTime, String status, int completedTicks, int maxTicks) {
         this.id = id;
+        this.entityDTOList = entityDTOList;
+
         this.startTime = simulationTime.getStartDateString();
         this.endTime = new SimpleStringProperty(simulationTime.getEndDateString());
-        this.entitiesList = entitiesList;
+
         this.simulationTime = simulationTime;
         this.completedTicks = completedTicks;
         this.maxTicks = maxTicks;
@@ -43,12 +40,13 @@ public class ResultsTableItem {
     /**
      * Update the running execution table item with newly given data.
      */
-    public void update(SimulationTime simulationTime, String status, int completedTicks) {
+    public void update(SimulationTime simulationTime, String status, int completedTicks, List<EntityDTO> entityDTOList) {
         this.endTime.set(simulationTime.getEndDateString());
         this.status.set(status);
 
         this.simulationTime = simulationTime;
         this.completedTicks = completedTicks;
+        this.entityDTOList = entityDTOList;
     }
 
     public int getId() {
@@ -71,8 +69,8 @@ public class ResultsTableItem {
         return maxTicks;
     }
 
-    public List<EntityDTO> getEntitiesList() {
-        return entitiesList;
+    public List<EntityDTO> getEntityDTOList() {
+        return entityDTOList;
     }
 
     public String getStartTime() {
