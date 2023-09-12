@@ -53,9 +53,11 @@ public class PropertyCreator<T> implements PropertyFactory{
      */
     @Override
     public Property createProperty() {
-        if(type.equals(PropertyType.INTEGER) || type.equals(PropertyType.FLOAT))
+        // Add range only for numeric properties
+        if(type.equals(PropertyType.FLOAT))
             return new Property(name, type, valueGenerator.generateValue(), range);
-        return new Property(name, type, valueGenerator.generateValue());
+        else
+            return new Property(name, type, valueGenerator.generateValue());
     }
 
     @Override
@@ -84,7 +86,7 @@ public class PropertyCreator<T> implements PropertyFactory{
 
     @Override
     public boolean isNumericProperty() {
-        return PropertyType.INTEGER.equals(type) || PropertyType.FLOAT.equals(type);
+        return PropertyType.FLOAT.equals(type);
     }
 
     @Override

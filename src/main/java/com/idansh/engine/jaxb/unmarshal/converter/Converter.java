@@ -38,7 +38,7 @@ public abstract class Converter {
         World retWorld = new World();
 
         // Iterates over all PRDEnvironmentProperties, converts each property and adds it to the world
-        prdWorld.getPRDEvironment().getPRDEnvProperty().forEach(
+        prdWorld.getPRDEnvironment().getPRDEnvProperty().forEach(
                 p -> retWorld.addEnvironmentVariableFactory(environmentVariableConvert(p))
         );
 
@@ -57,7 +57,7 @@ public abstract class Converter {
         );
 
         // Iterate over all PRDTerminations, converts each termination rule and adds it to the world
-        prdWorld.getPRDTermination().getPRDByTicksOrPRDBySecond().forEach(
+        prdWorld.getPRDTermination().getPRDBySecondOrPRDByTicks().forEach(
                 t -> retWorld.addTerminationRule(terminationRuleConvert(t))
         );
 
@@ -99,15 +99,6 @@ public abstract class Converter {
         // Create the property according to its type:
         // PropertyType.getType handles errors with the prdProperty's type
         switch(PropertyType.getType(prdProperty.getType())) {
-            case INTEGER:
-                retPropertyFactory = new PropertyCreator<>(
-                        prdProperty.getPRDName(),
-                        PropertyType.INTEGER,
-                        isRandom ? new RandomIntegerValueGenerator(range) : new FixedValueGenerator<>(Integer.parseInt(prdProperty.getPRDValue().getInit())),
-                        range
-                );
-                break;
-
             case FLOAT:
                 retPropertyFactory = new PropertyCreator<>(
                         prdProperty.getPRDName(),
@@ -173,17 +164,6 @@ public abstract class Converter {
 
         // Create value generator and environment variable result according to the environment variable's type
         switch(envVarType) {
-            case INTEGER:
-                range = rangeConvert(prdEnvProperty.getPRDRange());
-                valueGenerator = new RandomIntegerValueGenerator(range);
-                retEnvironmentVariable = new PropertyCreator<>(
-                        prdEnvProperty.getPRDName(),
-                        envVarType,
-                        valueGenerator,
-                        range
-                );
-                break;
-
             case FLOAT:
                 range = rangeConvert(prdEnvProperty.getPRDRange());
                 valueGenerator = new RandomFloatValueGenerator(range);

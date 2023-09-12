@@ -16,7 +16,7 @@ public enum PropertyType {
      */
     public static PropertyType getType(String s) {
         switch(s) {
-            case "decimal":
+            case "int":
                 return INTEGER;
 
             case "float":
@@ -42,7 +42,7 @@ public enum PropertyType {
     public String getTypeString() {
         switch(this) {
             case INTEGER:
-                return "decimal";
+                return "int";
 
             case FLOAT:
                 return "float";
@@ -64,6 +64,6 @@ public enum PropertyType {
      * @return true if the property given is of type FLOAT or INTEGER, false otherwise.
      */
     public boolean isNumeric() {
-        return this.equals(PropertyType.FLOAT) || this.equals(PropertyType.INTEGER);
+        return this.equals(PropertyType.INTEGER) || this.equals(PropertyType.FLOAT);
     }
 }
