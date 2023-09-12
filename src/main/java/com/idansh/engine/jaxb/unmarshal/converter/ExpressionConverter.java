@@ -31,24 +31,28 @@ public class ExpressionConverter {
     /**
      * Converts a PRDAction object that was read from the XML file
      * into an Expression Object.
-     * Checks if the expression's value's typ matches the action's type.
+     * Checks if the expression's value's type matches the action's type.
      * If the type matches, returns the Expression object, otherwise throws exception.
-     * @return Action object with the data of the PRDAction received.
+     * @param entityName Name of the entity in context.
+     * @param propertyName Name of the property in context.
+     * @param actionType Type of the action in which the expression is defined.
+     * @param expressionStr String that contains expression to be converted.
+     * @return Converted Expression according to the string received.
      */
-    public Expression convertExpression(String actionType, String entityName, String propertyName, String prdStr) {
+    public Expression convertExpression(String actionType, String entityName, String propertyName, String expressionStr) {
         Expression retExpression;
 
         // Try to convert to FunctionExpression
-        retExpression = getFunctionExpression(entityName, prdStr);
+        retExpression = getFunctionExpression(actionType, entityName, propertyName, expressionStr);
 
         // Try to convert to PropertyExpression
         if(retExpression == null) {
-            retExpression = getPropertyExpression(entityName, prdStr);
+            retExpression = getPropertyExpression(entityName, expressionStr);
         }
 
         // Convert to FixedExpression
         if(retExpression == null) {
-            retExpression = getFixedValue(prdStr);
+            retExpression = getFixedValue(expressionStr);
         }
 
         // Check for type error
@@ -101,27 +105,27 @@ public class ExpressionConverter {
     /**
      * Checks if the PRDAction is a function expression.
      * If it is then returns the proper function expression, otherwise returns null.
-     * @param prdStr PRDAction's value string.
+     * @param expressionStr the string that contains the expression to convert.
      */
-    private Expression getFunctionExpression(String entityName, String prdStr) {
+    private Expression getFunctionExpression(String actionType, String entityName, String propertyName, String expressionStr) {
         Expression retFunctionExpression = null;
-        String functionName = getFunctionName(prdStr);
+        String functionName = getFunctionName(expressionStr);
         Pair<String, String> entityPropertyPair;
 
         if (functionName != null) {
             switch (FunctionActivationExpression.Type.getType(functionName)) {
                 case ENVIRONMENT:
                     retFunctionExpression = new EnvironmentFunctionExpression(
-                            environmentVariables, getFunctionArgument(prdStr));
+                            environmentVariables, getFunctionArgument(expressionStr));
                     break;
 
                 case RANDOM:
                     retFunctionExpression = new RandomFunctionExpression(
-                            Integer.parseInt(getFunctionArgument(prdStr)));
+                            Integer.parseInt(getFunctionArgument(expressionStr)));
                     break;
 
                 case EVALUATE:
-                    entityPropertyPair = getEntityPropertyFunctionArguments(prdStr);
+                    entityPropertyPair = getEntityPropertyFunctionArguments(expressionStr);
                     checkEntityContext(entityPropertyPair, entityName);
 
                     retFunctionExpression = new EvaluateFunctionExpression(
@@ -129,11 +133,17 @@ public class ExpressionConverter {
                     break;
 
                 case PERCENT:
-                    retFunctionExpression = new PercentFunctionExpression();
+                    Pair<String, String> percentExpressions = getPercentageExpressionsFromArgument(expressionStr);
+                    retFunctionExpression = new PercentFunctionExpression(
+                            convertExpression(
+                                    actionType, entityName, propertyName, percentExpressions.getKey()),
+                            convertExpression(
+                                    actionType, entityName, propertyName, percentExpressions.getValue())
+                    );
                     break;
 
                 case TICKS:
-                    entityPropertyPair = getEntityPropertyFunctionArguments(prdStr);
+                    entityPropertyPair = getEntityPropertyFunctionArguments(expressionStr);
                     checkEntityContext(entityPropertyPair, entityName);
 
                     retFunctionExpression = new TicksFunctionActivation(
@@ -178,7 +188,7 @@ public class ExpressionConverter {
      * Get the function's argument from a string, if the string does not contain one, return null.
      * @param str string value of PRDAction from the input XML file.
      */
-    private String getFunctionArgument(String str){
+    private String getFunctionArgument(String str) {
         String ret = null;
         int openInd = str.indexOf("(");
         int closeInd = str.indexOf(")");
@@ -192,6 +202,28 @@ public class ExpressionConverter {
 
 
     /**
+     * Get two arguments from a function's argument, each string representing an expression.
+     * The format of the string should be:
+     * "<function_name>(<first_expression>,<second_expression>)".
+     * @return a pair of two expression names to be converted to expression.
+     */
+    private Pair<String, String> getPercentageExpressionsFromArgument(String str) {
+        String withoutParenthesis = getFunctionArgument(str);
+        String[] parts = withoutParenthesis.split(",");
+
+        if(parts.length == 2) {
+            if(parts[0].isEmpty() || parts[1].isEmpty())
+                throw new IllegalArgumentException("Invalid percentage argument, " +
+                        "at least one of the expressions received is empty.");
+
+            return new Pair<>(parts[0], parts[1]);
+        } else
+            throw new IllegalArgumentException("Invalid percentage argument, " +
+                    "format should be \"<first_expression>,<second_expression>\".");
+    }
+
+
+    /**
      * Get a pair of entity name and property name from a string in the format of:
      * "<function_name>(<first_word>.<second_word>)".
      * @param str str in the format specified.
@@ -199,7 +231,6 @@ public class ExpressionConverter {
      */
     private Pair<String, String> getEntityPropertyFunctionArguments(String str) {
         String withoutParenthesis = getFunctionArgument(str);
-
         String[] parts = withoutParenthesis.split("\\.");
 
         if(parts.length == 2) {
