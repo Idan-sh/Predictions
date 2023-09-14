@@ -13,7 +13,7 @@ public abstract class Action {
          * @return Action.Type that defines the string received.
          * @throws IllegalArgumentException if the string received is in invalid format (not one of the specified strings).
          */
-        public static Action.Type getType(String s) {
+        public static Type getType(String s) {
             switch(s) {
                 case "increase":
                     return Type.INCREASE;
@@ -48,20 +48,18 @@ public abstract class Action {
     private final World worldContext;
 
     public Action(World worldContext, String entityContext) {
-        // Check if there is an entity factory with the name of that value of entityContext
-        worldContext.entityManager.getEntityFactory(entityContext);
+        checkEntityContext(entityContext);
 
         this.entityContext = entityContext;
         this.worldContext = worldContext;
     }
 
-    public String getEntityContext() {
-        return entityContext;
-    }
 
-
-    public World getWorldContext() {
-        return worldContext;
+    /**
+     * Check if there is an entity factory with the name of the value of entityContext.
+     */
+    public void checkEntityContext(String entityContext) {
+        worldContext.entityManager.getEntityFactory(entityContext);
     }
 
 
@@ -83,4 +81,15 @@ public abstract class Action {
      * Deep copies this Action instance, using a new worldContext for the action's activation.
      */
     public abstract Action copy(World worldContext);
+
+
+    public String getEntityContext() {
+        return entityContext;
+    }
+
+
+    public World getWorldContext() {
+        return worldContext;
+    }
+
 }

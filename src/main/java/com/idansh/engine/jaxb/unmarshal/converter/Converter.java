@@ -268,7 +268,7 @@ public abstract class Converter {
      * @return Action object with the data of the PRDAction received.
      */
     private static Action actionConvert(PRDAction prdAction, World worldContext) {
-        Action retAction = null;
+        Action retAction;
         ExpressionConverter expressionConverter = new ExpressionConverter(worldContext);
 
         switch (Action.Type.getType(prdAction.getType())) {
@@ -322,9 +322,16 @@ public abstract class Converter {
                 );
 
             case REPLACE:
+                retAction = new ReplaceAction(
+                        worldContext,
+                        prdAction.getKill(),
+                        prdAction.getCreate(),
+                        prdAction.getMode()
+                );
                 break;
 
             case PROXIMITY:
+                // todo - add proximity
                 break;
             }
 

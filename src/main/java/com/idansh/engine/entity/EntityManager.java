@@ -51,7 +51,8 @@ public class EntityManager {
 
     /**
      * Returns reference to an existing entity factory.
-     * @param name The name of the factory to search
+     * @param name The name of the entity factory to search.
+     * @throws IllegalArgumentException In case an entity factory with the given name doesn't exist.
      */
     public EntityFactory getEntityFactory(String name) {
         if(!entityFactories.containsKey(name))
@@ -82,6 +83,17 @@ public class EntityManager {
             return;
 
         entityToKill.kill();
+    }
+
+
+    /**
+     * Creates a new entity and adds it to the population.
+     * @param entityToCreate Name of the entity factory of which an instance
+     *                       will be created and added into the population.
+     * @throws IllegalArgumentException In case an entity factory with the given name doesn't exist.
+     */
+    public void createEntity(String entityToCreate) {
+        population.add(getEntityFactory(entityToCreate).createEntity());
     }
 
     public List<Entity> getPopulation() {
