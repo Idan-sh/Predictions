@@ -11,7 +11,6 @@ import com.idansh.engine.property.creator.generator.value.api.ValueGenerator;
 import com.idansh.engine.property.creator.generator.value.fixed.FixedValueGenerator;
 import com.idansh.engine.property.creator.generator.value.random.RandomBooleanValueGenerator;
 import com.idansh.engine.property.creator.generator.value.random.RandomFloatValueGenerator;
-import com.idansh.engine.property.creator.generator.value.random.RandomIntegerValueGenerator;
 import com.idansh.engine.property.creator.generator.value.random.RandomStringValueGenerator;
 import com.idansh.engine.property.instance.PropertyType;
 import com.idansh.engine.rule.Rule;
@@ -272,7 +271,13 @@ public abstract class Converter {
                         worldContext,
                         prdAction.getEntity(),
                         prdAction.getProperty(),
-                        expressionConverter.convertExpression("increase", prdAction.getEntity(), prdAction.getProperty(), prdAction.getBy())
+                        expressionConverter.convertExpression(
+                                "increase",
+                                prdAction.getEntity(),
+                                getSecondaryEntity(prdAction),
+                                prdAction.getProperty(),
+                                prdAction.getBy()
+                        )
                 );
                 break;
 
@@ -281,7 +286,13 @@ public abstract class Converter {
                         worldContext,
                         prdAction.getEntity(),
                         prdAction.getProperty(),
-                        expressionConverter.convertExpression("decrease", prdAction.getEntity(), prdAction.getProperty(), prdAction.getBy())
+                        expressionConverter.convertExpression(
+                                "decrease",
+                                prdAction.getEntity(),
+                                getSecondaryEntity(prdAction),
+                                prdAction.getProperty(),
+                                prdAction.getBy()
+                        )
                 );
                 break;
 
@@ -306,7 +317,13 @@ public abstract class Converter {
                         worldContext,
                         prdAction.getEntity(),
                         prdAction.getProperty(),
-                        expressionConverter.convertExpression("set", prdAction.getEntity(), prdAction.getProperty(), prdAction.getValue())
+                        expressionConverter.convertExpression(
+                                "set",
+                                prdAction.getEntity(),
+                                getSecondaryEntity(prdAction),
+                                prdAction.getProperty(),
+                                prdAction.getValue()
+                        )
                 );
                 break;
 
@@ -365,6 +382,7 @@ public abstract class Converter {
                 expressionConverter.convertExpression(
                         "proximity",
                         prdAction.getPRDBetween().getSourceEntity(),
+                        prdAction.getPRDBetween().getTargetEntity(),
                         null,
                         prdAction.getPRDEnvDepth().getOf()
                 )
@@ -390,16 +408,40 @@ public abstract class Converter {
                     worldContext,
                     prdAction.getEntity(),
                     prdAction.getResultProp(),
-                    expressionConverter.convertExpression("calculation", prdAction.getEntity(), prdAction.getResultProp(), prdMultiply.getArg1()),
-                    expressionConverter.convertExpression("calculation", prdAction.getEntity(), prdAction.getResultProp(), prdMultiply.getArg2()),
+                    expressionConverter.convertExpression(
+                            "calculation",
+                            prdAction.getEntity(),
+                            getSecondaryEntity(prdAction),
+                            prdAction.getResultProp(),
+                            prdMultiply.getArg1()
+                    ),
+                    expressionConverter.convertExpression(
+                            "calculation",
+                            prdAction.getEntity(),
+                            getSecondaryEntity(prdAction),
+                            prdAction.getResultProp(),
+                            prdMultiply.getArg2()
+                    ),
                     CalculationAction.Type.MULTIPLY);
         } else if (prdDivide != null) {
             retCalculationAction = new CalculationAction(
                     worldContext,
                     prdAction.getEntity(),
                     prdAction.getResultProp(),
-                    expressionConverter.convertExpression("calculation", prdAction.getEntity(), prdAction.getResultProp(), prdDivide.getArg1()),
-                    expressionConverter.convertExpression("calculation", prdAction.getEntity(), prdAction.getResultProp(), prdDivide.getArg2()),
+                    expressionConverter.convertExpression(
+                            "calculation",
+                            prdAction.getEntity(),
+                            getSecondaryEntity(prdAction),
+                            prdAction.getResultProp(),
+                            prdDivide.getArg1()
+                    ),
+                    expressionConverter.convertExpression(
+                            "calculation",
+                            prdAction.getEntity(),
+                            getSecondaryEntity(prdAction),
+                            prdAction.getResultProp(),
+                            prdDivide.getArg2()
+                    ),
                     CalculationAction.Type.DIVIDE);
         }
         else {
@@ -430,9 +472,19 @@ public abstract class Converter {
             return new SingleConditionAction(
                     worldContext,
                     prdAction.getEntity(),
-                    expressionConverter.convertPropertyExpression(prdCondition.getEntity(), prdCondition.getProperty()),
+                    expressionConverter.convertPropertyExpression(
+                            prdCondition.getEntity(),
+                            getSecondaryEntity(prdAction),
+                            prdCondition.getProperty()
+                    ),
                     prdCondition.getOperator(),
-                    expressionConverter.convertExpression("condition", prdAction.getEntity(), prdCondition.getProperty(), prdCondition.getValue()),
+                    expressionConverter.convertExpression(
+                            "condition",
+                            prdAction.getEntity(),
+                            getSecondaryEntity(prdAction),
+                            prdCondition.getProperty(),
+                            prdCondition.getValue()
+                    ),
                     thenActions,
                     elseActions,
                     true
@@ -473,9 +525,19 @@ public abstract class Converter {
                         mainConditionAction.addInnerCondition(new SingleConditionAction(
                                 worldContext,
                                 prdCondition.getEntity(),
-                                expressionConverter.convertPropertyExpression(prdCondition.getEntity(), prdCondition.getProperty()),
+                                expressionConverter.convertPropertyExpression(
+                                        prdCondition.getEntity(),
+                                        getSecondaryEntity(prdAction),
+                                        prdCondition.getProperty()
+                                ),
                                 prdCondition.getOperator(),
-                                expressionConverter.convertExpression("condition", prdCondition.getEntity(), prdCondition.getProperty(), prdCondition.getValue()),
+                                expressionConverter.convertExpression(
+                                        "condition",
+                                        prdCondition.getEntity(),
+                                        getSecondaryEntity(prdAction),
+                                        prdCondition.getProperty(),
+                                        prdCondition.getValue()
+                                ),
                                 null,
                                 null,
                                 false
@@ -538,5 +600,20 @@ public abstract class Converter {
         // Check if the then actions block contains no actions
         if(thenActions.isEmpty())
             throw new RuntimeException("Proximity action's actions set received from XML is empty, add at least one action to the actions set...");
+    }
+
+
+    /**
+     * Returns a secondary entity's name if one exists,
+     * Otherwise returns null.
+     * @param prdAction a PRDAction in which the secondary entity might reside.
+     */
+    private static String getSecondaryEntity(PRDAction prdAction) {
+        PRDAction.PRDSecondaryEntity prdSecondaryEntity = prdAction.getPRDSecondaryEntity();
+
+        if(prdSecondaryEntity != null)
+            return prdSecondaryEntity.getEntity();
+
+        return null;
     }
 }

@@ -25,10 +25,11 @@ public class SingleConditionAction extends ConditionAction{
      * if the condition is met then the "then" actions will be performed,
      * if not then the "else" actions will be preformed (if exist).
      * Referred by the singularity value "single"
-     * @param propertyName name of the property that will be checked by the condition
-     * @param operator     comparison operator for the condition.
-     *                     possible values:  = (equal) / != (not equal) / bt (greater than) / lt (less than)
-     * @param value        a number that will be compared to the property's value
+     * @param worldContext  The simulated world in which the action is defined.
+     * @param entityContext Name of the entity on which the condition is set.
+     * @param operator      comparison operator for the condition.
+     *                      possible values:  = (equal) / != (not equal) / bt (greater than) / lt (less than)
+     * @param value         a number that will be compared to the property's value
      */
     public SingleConditionAction(World worldContext, String entityContext, Expression propertyExpression, String operator, Expression value, ThenOrElseActions thenActions, ThenOrElseActions elseActions, boolean isMainCondition) {
         super(worldContext, entityContext, thenActions, elseActions, isMainCondition);
