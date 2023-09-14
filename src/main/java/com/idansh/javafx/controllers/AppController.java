@@ -135,6 +135,7 @@ public class AppController implements Initializable {
             moveToDetailsTab();
         }  catch (RuntimeException e) {
             showErrorAlert("Simulation Load Failed!", e.getMessage());
+            throw e;
         }
     }
 

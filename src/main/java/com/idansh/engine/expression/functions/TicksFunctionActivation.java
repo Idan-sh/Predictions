@@ -3,8 +3,8 @@ package com.idansh.engine.expression.functions;
 import com.idansh.engine.property.instance.PropertyType;
 
 public class TicksFunctionActivation extends FunctionActivationExpression {
-    private String entityName;
-    private String propertyName;
+    private final String entityName;
+    private final String propertyName;
 
     public TicksFunctionActivation(String entityName, String propertyName) {
         super(Type.TICKS);
@@ -14,11 +14,11 @@ public class TicksFunctionActivation extends FunctionActivationExpression {
 
     @Override
     public PropertyType getType() {
-        return null;
+        return PropertyType.INTEGER;
     }
 
     @Override
     public Object getValue() {
-        return null;
+        return 0; // todo - add ticks getValue()
     }
 }

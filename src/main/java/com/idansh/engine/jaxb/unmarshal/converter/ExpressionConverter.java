@@ -33,9 +33,10 @@ public class ExpressionConverter {
      * into an Expression Object.
      * Checks if the expression's value's type matches the action's type.
      * If the type matches, returns the Expression object, otherwise throws exception.
-     * @param entityName Name of the entity in context.
-     * @param propertyName Name of the property in context.
-     * @param actionType Type of the action in which the expression is defined.
+     *
+     * @param entityName    Name of the entity in context.
+     * @param propertyName  Name of the property in context.
+     * @param actionType    Type of the action in which the expression is defined.
      * @param expressionStr String that contains expression to be converted.
      * @return Converted Expression according to the string received.
      */
@@ -46,19 +47,43 @@ public class ExpressionConverter {
         retExpression = getFunctionExpression(actionType, entityName, propertyName, expressionStr);
 
         // Try to convert to PropertyExpression
-        if(retExpression == null) {
+        if (retExpression == null) {
             retExpression = getPropertyExpression(entityName, expressionStr);
         }
 
         // Convert to FixedExpression
-        if(retExpression == null) {
+        if (retExpression == null) {
             retExpression = getFixedValue(expressionStr);
         }
 
-        // Check for type error
-        validateValueType(actionType, entityName, propertyName, retExpression);
+        // Check for type error, in condition we don't need to check as we don't access a property to save in
+        if (!actionType.equals("condition")) {
+            validateValueType(actionType, entityName, propertyName, retExpression);
+        }
+        else {
+            // Create an Expression for the property, then validate its compatibility
+            Expression propertyExpression = convertPropertyExpression(entityName, propertyName);
+            validateConditionValueType(propertyExpression ,retExpression);
+        }
 
         return retExpression;
+    }
+
+
+    /**
+     * Validates that both expressions of a condition expression created by expressionConvert are compatible.
+     * @param propertyExpression Expression for the property value.
+     * @param expression Expression for the value field.
+     * @throws RuntimeException if the expressions are not compatible.
+     */
+    private void validateConditionValueType(Expression propertyExpression, Expression expression) {
+        PropertyType expressionType = expression.getType();
+        PropertyType propertyType = propertyExpression.getType();
+
+        // Check if types are not equal and if at least one of them is not numeric (if both are numeric it is possible to convert between the types)
+        if(!propertyType.equals(expressionType) && ((!propertyType.isNumeric()) || (!expressionType.isNumeric()))) {
+            throw new RuntimeException("cannot check condition on expression of type \"" + expressionType + "\" with the property of type \"" + propertyType + "\"");
+        }
     }
 
 
@@ -73,30 +98,39 @@ public class ExpressionConverter {
     private void validateValueType(String actionType, String entityName, String propertyName, Expression expression) {
         PropertyType expressionType = expression.getType();
 
-        // Check if the action is of type condition
-        if(actionType.equals("condition")) {
+        // Check if action is of type increase/decrease/set
+        if (actionType.equals("increase") || actionType.equals("decrease") || actionType.equals("set")) {
             PropertyType propertyType = entityManager.getEntityFactory(entityName).getPropertyFactory(propertyName).getType();
+            if (!propertyType.isNumeric())
+                throw new RuntimeException("cannot use expression of type \"" + expressionType + "\" in the action \"" + actionType + "\" on the property of type \"" + propertyType + "\"");
+        } // Action type is of calculation
+        else if (actionType.equals("calculation")) {
+            PropertyType propertyType = entityManager.getEntityFactory(entityName).getPropertyFactory(propertyName).getType();
+            if (!propertyType.equals(expressionType))
+                throw new RuntimeException("cannot save expression of type \"" + expressionType + "\" in the action \"" + actionType + "\" to the property of type \"" + propertyType + "\"");
+        } // Illegal action type
+        else
+            throw new RuntimeException("cannot validate expression's value type, action type \"" + actionType + "\" is invalid!");
+    }
 
-            // Check if types are not equal and if at least one of them is not numeric (if both are numeric it is possible to convert between the types)
-            if(!propertyType.equals(expressionType) && ((!propertyType.isNumeric()) || (!expressionType.isNumeric()))) {
-                throw new RuntimeException("cannot check condition on expression of type \"" + expressionType + "\" with the property of type \"" + propertyType + "\"");
-            }
 
-        } else {
-            // Check if action is of type increase/decrease/set
-            if(actionType.equals("increase") || actionType.equals("decrease") || actionType.equals("set")) {
-                PropertyType propertyType = entityManager.getEntityFactory(entityName).getPropertyFactory(propertyName).getType();
-                if(!propertyType.isNumeric())
-                    throw new RuntimeException("cannot use expression of type \"" + expressionType + "\" in the action \"" + actionType + "\" on the property of type \"" + propertyType + "\"");
-            } // Action type is of calculation
-            else if (actionType.equals("calculation")) {
-                PropertyType propertyType = entityManager.getEntityFactory(entityName).getPropertyFactory(propertyName).getType();
-                if(!propertyType.equals(expressionType))
-                    throw new RuntimeException("cannot save expression of type \"" + expressionType + "\" in the action \"" + actionType + "\" to the property of type \"" + propertyType + "\"");
-            } // Illegal action type
-            else
-                throw new RuntimeException("cannot validate expression's value type, action type \"" + actionType + "\" is invalid!");
+    /**
+     * Converts a string of an expression written in the property field of a condition action into an Expression object.
+     * @param entityName Name of the entity in which the property expression is defined.
+     * @param propertyValue String value to be converted into an Expression object.
+     */
+    public Expression convertPropertyExpression(String entityName, String propertyValue) {
+        Expression retExpression;
+
+        // Try to convert to FunctionExpression
+        retExpression = getFunctionExpression("condition", entityName, null, propertyValue);
+
+        // Convert to PropertyExpression
+        if(retExpression == null) {
+            retExpression = getPropertyExpression(entityName, propertyValue);
         }
+
+        return retExpression;
     }
 
 

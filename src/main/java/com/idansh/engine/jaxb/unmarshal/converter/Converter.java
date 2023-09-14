@@ -388,7 +388,7 @@ public abstract class Converter {
             return new SingleConditionAction(
                     worldContext,
                     prdAction.getEntity(),
-                    prdCondition.getProperty(),
+                    expressionConverter.convertPropertyExpression(prdCondition.getEntity(), prdCondition.getProperty()),
                     prdCondition.getOperator(),
                     expressionConverter.convertExpression("condition", prdAction.getEntity(), prdCondition.getProperty(), prdCondition.getValue()),
                     thenActions,
@@ -431,7 +431,7 @@ public abstract class Converter {
                         mainConditionAction.addInnerCondition(new SingleConditionAction(
                                 worldContext,
                                 prdCondition.getEntity(),
-                                prdCondition.getProperty(),
+                                expressionConverter.convertPropertyExpression(prdCondition.getEntity(), prdCondition.getProperty()),
                                 prdCondition.getOperator(),
                                 expressionConverter.convertExpression("condition", prdCondition.getEntity(), prdCondition.getProperty(), prdCondition.getValue()),
                                 null,

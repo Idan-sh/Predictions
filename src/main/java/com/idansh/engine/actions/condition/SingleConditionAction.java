@@ -8,7 +8,7 @@ import com.idansh.engine.world.World;
 import java.util.List;
 
 public class SingleConditionAction extends ConditionAction{
-    private final String propertyName;
+    private final Expression propertyExpression; // Possible types will be a PropertyExpression or a FunctionActivationExpression
     private final ConditionOperator operator;
     private final Expression expression;
 
@@ -22,9 +22,9 @@ public class SingleConditionAction extends ConditionAction{
      *                     possible values:  = (equal) / != (not equal) / bt (greater than) / lt (less than)
      * @param value        a number that will be compared to the property's value
      */
-    public SingleConditionAction(World worldContext, String entityContext, String propertyName, String operator, Expression value, ThenOrElseActions thenActions, ThenOrElseActions elseActions, boolean isMainCondition) {
+    public SingleConditionAction(World worldContext, String entityContext, Expression propertyExpression, String operator, Expression value, ThenOrElseActions thenActions, ThenOrElseActions elseActions, boolean isMainCondition) {
         super(worldContext, entityContext, thenActions, elseActions, isMainCondition);
-        this.propertyName = propertyName;
+        this.propertyExpression = propertyExpression;
         this.expression = value;
         this.operator = ConditionOperator.getConditionOperator(operator); // Try to convert to ConditionOperator, if fails throw exception
     }
@@ -38,7 +38,7 @@ public class SingleConditionAction extends ConditionAction{
 
     @Override
     public void invoke(Entity entity) {
-        Object propertyValue = entity.getPropertyByName(propertyName).getValue();
+        Object propertyValue = propertyExpression.getValue();
         boolean res;
 
         switch (operator) {
@@ -85,7 +85,7 @@ public class SingleConditionAction extends ConditionAction{
             elseActions = new ThenOrElseActions(getElseActions(), worldContext);
         }
 
-        return new SingleConditionAction(worldContext, getEntityContext(), propertyName, ConditionOperator.getConditionOperatorString(operator), expression, thenActions, elseActions, isMainCondition());
+        return new SingleConditionAction(worldContext, getEntityContext(), propertyExpression, ConditionOperator.getConditionOperatorString(operator), expression, thenActions, elseActions, isMainCondition());
     }
 
 
