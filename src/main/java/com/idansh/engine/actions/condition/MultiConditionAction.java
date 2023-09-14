@@ -7,6 +7,10 @@ import com.idansh.engine.world.World;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Defines a single logical OR/AND condition that will be invoked on multiple inner conditions.
+ * These inner conditions can be also of type MultiConditionAction, or of type SingleConditionAction.
+ */
 public class MultiConditionAction extends ConditionAction{
     private enum LogicOp {
         OR, AND;

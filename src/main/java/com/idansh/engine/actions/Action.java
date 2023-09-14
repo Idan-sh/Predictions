@@ -48,10 +48,10 @@ public abstract class Action {
     private final World worldContext;
 
     public Action(World worldContext, String entityContext) {
-        checkEntityContext(entityContext);
-
         this.entityContext = entityContext;
         this.worldContext = worldContext;
+
+        checkEntityContext(entityContext);
     }
 
 

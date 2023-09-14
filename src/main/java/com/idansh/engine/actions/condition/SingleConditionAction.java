@@ -7,6 +7,14 @@ import com.idansh.engine.world.World;
 
 import java.util.List;
 
+
+/**
+ * Defines a single condition, defined by two Expressions which will be compared by a given Operator.
+ * When the condition is invoked, the comparison will be performed.
+ * When the condition is invoked:
+ *      If resulted "true", a collection of "then" actions will be invoked,
+ *      otherwise (resulted "false"), a collection of "else" actions will be invoked.
+ */
 public class SingleConditionAction extends ConditionAction{
     private final Expression propertyExpression; // Possible types will be a PropertyExpression or a FunctionActivationExpression
     private final ConditionOperator operator;

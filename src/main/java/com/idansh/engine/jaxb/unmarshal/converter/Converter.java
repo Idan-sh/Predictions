@@ -1,10 +1,7 @@
 package com.idansh.engine.jaxb.unmarshal.converter;
 
 import com.idansh.engine.actions.*;
-import com.idansh.engine.actions.condition.ConditionAction;
-import com.idansh.engine.actions.condition.MultiConditionAction;
-import com.idansh.engine.actions.condition.SingleConditionAction;
-import com.idansh.engine.actions.condition.ThenOrElseActions;
+import com.idansh.engine.actions.condition.*;
 import com.idansh.engine.entity.EntityFactory;
 import com.idansh.engine.helpers.Range;
 import com.idansh.engine.jaxb.schema.generated.*;
@@ -48,8 +45,6 @@ public abstract class Converter {
         prdWorld.getPRDEntities().getPRDEntity().forEach(
                 e -> retWorld.entityManager.addEntityFactory(entityConvert(e))
         );
-
-//        retWorld.entityManager.initEntityPopulation();
 
         // Iterates over all PRDRules, converts each rule and adds it to the world
         prdWorld.getPRDRules().getPRDRule().forEach(
@@ -300,8 +295,8 @@ public abstract class Converter {
 
             case CONDITION:
                 retAction = conditionActionConvert(
-                        prdAction,
                         worldContext,
+                        prdAction,
                         expressionConverter
                 );
                 break;
@@ -320,6 +315,7 @@ public abstract class Converter {
                         worldContext,
                         prdAction.getEntity()
                 );
+                break;
 
             case REPLACE:
                 retAction = new ReplaceAction(
@@ -331,8 +327,15 @@ public abstract class Converter {
                 break;
 
             case PROXIMITY:
-                // todo - add proximity
+                retAction = proximityActionConvert(
+                        worldContext,
+                        prdAction,
+                        expressionConverter
+                );
                 break;
+
+            default:
+                throw new IllegalArgumentException("Cannot convert action of type \"" + prdAction.getType() + "\", no action available of this type.");
             }
 
         return retAction;
@@ -340,9 +343,41 @@ public abstract class Converter {
 
 
     /**
+     * Converts a PRDAction of proximity condition that was read from the XML file
+     * into a ProximityConditionAction Object.
+     * @param prdAction PRDAction object that was read from the XML file.
+     * @param worldContext the simulated world in which the proximity condition is set.
+     * @param expressionConverter used for creating Expression objects from the XML file.
+     * @return ProximityConditionAction object with the data of the PRDAction received.
+     */
+    private static ProximityConditionAction proximityActionConvert(World worldContext, PRDAction prdAction, ExpressionConverter expressionConverter) {
+        ThenOrElseActions thenActions = new ThenOrElseActions();
+
+        // Convert 'then' action sets
+        proximityActionsConvert(prdAction, worldContext, thenActions);
+
+        // Create and return result Proximity Action
+        return new ProximityConditionAction(
+                worldContext,
+                prdAction.getPRDBetween().getSourceEntity(),
+                prdAction.getPRDBetween().getTargetEntity(),
+                thenActions,
+                expressionConverter.convertExpression(
+                        "proximity",
+                        prdAction.getPRDBetween().getSourceEntity(),
+                        null,
+                        prdAction.getPRDEnvDepth().getOf()
+                )
+        );
+    }
+
+
+    /**
      * Converts a PRDAction of calculation that was read from the XML file
      * into a CalculationAction Object.
      * @param prdAction PRDAction object that was read from the XML file.
+     * @param worldContext the simulated world in which the conditions are set.
+     * @param expressionConverter used for creating Expression objects from the XML file.
      * @return CalculationAction object with the data of the PRDAction received.
      */
     private static CalculationAction calculationActionConvert(World worldContext, PRDAction prdAction, ExpressionConverter expressionConverter){
@@ -380,12 +415,12 @@ public abstract class Converter {
      * into a ConditionAction Object.
      * @param prdAction PRDAction object that was read from the XML file.
      * @param worldContext the simulated world in which the conditions are set.
-     * @param expressionConverter used for converting expressions into values.
+     * @param expressionConverter used for creating Expression objects from the XML file.
      * @return ConditionAction object with the data of the PRDAction received.
      */
-    private static ConditionAction conditionActionConvert(PRDAction prdAction, World worldContext, ExpressionConverter expressionConverter){
+    private static ConditionAction conditionActionConvert( World worldContext, PRDAction prdAction, ExpressionConverter expressionConverter){
         PRDCondition prdCondition = prdAction.getPRDCondition();
-        final ThenOrElseActions thenActions = new ThenOrElseActions(), elseActions = new ThenOrElseActions();
+        ThenOrElseActions thenActions = new ThenOrElseActions(), elseActions = new ThenOrElseActions();
 
         // Convert Then/Else action sets
         thenOrElseConvert(prdAction, worldContext, thenActions, elseActions);
@@ -426,7 +461,7 @@ public abstract class Converter {
      * @param prdAction the main action in which the conditions are set.
      * @param prdConditionList list of all inner conditions to convert.
      * @param worldContext the simulated world in which the conditions are set.
-     * @param expressionConverter used for converting expressions into values.
+     * @param expressionConverter used for creating Expression objects from the XML file.
      * @param mainConditionAction the main multi-action in which we search for inner conditions. these inner conditions will be added to the main condition action's list.
      */
     private static void convertInnerConditions(PRDAction prdAction, List<PRDCondition> prdConditionList, World worldContext, ExpressionConverter expressionConverter, MultiConditionAction mainConditionAction) {
@@ -468,8 +503,9 @@ public abstract class Converter {
     /**
      * Convert Then and Else action sets from XML file, adds them into the proper action sets.
      * @param prdAction PRDAction object that was read from the XML file.
+     * @param worldContext the simulated world in which the conditions are set.
      * @param thenActions ThenElseActions action set for the Then actions.
-     * @param elseActions ThenElseActions action set for the Else actions.
+     * @param elseActions ThenElseActions action set for the Else actions (optional).
      */
     private static void thenOrElseConvert(PRDAction prdAction, World worldContext, final ThenOrElseActions thenActions, final ThenOrElseActions elseActions){
         prdAction.getPRDThen().getPRDAction().forEach(
@@ -485,5 +521,22 @@ public abstract class Converter {
             prdAction.getPRDElse().getPRDAction().forEach(
                 a -> elseActions.addAction(actionConvert(a, worldContext))
         );
+    }
+
+
+    /**
+     * Convert action set for proximity action from XML file.
+     * @param prdAction PRDAction object that was read from the XML file.
+     * @param worldContext the simulated world in which the conditions are set.
+     * @param thenActions ThenElseActions action set for the proximity's actions.
+     */
+    private static void proximityActionsConvert(PRDAction prdAction, World worldContext, final ThenOrElseActions thenActions){
+        prdAction.getPRDActions().getPRDAction().forEach(
+                a -> thenActions.addAction(actionConvert(a, worldContext))
+        );
+
+        // Check if the then actions block contains no actions
+        if(thenActions.isEmpty())
+            throw new RuntimeException("Proximity action's actions set received from XML is empty, add at least one action to the actions set...");
     }
 }

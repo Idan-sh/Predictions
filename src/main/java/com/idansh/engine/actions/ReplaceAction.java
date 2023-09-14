@@ -51,7 +51,8 @@ public class ReplaceAction extends Action {
     public ReplaceAction(World worldContext, String entityToKill, String entityToCreate, String mode) {
         super(worldContext, entityToKill);
 
-        super.checkEntityContext(entityToCreate); // Check if an entity with the received name entityToCreate exists.
+        checkEntityContext(entityToCreate); // Check if an entity with the received name entityToCreate exists.
+
         this.entityToCreate = entityToCreate;
         this.mode = Mode.getMode(mode);
     }
