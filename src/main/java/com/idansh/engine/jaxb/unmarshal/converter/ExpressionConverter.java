@@ -94,12 +94,19 @@ public class ExpressionConverter {
     private void validateValueType(String actionType, String mainEntityName, String secondaryEntityName, String propertyName, Expression expression) {
         PropertyType expressionType = expression.getType();
 
-        // Check if action is of type increase/decrease/set
-        if (actionType.equals("increase") || actionType.equals("decrease") || actionType.equals("set")) {
+        // Check if action is of type increase/decrease
+        if (actionType.equals("increase") || actionType.equals("decrease")) {
             PropertyType propertyType = entityManager.getEntityFactory(mainEntityName).getPropertyFactory(propertyName).getType();
 
             if (!propertyType.isNumeric())
                 throw new RuntimeException("cannot use expression of type \"" + expressionType + "\" in the action \"" + actionType + "\" on the property of type \"" + propertyType + "\"");
+        }
+        // Action type is of set
+        else if (actionType.equals("set")) {
+            PropertyType propertyType = entityManager.getEntityFactory(mainEntityName).getPropertyFactory(propertyName).getType();
+
+            if (!propertyType.equals(expressionType))
+                throw new RuntimeException("cannot set expression of type \"" + expressionType + "\" in the action \"" + actionType + "\" to the property of type \"" + propertyType + "\"");
         }
         // Action type is of calculation
         else if (actionType.equals("calculation")) {

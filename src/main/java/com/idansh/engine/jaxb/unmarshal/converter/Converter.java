@@ -580,14 +580,22 @@ public abstract class Converter {
      */
     private static void thenOrElseConvert(PRDAction prdAction, World worldContext, final ThenOrElseActions thenActions, final ThenOrElseActions elseActions){
         prdAction.getPRDThen().getPRDAction().forEach(
-                a -> thenActions.addAction(
-                        actionConvert(
-                                a,
-                                worldContext,
-                                prdAction.getEntity(),
-                                prdAction.getPRDSecondaryEntity().getEntity()
-                        )
-                )
+                a -> {
+                    PRDAction.PRDSecondaryEntity prdSecondaryEntity = prdAction.getPRDSecondaryEntity();
+                    String secondaryEntityName = null;
+
+                    if(prdSecondaryEntity != null)
+                        secondaryEntityName = prdSecondaryEntity.getEntity();
+
+                    thenActions.addAction(
+                            actionConvert(
+                                    a,
+                                    worldContext,
+                                    prdAction.getEntity(),
+                                    secondaryEntityName
+                            )
+                    );
+                }
         );
 
         // Check if the then actions block contains no actions

@@ -18,8 +18,8 @@ public class ProximityConditionAction extends ConditionAction {
     public ProximityConditionAction(World worldContext, String sourceEntity, String targetEntity, ThenOrElseActions thenActions, Expression proximityDepth) {
         super(worldContext, sourceEntity, thenActions, null, true);
 
-        if(!proximityDepth.getType().equals(PropertyType.INTEGER))
-            throw new IllegalArgumentException("Cannot create proximity action with an non-Integer expression, got expression of type \"" + proximityDepth.getType() + "\".");
+        if(!proximityDepth.getType().equals(PropertyType.INTEGER) && !proximityDepth.getType().equals(PropertyType.FLOAT))
+            throw new IllegalArgumentException("Cannot create proximity action with an non-numeric expression, got expression of type \"" + proximityDepth.getType() + "\".");
 
         this.targetEntity = targetEntity;
         this.proximityDepth = proximityDepth;

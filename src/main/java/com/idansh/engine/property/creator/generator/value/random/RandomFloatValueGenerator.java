@@ -11,6 +11,9 @@ public class RandomFloatValueGenerator implements ValueGenerator<Float> {
     private final Range range;
 
     public RandomFloatValueGenerator(Range range) {
+        if(range == null) {
+            throw new IllegalArgumentException("Cannot create Random Float Value Generator, received no range!");
+        }
         this.range = range;
     }
 
