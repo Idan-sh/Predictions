@@ -58,15 +58,8 @@ public class ExpressionConverter {
             retExpression = getFixedValue(expressionStr);
         }
 
-        // Check for type error, in condition we don't need to check as we don't access a property to save in
-        if (!actionType.equals("condition")) {
-            validateValueType(actionType, mainEntityName, propertyName, retExpression);
-        }
-        else {
-            // Create an Expression for the property, then validate its compatibility
-            Expression propertyExpression = convertPropertyExpression(mainEntityName, secondaryEntityName, propertyName);
-            validateConditionValueType(propertyExpression ,retExpression);
-        }
+        // Check for errors in the created expression
+        validateValueType(actionType, mainEntityName, secondaryEntityName, propertyName, retExpression);
 
         return retExpression;
     }
@@ -91,28 +84,40 @@ public class ExpressionConverter {
 
     /**
      * Validates that an expression created by expressionConvert is compatible with the action's type.
-     * @param actionType type action in which the expression is set.
-     * @param entityName name of the entity defined in the action.
-     * @param propertyName name of the property defined in the action.
-     * @param expression expression that was defined in the action.
+     * @param actionType Type action in which the expression is set.
+     * @param mainEntityName Name of the main entity defined in the action.
+     * @param secondaryEntityName Name of the secondary entity defined in the action.
+     * @param propertyName Mame of the property defined in the action.
+     * @param expression The expression to check its type.
      * @throws RuntimeException if the expression created is not compatible with the action's type.
      */
-    private void validateValueType(String actionType, String entityName, String propertyName, Expression expression) {
+    private void validateValueType(String actionType, String mainEntityName, String secondaryEntityName, String propertyName, Expression expression) {
         PropertyType expressionType = expression.getType();
 
         // Check if action is of type increase/decrease/set
         if (actionType.equals("increase") || actionType.equals("decrease") || actionType.equals("set")) {
-            PropertyType propertyType = entityManager.getEntityFactory(entityName).getPropertyFactory(propertyName).getType();
+            PropertyType propertyType = entityManager.getEntityFactory(mainEntityName).getPropertyFactory(propertyName).getType();
+
             if (!propertyType.isNumeric())
                 throw new RuntimeException("cannot use expression of type \"" + expressionType + "\" in the action \"" + actionType + "\" on the property of type \"" + propertyType + "\"");
-        } // Action type is of calculation
+        }
+        // Action type is of calculation
         else if (actionType.equals("calculation")) {
-            PropertyType propertyType = entityManager.getEntityFactory(entityName).getPropertyFactory(propertyName).getType();
+            PropertyType propertyType = entityManager.getEntityFactory(mainEntityName).getPropertyFactory(propertyName).getType();
+
             if (!propertyType.equals(expressionType))
                 throw new RuntimeException("cannot save expression of type \"" + expressionType + "\" in the action \"" + actionType + "\" to the property of type \"" + propertyType + "\"");
-        } // Illegal action type
-        else
+        }
+        // Action type is of condition
+        else if(actionType.equals("condition")) {
+            // Create an Expression for the property, then validate its compatibility
+            Expression propertyExpression = convertPropertyExpression(mainEntityName, secondaryEntityName, propertyName);
+            validateConditionValueType(propertyExpression ,expression);
+        }
+        // Check if ignored type, if not then received illegal action type
+        else if (!actionType.equals("proximity")) {
             throw new RuntimeException("cannot validate expression's value type, action type \"" + actionType + "\" is invalid!");
+        }
     }
 
 
@@ -208,6 +213,7 @@ public class ExpressionConverter {
      * @throws IllegalArgumentException in case that the entity context name doesn't equal to the function argument's entity name.
      */
     private void checkEntityContext(Pair<String, String> entityPropertyPair, String mainEntityContext, String secondaryEntityContext) {
+        System.out.println("secondary is " + secondaryEntityContext); // todo - secondary entity received is null for some reason... debug this piece of shit plz
         if(!mainEntityContext.equals(entityPropertyPair.getKey()) && !(secondaryEntityContext != null && secondaryEntityContext.equals(entityPropertyPair.getKey()))) {
             throw new IllegalArgumentException("Cannot evaluate with entity " + entityPropertyPair.getKey()
                     + " on entity context " + mainEntityContext + ". Evaluate only works on an argument with an entity name " +
@@ -321,10 +327,10 @@ public class ExpressionConverter {
 
     /**
      * Parses a string to one of the following:
-     * Float, Boolean, String,
+     * Integer, Float, Boolean, String,
      * and creates a FixedValueExpression with the resulted value.
-     * Will try to convert to integer, then to float, then to boolean,
-     * and if all fails will keep as string.
+     * Will try to convert to Integer, then to Float, then to Boolean,
+     * and if all fails will keep as String.
      * @param prdStr PRDAction's value string.
      * @return a FixedValueExpression with the resulted converted value.
      */
@@ -333,20 +339,26 @@ public class ExpressionConverter {
         PropertyType retType;
 
         try {
-            // Try to convert to float
-            retValue = Float.parseFloat(prdStr);
-            retType = PropertyType.FLOAT;
-        } catch (NumberFormatException notFloat) {
-            // Try to convert to boolean
-            if (prdStr.equalsIgnoreCase("true")) {
-                retValue = true;
-                retType = PropertyType.BOOLEAN;
-            } else if (prdStr.equalsIgnoreCase("false")) {
-                retValue = false;
-                retType = PropertyType.BOOLEAN;
-            } else { // Keep as string
-                retValue = prdStr;
-                retType = PropertyType.STRING;
+            // Try to convert to Integer
+            retValue = Integer.parseInt(prdStr);
+            retType = PropertyType.INTEGER;
+        } catch (NumberFormatException notInteger) {
+            try {
+                // Try to convert to Float
+                retValue = Float.parseFloat(prdStr);
+                retType = PropertyType.FLOAT;
+            } catch (NumberFormatException notFloat) {
+                // Try to convert to Boolean
+                if (prdStr.equalsIgnoreCase("true")) {
+                    retValue = true;
+                    retType = PropertyType.BOOLEAN;
+                } else if (prdStr.equalsIgnoreCase("false")) {
+                    retValue = false;
+                    retType = PropertyType.BOOLEAN;
+                } else { // Keep as String
+                    retValue = prdStr;
+                    retType = PropertyType.STRING;
+                }
             }
         }
 

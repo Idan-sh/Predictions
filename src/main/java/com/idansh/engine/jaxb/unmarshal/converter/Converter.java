@@ -228,7 +228,14 @@ public abstract class Converter {
 
         // Iterates over all prdActions, converts them to actions and adds them to the rule
         prdRule.getPRDActions().getPRDAction().forEach(
-                a -> retRule.addAction(actionConvert(a, worldContext))
+                a -> retRule.addAction(
+                        actionConvert(
+                            a,
+                            worldContext,
+                            a.getEntity(),
+                            getSecondaryEntity(a)
+                        )
+                )
         );
 
         return retRule;
@@ -259,9 +266,11 @@ public abstract class Converter {
      * Converts a PRDAction object that was read from the XML file
      * into an Action Object.
      * @param prdAction PRDAction object that was read from the XML file.
+     * @param mainEntityName Name of the main entity in which the action is defined.
+     * @param secondaryEntityName Name of the secondary entity in which the action is defined (optional).
      * @return Action object with the data of the PRDAction received.
      */
-    private static Action actionConvert(PRDAction prdAction, World worldContext) {
+    private static Action actionConvert(PRDAction prdAction, World worldContext, String mainEntityName, String secondaryEntityName) {
         Action retAction;
         ExpressionConverter expressionConverter = new ExpressionConverter(worldContext);
 
@@ -273,8 +282,8 @@ public abstract class Converter {
                         prdAction.getProperty(),
                         expressionConverter.convertExpression(
                                 "increase",
-                                prdAction.getEntity(),
-                                getSecondaryEntity(prdAction),
+                                mainEntityName,
+                                secondaryEntityName,
                                 prdAction.getProperty(),
                                 prdAction.getBy()
                         )
@@ -288,8 +297,8 @@ public abstract class Converter {
                         prdAction.getProperty(),
                         expressionConverter.convertExpression(
                                 "decrease",
-                                prdAction.getEntity(),
-                                getSecondaryEntity(prdAction),
+                                mainEntityName,
+                                secondaryEntityName,
                                 prdAction.getProperty(),
                                 prdAction.getBy()
                         )
@@ -319,8 +328,8 @@ public abstract class Converter {
                         prdAction.getProperty(),
                         expressionConverter.convertExpression(
                                 "set",
-                                prdAction.getEntity(),
-                                getSecondaryEntity(prdAction),
+                                mainEntityName,
+                                secondaryEntityName,
                                 prdAction.getProperty(),
                                 prdAction.getValue()
                         )
@@ -330,7 +339,7 @@ public abstract class Converter {
             case KILL:
                 retAction = new KillAction(
                         worldContext,
-                        prdAction.getEntity()
+                        mainEntityName
                 );
                 break;
 
@@ -383,7 +392,7 @@ public abstract class Converter {
                         "proximity",
                         prdAction.getPRDBetween().getSourceEntity(),
                         prdAction.getPRDBetween().getTargetEntity(),
-                        null,
+                        prdAction.getPRDBetween().getTargetEntity(),
                         prdAction.getPRDEnvDepth().getOf()
                 )
         );
@@ -571,7 +580,14 @@ public abstract class Converter {
      */
     private static void thenOrElseConvert(PRDAction prdAction, World worldContext, final ThenOrElseActions thenActions, final ThenOrElseActions elseActions){
         prdAction.getPRDThen().getPRDAction().forEach(
-                a -> thenActions.addAction(actionConvert(a, worldContext))
+                a -> thenActions.addAction(
+                        actionConvert(
+                                a,
+                                worldContext,
+                                prdAction.getEntity(),
+                                prdAction.getPRDSecondaryEntity().getEntity()
+                        )
+                )
         );
 
         // Check if the then actions block contains no actions
@@ -581,7 +597,14 @@ public abstract class Converter {
         // Check if there is an else actions block
         if(prdAction.getPRDElse() != null)
             prdAction.getPRDElse().getPRDAction().forEach(
-                a -> elseActions.addAction(actionConvert(a, worldContext))
+                a -> elseActions.addAction(
+                        actionConvert(
+                                a,
+                                worldContext,
+                                prdAction.getEntity(),
+                                prdAction.getPRDSecondaryEntity().getEntity()
+                        )
+                )
         );
     }
 
@@ -594,7 +617,14 @@ public abstract class Converter {
      */
     private static void proximityActionsConvert(PRDAction prdAction, World worldContext, final ThenOrElseActions thenActions){
         prdAction.getPRDActions().getPRDAction().forEach(
-                a -> thenActions.addAction(actionConvert(a, worldContext))
+                a -> thenActions.addAction(
+                        actionConvert(
+                                a,
+                                worldContext,
+                                prdAction.getPRDBetween().getSourceEntity(),
+                                prdAction.getPRDBetween().getTargetEntity()
+                        )
+                )
         );
 
         // Check if the then actions block contains no actions
@@ -611,9 +641,12 @@ public abstract class Converter {
     private static String getSecondaryEntity(PRDAction prdAction) {
         PRDAction.PRDSecondaryEntity prdSecondaryEntity = prdAction.getPRDSecondaryEntity();
 
-        if(prdSecondaryEntity != null)
+        if(prdSecondaryEntity != null) {
+            System.out.println("found secondary entity " + prdSecondaryEntity.getEntity());
             return prdSecondaryEntity.getEntity();
+        }
 
+        System.out.println("found no secondary");
         return null;
     }
 }
