@@ -50,6 +50,11 @@ public abstract class Converter {
                 r -> retWorld.addRule(ruleConvert(r, retWorld))
         );
 
+        if(prdWorld.getPRDTermination().getPRDByUser() != null)
+            retWorld.addTerminationRule(
+                    new TerminationRule(TerminationRule.Type.USER_DEFINED, null)
+            );
+
         // Iterate over all PRDTerminations, converts each termination rule and adds it to the world
         prdWorld.getPRDTermination().getPRDBySecondOrPRDByTicks().forEach(
                 t -> retWorld.addTerminationRule(terminationRuleConvert(t))
@@ -650,11 +655,9 @@ public abstract class Converter {
         PRDAction.PRDSecondaryEntity prdSecondaryEntity = prdAction.getPRDSecondaryEntity();
 
         if(prdSecondaryEntity != null) {
-            System.out.println("found secondary entity " + prdSecondaryEntity.getEntity());
             return prdSecondaryEntity.getEntity();
         }
 
-        System.out.println("found no secondary");
         return null;
     }
 }

@@ -42,7 +42,6 @@ public class ExpressionConverter {
      * @return                      Converted Expression according to the string received.
      */
     public Expression convertExpression(String actionType, String mainEntityName, String secondaryEntityName, String propertyName, String expressionStr) {
-        System.out.println("Converting expression " + expressionStr);
         Expression retExpression;
 
         // Try to convert to FunctionExpression
@@ -105,7 +104,7 @@ public class ExpressionConverter {
         else if (actionType.equals("set")) {
             PropertyType propertyType = entityManager.getEntityFactory(mainEntityName).getPropertyFactory(propertyName).getType();
 
-            if (!propertyType.equals(expressionType))
+            if (!propertyType.equals(expressionType) && !(propertyType.equals(PropertyType.FLOAT) && expressionType.equals(PropertyType.INTEGER)))
                 throw new RuntimeException("cannot set expression of type \"" + expressionType + "\" in the action \"" + actionType + "\" to the property of type \"" + propertyType + "\"");
         }
         // Action type is of calculation
@@ -220,7 +219,6 @@ public class ExpressionConverter {
      * @throws IllegalArgumentException in case that the entity context name doesn't equal to the function argument's entity name.
      */
     private void checkEntityContext(Pair<String, String> entityPropertyPair, String mainEntityContext, String secondaryEntityContext) {
-        System.out.println("secondary is " + secondaryEntityContext); // todo - secondary entity received is null for some reason... debug this piece of shit plz
         if(!mainEntityContext.equals(entityPropertyPair.getKey()) && !(secondaryEntityContext != null && secondaryEntityContext.equals(entityPropertyPair.getKey()))) {
             throw new IllegalArgumentException("Cannot evaluate with entity " + entityPropertyPair.getKey()
                     + " on entity context " + mainEntityContext + ". Evaluate only works on an argument with an entity name " +

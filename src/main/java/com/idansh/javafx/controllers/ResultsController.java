@@ -218,8 +218,10 @@ public class ResultsController implements Initializable {
      *      and how much time had passed since the beginning of the simulation (in seconds).
      */
     public void selectTableItem() {
-        BiFunction<Integer, Integer, String> ticksFormatter =
+        BiFunction<Integer, Integer, String> ticksFormatterWithMax =
                 (completedTicks, maxTicks) -> String.format("Ticks Reached: %d/%d", completedTicks, maxTicks);
+        Function<Integer, String> ticksFormatterWithoutMax =
+                (completedTicks) -> String.format("Ticks Reached: %d", completedTicks);
         Function<Float, String> timerFormatter = (timePassed) -> String.format("Time Passed: %.3f Seconds", timePassed);
 
         ResultsTableItem selectedItem = executionListTableView.getSelectionModel().getSelectedItem();
@@ -239,12 +241,18 @@ public class ResultsController implements Initializable {
             propertyDetailsTreeView.getRoot().getChildren().clear();
 
             // Add completed ticks and time passed to the list view
-            progressListView.getItems().addAll(ticksFormatter.apply(
-                            selectedItem.getCompletedTicks(),
-                            selectedItem.getMaxTicks()
-                    ),
-                    timerFormatter.apply(selectedItem.getSimulationTime().getSecondsPassed())
-            );
+            if(selectedItem.getMaxTicks() != null) {
+                progressListView.getItems().addAll(
+                        ticksFormatterWithMax.apply(selectedItem.getCompletedTicks(), selectedItem.getMaxTicks()),
+                        timerFormatter.apply(selectedItem.getSimulationTime().getSecondsPassed())
+                );
+            } else {
+                progressListView.getItems().addAll(
+                        ticksFormatterWithoutMax.apply(selectedItem.getCompletedTicks()),
+                        timerFormatter.apply(selectedItem.getSimulationTime().getSecondsPassed())
+                );
+            }
+
 
             // Add entity amounts to the table
             entityAmountsTableView.getItems().addAll(selectedItem.getEntityDTOList());

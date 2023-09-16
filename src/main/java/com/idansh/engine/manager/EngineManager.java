@@ -269,13 +269,17 @@ public class EngineManager {
      * @return a DTO List of running simulations.
      */
     private RunningSimulationDTO getRunningSimulationDTO(World world) {
+        Integer maxTicks = null;
+        if(world.getTerminationRules().containsKey(TerminationRule.Type.TICKS))
+            maxTicks = world.getTerminationRules().get(TerminationRule.Type.TICKS).getValue();
+
         RunningSimulationDTO runningSimulationDTO =
                 new RunningSimulationDTO(
                         world.getId(),
                         getEnvironmentVariablesListDTO(world),
                         world.getSimulationTime(),
                         world.getTickCount(),
-                        world.getTerminationRules().get(TerminationRule.Type.TICKS).getValue()
+                        maxTicks
                 );
 
         // Add Entities:

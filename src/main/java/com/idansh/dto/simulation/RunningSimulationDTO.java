@@ -21,10 +21,11 @@ public class RunningSimulationDTO {
     private final List<TerminationRuleDTO> terminationRuleDTOList;
     private final EnvironmentVariablesListDTO environmentVariablesListDTO;
     private final SimulationTime simulationTime;
-    private final int completedTicks, maxTicks;
+    private final int completedTicks;
+    private final Integer maxTicks;
 
 
-    public RunningSimulationDTO(int id, EnvironmentVariablesListDTO environmentVariablesListDTO, SimulationTime simulationTime, int completedTicks, int maxTicks) {
+    public RunningSimulationDTO(int id, EnvironmentVariablesListDTO environmentVariablesListDTO, SimulationTime simulationTime, int completedTicks, Integer maxTicks) {
         this.id = id;
         this.entityDTOList = new ArrayList<>();
         this.ruleDTOList = new ArrayList<>();
@@ -76,7 +77,7 @@ public class RunningSimulationDTO {
         return completedTicks;
     }
 
-    public int getMaxTicks() {
+    public Integer getMaxTicks() {
         return maxTicks;
     }
 }

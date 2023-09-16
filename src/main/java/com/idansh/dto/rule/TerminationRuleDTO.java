@@ -2,9 +2,9 @@ package com.idansh.dto.rule;
 
 public class TerminationRuleDTO {
     String type;
-    int value;
+    Integer value;
 
-    public TerminationRuleDTO(String type, int value) {
+    public TerminationRuleDTO(String type, Integer value) {
         this.type = type;
         this.value = value;
     }
@@ -13,7 +13,7 @@ public class TerminationRuleDTO {
         return type;
     }
 
-    public int getValue() {
+    public Integer getValue() {
         return value;
     }
 

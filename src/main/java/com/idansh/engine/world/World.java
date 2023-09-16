@@ -104,7 +104,10 @@ public class World implements Runnable {
      */
     public void addTerminationRule(TerminationRule terminationRule) {
         if(terminationRules.containsKey(terminationRule.getType()))
-            throw new IllegalArgumentException("received terminationRule's type - " + terminationRule.getType() + " already exists!");
+            throw new IllegalArgumentException("Received terminationRule's type - " + terminationRule.getType() + " already exists!");
+
+        if(terminationRule.getType().equals(TerminationRule.Type.USER_DEFINED) && !terminationRules.isEmpty())
+            throw new IllegalArgumentException("Cannot add user-defined termination rule with other types of termination rules!");
 
         terminationRules.put(terminationRule.getType(), terminationRule);
     }
@@ -135,7 +138,7 @@ public class World implements Runnable {
         if(terminationRules.containsKey(TerminationRule.Type.SECONDS))
             timer.schedule(countdown, terminationRules.get(TerminationRule.Type.SECONDS).getValue() * 1000L); // Get the amount of seconds and multiply by 1000 to get in milliseconds
 
-        // Check if the current tick has reached the termination rule tick defined, if one does not exist keeps going until reached the timer defined
+        // Check if the current tick has reached the termination rule tick defined, if one does not exist keeps going until reached the timer defined or the user decided to stop the simulation
         while((!terminationRules.containsKey(TerminationRule.Type.TICKS)) || (terminationRules.containsKey(TerminationRule.Type.TICKS) && tickCounter.getCount() < terminationRules.get(TerminationRule.Type.TICKS).getValue())) {
             // Checks if the timer expired, if so end simulation
             if (countdown.isFinished())

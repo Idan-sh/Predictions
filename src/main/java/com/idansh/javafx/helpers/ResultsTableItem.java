@@ -20,10 +20,10 @@ public class ResultsTableItem {
     private List<EntityDTO> entityDTOList;
 
     private int completedTicks;
-    private final int maxTicks;
+    private final Integer maxTicks;
 
 
-    public ResultsTableItem(int id, List<EntityDTO> entityDTOList, SimulationTime simulationTime, String status, int completedTicks, int maxTicks) {
+    public ResultsTableItem(int id, List<EntityDTO> entityDTOList, SimulationTime simulationTime, String status, int completedTicks, Integer maxTicks) {
         this.id = id;
         this.entityDTOList = entityDTOList;
 
@@ -65,7 +65,7 @@ public class ResultsTableItem {
         return completedTicks;
     }
 
-    public int getMaxTicks() {
+    public Integer getMaxTicks() {
         return maxTicks;
     }
 

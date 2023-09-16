@@ -153,10 +153,15 @@ public class DetailsController {
         TreeItem<String> mainRoot = new TreeItem<>(MAIN_ROOT_NAME);
         detailsTreeView.setRoot(mainRoot);
 
-        TreeItem<String> valueItem = new TreeItem<>(VALUE_TITLE + terminationRuleDTO.getValue());
+        // Create and add Termination Rule Type
         TreeItem<String> typeItem = new TreeItem<>(TYPE_TITLE + terminationRuleDTO.getType());
+        mainRoot.getChildren().add(typeItem);
 
-        mainRoot.getChildren().addAll(valueItem, typeItem);
+        // Create and add Termination Rule Value (if exists)
+        if(terminationRuleDTO.getValue() != null) {
+            TreeItem<String> valueItem = new TreeItem<>(VALUE_TITLE + terminationRuleDTO.getValue());
+            mainRoot.getChildren().add(valueItem);
+        }
     }
 
 

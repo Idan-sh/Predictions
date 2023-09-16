@@ -6,11 +6,12 @@ package com.idansh.engine.rule;
 public class TerminationRule {
     /**
      * Sets the type of termination rule to be:
-     * 0. TICKS -       maximum clock tick to reach
-     * 1. SECONDS -     number of seconds for a timer to be set by
+     * 0. TICKS -           maximum clock tick to reach.
+     * 1. SECONDS -         number of seconds for a timer to be set by.
+     * 2. USER_DEFINED-     user will stop the simulation manually.
      */
     public enum Type {
-        TICKS, SECONDS;
+        TICKS, SECONDS, USER_DEFINED;
 
         /**
          * @param type TerminationRule.Type object of the termination rule.
@@ -22,20 +23,22 @@ public class TerminationRule {
                     return "ticks";
                 case SECONDS:
                     return "seconds";
+                case USER_DEFINED:
+                    return "user-defined";
                 default:
                     throw new RuntimeException("termination rule type received is invalid!");
             }
         }
     }
-    Type type;  // the type of the termination rule
-    int value;  // nof ticks/seconds
+    Type type;      // the type of the termination rule
+    Integer value;  // nof ticks/seconds, if user defined will be null
 
-    public TerminationRule(Type type, int value) {
+    public TerminationRule(Type type, Integer value) {
         this.type = type;
         this.value = value;
     }
 
-    public int getValue() {
+    public Integer getValue() {
         return value;
     }
 
