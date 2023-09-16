@@ -1,6 +1,7 @@
 package com.idansh.engine.actions;
 
 import com.idansh.engine.entity.Entity;
+import com.idansh.engine.entity.SecondaryEntity;
 import com.idansh.engine.world.World;
 
 public abstract class Action {
@@ -44,19 +45,45 @@ public abstract class Action {
             }
         }
     }
-    private final String entityContext;
+    private final String mainEntityContext;
     private final World worldContext;
+    private final SecondaryEntity secondaryEntity; // Optional
+    private final String entityToInvokeOn;
 
-    public Action(World worldContext, String entityContext) {
-        this.entityContext = entityContext;
+
+    public Action(World worldContext, String mainEntityContext, String entityToInvokeOn) {
+        this.mainEntityContext = mainEntityContext;
         this.worldContext = worldContext;
+        this.secondaryEntity = null;
 
-        checkEntityContext(entityContext);
+        checkEntityToInvokeOn(entityToInvokeOn);
+        this.entityToInvokeOn = entityToInvokeOn;
+
+        checkEntityContext(mainEntityContext);
     }
 
+    public Action(World worldContext, String mainEntityContext, SecondaryEntity secondaryEntity, String entityToInvokeOn) {
+        this.mainEntityContext = mainEntityContext;
+        this.worldContext = worldContext;
+        this.secondaryEntity = secondaryEntity;
+
+        checkEntityToInvokeOn(entityToInvokeOn);
+        this.entityToInvokeOn = entityToInvokeOn;
+
+        checkEntityContext(mainEntityContext);
+    }
+
+    private void checkEntityToInvokeOn(String entityToInvokeOn) {
+        if (!entityToInvokeOn.equals(mainEntityContext)) {
+            if (secondaryEntity != null && !entityToInvokeOn.equals(secondaryEntity.getName()))
+                throw new IllegalArgumentException("Invalid action received in the XML file, " +
+                        "cannot create action on entity \"" + entityToInvokeOn + "\" which is not the main or secondary entity!" +
+                        "\nMain entity: " + mainEntityContext + "\nSecondary entity: " + secondaryEntity.getName());
+        }
+    }
 
     /**
-     * Check if there is an entity factory with the name of the value of entityContext.
+     * Check if there is an entity factory with the name of the value of the received entityContext.
      */
     public void checkEntityContext(String entityContext) {
         worldContext.entityManager.getEntityFactory(entityContext);
@@ -65,10 +92,17 @@ public abstract class Action {
 
     /**
      * Invokes the action, according to the action's type.
-     * The action will be invoked on every instance of the defined entity in the population of the simulation.
      * @param entity the entity instance on which the action will be performed.
      */
     public abstract void invoke(Entity entity);
+
+
+    /**
+     * Invokes the action, according to the action's type.
+     * @param mainEntity The main entity instance on which the action will be performed.
+     * @param secondaryEntity The secondary entity instance on which the action will be performed.
+     */
+    public abstract void invoke(Entity mainEntity, Entity secondaryEntity);
 
 
     /**
@@ -83,13 +117,19 @@ public abstract class Action {
     public abstract Action copy(World worldContext);
 
 
-    public String getEntityContext() {
-        return entityContext;
+    public String getMainEntityContext() {
+        return mainEntityContext;
     }
 
+    public SecondaryEntity getSecondaryEntity() {
+        return secondaryEntity;
+    }
 
     public World getWorldContext() {
         return worldContext;
     }
 
+    public String getEntityToInvokeOn() {
+        return entityToInvokeOn;
+    }
 }

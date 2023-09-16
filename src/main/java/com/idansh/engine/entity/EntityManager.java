@@ -65,12 +65,23 @@ public class EntityManager {
     /**
      * Returns an entity in the population with the given name.
      */
-    public Entity getEntityInPopulation(String name) {
+    public Entity getEntityInPopulationByIndex(String name) {
         // Find an entity with the given name in the population
         Optional<Entity> retEntity =
                 population.stream().filter(e -> e.getName().equals(name)).findAny();
 
         return retEntity.orElse(null);
+    }
+
+
+    /**
+     * Returns an entity in the population in the given index.
+     */
+    public Entity getEntityInPopulationByIndex(int ind) {
+        if(ind < 0 || ind > population.size() - 1)
+            throw new IndexOutOfBoundsException("Out of bounds index given, cannot get entity in population in index of \"" + ind + "\".");
+
+        return population.get(ind);
     }
 
 
@@ -100,6 +111,22 @@ public class EntityManager {
         return population;
     }
 
+
+    /**
+     * Creates a list of all entity instances that live in the population with a given name.
+     */
+    public List<Entity> getAllEntityInstancesInPopulation(String entityName) {
+        List<Entity> retList = new ArrayList<>();
+
+        for (Entity entity : population) {
+            if(entity.getName().equals(entityName))
+                retList.add(entity);
+        }
+
+        return retList;
+    }
+
+
     public Map<String, EntityFactory> getEntityFactories() {
         return entityFactories;
     }
@@ -115,5 +142,9 @@ public class EntityManager {
                 population.remove(entity);
             }
         }
+    }
+
+    public int getPopulationSize() {
+        return population.size();
     }
 }

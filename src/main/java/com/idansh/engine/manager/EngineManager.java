@@ -289,7 +289,7 @@ public class EngineManager {
                     EntityDTO entityDTO = new EntityDTO(
                             entityFactoryName,
                             entityFactory.getPopulationCount(),
-                            entityFactory.getPopulationCount());
+                            entityFactory.getInitPopulation());
 
                     // Create properties for the entity DTO
                     entityFactory.getPropertiesToAssign().forEach(

@@ -1,6 +1,7 @@
 package com.idansh.engine.actions;
 
 import com.idansh.engine.entity.Entity;
+import com.idansh.engine.entity.SecondaryEntity;
 import com.idansh.engine.expression.api.Expression;
 import com.idansh.engine.property.instance.Property;
 import com.idansh.engine.world.World;
@@ -14,14 +15,25 @@ public class IncreaseAction extends Action {
 
     /**
      * @param worldContext reference to the simulated world in which the action is preformed.
-     * @param entityContext name entity on which the action will be preformed.
+     * @param mainEntityContext name entity on which the action will be preformed.
      * @param propertyName name of the property whose value will be changed.
      * @param amount the amount to be added to the property's value.
      */
-    public IncreaseAction(World worldContext, String entityContext, String propertyName, Expression amount) {
-        super(worldContext, entityContext);
+    public IncreaseAction(World worldContext, String mainEntityContext, SecondaryEntity secondaryEntity, String entityName, String propertyName, Expression amount) {
+        super(worldContext, mainEntityContext, secondaryEntity, entityName);
         this.propertyName = propertyName;
         this.amount = amount;
+    }
+
+    public IncreaseAction(World worldContext, String mainEntityContext, String entityName, String propertyName, Expression amount) {
+        super(worldContext, mainEntityContext, entityName);
+        this.propertyName = propertyName;
+        this.amount = amount;
+    }
+
+    @Override
+    public void invoke(Entity mainEntity, Entity secondaryEntity) {
+        invoke(mainEntity);
     }
 
     @Override
@@ -37,7 +49,7 @@ public class IncreaseAction extends Action {
 
     @Override
     public Action copy(World worldContext) {
-        return new IncreaseAction(worldContext, getEntityContext(), propertyName, amount);
+        return new IncreaseAction(worldContext, getMainEntityContext(), getEntityToInvokeOn(), propertyName, amount);
     }
 
 

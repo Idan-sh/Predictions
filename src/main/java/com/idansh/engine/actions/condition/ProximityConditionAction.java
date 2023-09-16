@@ -15,8 +15,8 @@ public class ProximityConditionAction extends ConditionAction {
     private final Expression proximityDepth;    // The distance (location radius) of which the target entity will be searched from the source entity
 
 
-    public ProximityConditionAction(World worldContext, String sourceEntity, String targetEntity, ThenOrElseActions thenActions, Expression proximityDepth) {
-        super(worldContext, sourceEntity, thenActions, null, true);
+    public ProximityConditionAction(World worldContext, String mainEntityContext, String sourceEntity, String targetEntity, ThenOrElseActions thenActions, Expression proximityDepth) {
+        super(worldContext, mainEntityContext, sourceEntity, thenActions, null, true);
 
         if(!proximityDepth.getType().equals(PropertyType.INTEGER) && !proximityDepth.getType().equals(PropertyType.FLOAT))
             throw new IllegalArgumentException("Cannot create proximity action with an non-numeric expression, got expression of type \"" + proximityDepth.getType() + "\".");
@@ -33,6 +33,11 @@ public class ProximityConditionAction extends ConditionAction {
 
 
     @Override
+    public void invoke(Entity mainEntity, Entity secondaryEntity) {
+        invoke(mainEntity);
+    }
+
+    @Override
     public void invoke(Entity entity) {
         // todo - complete proximity invoke
     }
@@ -44,7 +49,8 @@ public class ProximityConditionAction extends ConditionAction {
 
         return new ProximityConditionAction(
                 worldContext,
-                getEntityContext(),
+                getMainEntityContext(),
+                getEntityToInvokeOn(),
                 targetEntity,
                 thenActions,
                 proximityDepth

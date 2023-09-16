@@ -3,6 +3,7 @@ package com.idansh.engine.jaxb.unmarshal.converter;
 import com.idansh.engine.entity.Entity;
 import com.idansh.engine.entity.EntityFactory;
 import com.idansh.engine.entity.EntityManager;
+import com.idansh.engine.entity.SecondaryEntity;
 import com.idansh.engine.environment.ActiveEnvironmentVariables;
 import com.idansh.engine.expression.api.Expression;
 import com.idansh.engine.expression.fixed.FixedValueExpression;
@@ -35,17 +36,17 @@ public class ExpressionConverter {
      * If the type matches, returns the Expression object, otherwise throws exception.
      *
      * @param mainEntityName        Name of the main entity in context.
-     * @param secondaryEntityName   Name of the secondary entity in context (optional).
+     * @param secondaryEntity       The secondary entity in context (optional).
      * @param propertyName          Name of the property in context.
      * @param actionType            Type of the action in which the expression is defined.
      * @param expressionStr         String that contains expression to be converted.
      * @return                      Converted Expression according to the string received.
      */
-    public Expression convertExpression(String actionType, String mainEntityName, String secondaryEntityName, String propertyName, String expressionStr) {
+    public Expression convertExpression(String actionType, String mainEntityName, SecondaryEntity secondaryEntity, String propertyName, String expressionStr) {
         Expression retExpression;
 
         // Try to convert to FunctionExpression
-        retExpression = getFunctionExpression(actionType, mainEntityName, secondaryEntityName, propertyName, expressionStr);
+        retExpression = getFunctionExpression(actionType, mainEntityName, secondaryEntity, propertyName, expressionStr);
 
         // Try to convert to PropertyExpression
         if (retExpression == null) {
@@ -58,7 +59,7 @@ public class ExpressionConverter {
         }
 
         // Check for errors in the created expression
-        validateValueType(actionType, mainEntityName, secondaryEntityName, propertyName, retExpression);
+        validateValueType(actionType, mainEntityName, secondaryEntity, propertyName, retExpression);
 
         return retExpression;
     }
@@ -85,12 +86,12 @@ public class ExpressionConverter {
      * Validates that an expression created by expressionConvert is compatible with the action's type.
      * @param actionType Type action in which the expression is set.
      * @param mainEntityName Name of the main entity defined in the action.
-     * @param secondaryEntityName Name of the secondary entity defined in the action.
+     * @param secondaryEntity The secondary entity defined in the action.
      * @param propertyName Mame of the property defined in the action.
      * @param expression The expression to check its type.
      * @throws RuntimeException if the expression created is not compatible with the action's type.
      */
-    private void validateValueType(String actionType, String mainEntityName, String secondaryEntityName, String propertyName, Expression expression) {
+    private void validateValueType(String actionType, String mainEntityName, SecondaryEntity secondaryEntity, String propertyName, Expression expression) {
         PropertyType expressionType = expression.getType();
 
         // Check if action is of type increase/decrease
@@ -117,7 +118,7 @@ public class ExpressionConverter {
         // Action type is of condition
         else if(actionType.equals("condition")) {
             // Create an Expression for the property, then validate its compatibility
-            Expression propertyExpression = convertPropertyExpression(mainEntityName, secondaryEntityName, propertyName);
+            Expression propertyExpression = convertPropertyExpression(mainEntityName, secondaryEntity, propertyName);
             validateConditionValueType(propertyExpression ,expression);
         }
         // Check if ignored type, if not then received illegal action type
@@ -130,18 +131,18 @@ public class ExpressionConverter {
     /**
      * Converts a string of an expression written in the property field of a condition action into an Expression object.
      * @param mainEntityName Name of the main entity in which the property expression is defined.
-     * @param secondaryEntityName Name of the secondary entity in which the property expression is defined.
+     * @param secondaryEntity The secondary entity in which the property expression is defined.
      * @param propertyValue String value to be converted into an Expression object.
      */
-    public Expression convertPropertyExpression(String mainEntityName, String secondaryEntityName, String propertyValue) {
+    public Expression convertPropertyExpression(String mainEntityName, SecondaryEntity secondaryEntity, String propertyValue) {
         Expression retExpression;
 
         // Try to convert to FunctionExpression
         retExpression = getFunctionExpression(
                 "condition",
                 mainEntityName,
+                secondaryEntity,
                 null,
-                secondaryEntityName,
                 propertyValue);
 
         // Convert to PropertyExpression
@@ -160,7 +161,7 @@ public class ExpressionConverter {
      * If it is then returns the proper function expression, otherwise returns null.
      * @param expressionStr the string that contains the expression to convert.
      */
-    private Expression getFunctionExpression(String actionType, String mainEntityName, String secondaryEntityName, String propertyName, String expressionStr) {
+    private Expression getFunctionExpression(String actionType, String mainEntityName, SecondaryEntity secondaryEntity, String propertyName, String expressionStr) {
         Expression retFunctionExpression = null;
         String functionName = getFunctionName(expressionStr);
         Pair<String, String> entityPropertyPair;
@@ -179,7 +180,7 @@ public class ExpressionConverter {
 
                 case EVALUATE:
                     entityPropertyPair = getEntityPropertyFunctionArguments(expressionStr);
-                    checkEntityContext(entityPropertyPair, mainEntityName, secondaryEntityName);
+                    checkEntityContext(entityPropertyPair, mainEntityName, secondaryEntity);
 
                     retFunctionExpression = new EvaluateFunctionExpression(
                             entityManager, entityPropertyPair.getKey(), entityPropertyPair.getValue());
@@ -189,15 +190,15 @@ public class ExpressionConverter {
                     Pair<String, String> percentExpressions = getPercentageExpressionsFromArgument(expressionStr);
                     retFunctionExpression = new PercentFunctionExpression(
                             convertExpression(
-                                    actionType, mainEntityName, secondaryEntityName, propertyName, percentExpressions.getKey()),
+                                    actionType, mainEntityName, secondaryEntity, propertyName, percentExpressions.getKey()),
                             convertExpression(
-                                    actionType, mainEntityName, secondaryEntityName, propertyName, percentExpressions.getValue())
+                                    actionType, mainEntityName, secondaryEntity, propertyName, percentExpressions.getValue())
                     );
                     break;
 
                 case TICKS:
                     entityPropertyPair = getEntityPropertyFunctionArguments(expressionStr);
-                    checkEntityContext(entityPropertyPair, mainEntityName, secondaryEntityName);
+                    checkEntityContext(entityPropertyPair, mainEntityName, secondaryEntity);
 
                     retFunctionExpression = new TicksFunctionActivation(
                             entityPropertyPair.getKey(), entityPropertyPair.getValue());
@@ -218,11 +219,13 @@ public class ExpressionConverter {
      * @param entityPropertyPair Pair of entity name and property name arguments of a function expression.
      * @throws IllegalArgumentException in case that the entity context name doesn't equal to the function argument's entity name.
      */
-    private void checkEntityContext(Pair<String, String> entityPropertyPair, String mainEntityContext, String secondaryEntityContext) {
-        if(!mainEntityContext.equals(entityPropertyPair.getKey()) && !(secondaryEntityContext != null && secondaryEntityContext.equals(entityPropertyPair.getKey()))) {
+    private void checkEntityContext(Pair<String, String> entityPropertyPair, String mainEntityContext, SecondaryEntity secondaryEntityContext) {
+        if(!mainEntityContext.equals(entityPropertyPair.getKey()) && !(secondaryEntityContext != null && secondaryEntityContext.getName().equals(entityPropertyPair.getKey()))) {
             throw new IllegalArgumentException("Cannot evaluate with entity " + entityPropertyPair.getKey()
-                    + " on entity context " + mainEntityContext + ". Evaluate only works on an argument with an entity name " +
-                    "that equals to the entity in context.");
+                    + " on main entity context \"" + mainEntityContext + "\", and secondary entity context \"" + (secondaryEntityContext == null ? "N/A" : secondaryEntityContext) + "\"."
+                    + "\nEvaluate only works on an argument with an entity name "
+                    + "that equals to the main or secondary entities in context."
+            );
         }
     }
 

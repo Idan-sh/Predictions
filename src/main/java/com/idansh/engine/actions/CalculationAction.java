@@ -1,6 +1,7 @@
 package com.idansh.engine.actions;
 
 import com.idansh.engine.entity.Entity;
+import com.idansh.engine.entity.SecondaryEntity;
 import com.idansh.engine.expression.api.Expression;
 import com.idansh.engine.property.instance.Property;
 import com.idansh.engine.world.World;
@@ -24,15 +25,28 @@ public class CalculationAction extends Action {
      * Perform a mathematical calculation on a value of a property of the entity,
      * Using two argument expressions.
      * @param worldContext reference to the simulated world in which the action is preformed.
-     * @param entityContext name entity on which the action will be preformed.
+     * @param mainEntityContext name entity on which the action will be preformed.
      * @param propertyName name of the property whose value will be changed.
      */
-    public CalculationAction(World worldContext, String entityContext, String propertyName, Expression arg1, Expression arg2, Type type) {
-        super(worldContext, entityContext);
+    public CalculationAction(World worldContext, String mainEntityContext, SecondaryEntity secondaryEntity, String entityName, String propertyName, Expression arg1, Expression arg2, Type type) {
+        super(worldContext, mainEntityContext, secondaryEntity, entityName);
         this.propertyName = propertyName;
         this.arg1 = arg1;
         this.arg2 = arg2;
         this.type = type;
+    }
+
+    public CalculationAction(World worldContext, String mainEntityContext, String entityName, String propertyName, Expression arg1, Expression arg2, Type type) {
+        super(worldContext, mainEntityContext, entityName);
+        this.propertyName = propertyName;
+        this.arg1 = arg1;
+        this.arg2 = arg2;
+        this.type = type;
+    }
+
+    @Override
+    public void invoke(Entity mainEntity, Entity secondaryEntity) {
+        invoke(mainEntity);
     }
 
     @Override
@@ -68,7 +82,16 @@ public class CalculationAction extends Action {
 
     @Override
     public Action copy(World worldContext) {
-        return new CalculationAction(worldContext, getEntityContext(), propertyName, arg1, arg2, type);
+        return new CalculationAction(
+                worldContext,
+                getMainEntityContext(),
+                getSecondaryEntity(),
+                getEntityToInvokeOn(),
+                propertyName,
+                arg1,
+                arg2,
+                type
+        );
     }
 
 

@@ -2,10 +2,9 @@ package com.idansh.engine.actions.condition;
 
 import com.idansh.engine.actions.Action;
 import com.idansh.engine.entity.Entity;
+import com.idansh.engine.entity.SecondaryEntity;
 import com.idansh.engine.expression.api.Expression;
 import com.idansh.engine.world.World;
-
-import java.util.List;
 
 
 /**
@@ -21,18 +20,29 @@ public class SingleConditionAction extends ConditionAction{
     private final Expression expression;
 
     /**
-     * Checks if a single condition is met,
-     * if the condition is met then the "then" actions will be performed,
-     * if not then the "else" actions will be preformed (if exist).
-     * Referred by the singularity value "single"
      * @param worldContext  The simulated world in which the action is defined.
-     * @param entityContext Name of the entity on which the condition is set.
+     * @param mainEntityContext Name of the main entity on which the condition is set.
+     * @param secondaryEntity Name of the secondary entity on which the condition is set.
      * @param operator      comparison operator for the condition.
      *                      possible values:  = (equal) / != (not equal) / bt (greater than) / lt (less than)
      * @param value         a number that will be compared to the property's value
      */
-    public SingleConditionAction(World worldContext, String entityContext, Expression propertyExpression, String operator, Expression value, ThenOrElseActions thenActions, ThenOrElseActions elseActions, boolean isMainCondition) {
-        super(worldContext, entityContext, thenActions, elseActions, isMainCondition);
+    public SingleConditionAction(World worldContext, String mainEntityContext, SecondaryEntity secondaryEntity, String entityName, Expression propertyExpression, String operator, Expression value, ThenOrElseActions thenActions, ThenOrElseActions elseActions, boolean isMainCondition) {
+        super(worldContext, mainEntityContext, secondaryEntity, entityName, thenActions, elseActions, isMainCondition);
+        this.propertyExpression = propertyExpression;
+        this.expression = value;
+        this.operator = ConditionOperator.getConditionOperator(operator); // Try to convert to ConditionOperator, if fails throw exception
+    }
+
+    /**
+     * @param worldContext  The simulated world in which the action is defined.
+     * @param mainEntityContext Name of the main entity on which the condition is set.
+     * @param operator      comparison operator for the condition.
+     *                      possible values:  = (equal) / != (not equal) / bt (greater than) / lt (less than)
+     * @param value         a number that will be compared to the property's value
+     */
+    public SingleConditionAction(World worldContext, String mainEntityContext, String entityName, Expression propertyExpression, String operator, Expression value, ThenOrElseActions thenActions, ThenOrElseActions elseActions, boolean isMainCondition) {
+        super(worldContext, mainEntityContext, entityName, thenActions, elseActions, isMainCondition);
         this.propertyExpression = propertyExpression;
         this.expression = value;
         this.operator = ConditionOperator.getConditionOperator(operator); // Try to convert to ConditionOperator, if fails throw exception
@@ -42,6 +52,12 @@ public class SingleConditionAction extends ConditionAction{
     @Override
     public String getActionTypeString() {
         return "condition";
+    }
+
+
+    @Override
+    public void invoke(Entity mainEntity, Entity secondaryEntity) {
+        invoke(mainEntity);
     }
 
 
@@ -94,7 +110,18 @@ public class SingleConditionAction extends ConditionAction{
             elseActions = new ThenOrElseActions(getElseActions(), worldContext);
         }
 
-        return new SingleConditionAction(worldContext, getEntityContext(), propertyExpression, ConditionOperator.getConditionOperatorString(operator), expression, thenActions, elseActions, isMainCondition());
+        return new SingleConditionAction(
+                worldContext,
+                getMainEntityContext(),
+                getSecondaryEntity(),
+                getEntityToInvokeOn(),
+                propertyExpression,
+                ConditionOperator.getConditionOperatorString(operator),
+                expression,
+                thenActions,
+                elseActions,
+                isMainCondition()
+        );
     }
 
 

@@ -5,7 +5,6 @@ import com.idansh.engine.entity.Entity;
 import com.idansh.engine.helpers.Counter;
 import com.idansh.engine.world.World;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -13,22 +12,29 @@ import java.util.Set;
 public class Rule {
     private final String name;
     private final RuleActivation activation;    // Determines when to activate the rule
-    private final Set<Action> actionsSet;             // Set of actions to be preformed when the rule is activated
+    private final Set<Action> actionsSet;       // Set of actions to be preformed when the rule is activated
     private final Counter tickCounter;
+    private final World worldContext;
 
-    public Rule(String name, RuleActivation activation) {
+    public Rule(String name, RuleActivation activation, World worldContext) {
         this.name = name;
         this.activation = activation;
         this.actionsSet = new HashSet<>();
         this.tickCounter = new Counter(0);
+        this.worldContext = worldContext;
     }
 
+    /**
+     * Copy constructor that creates a new rule from the given rule,
+     * while setting the world context as the given world context.
+     */
     public Rule(Rule rule, World worldContext) {
         this.name = rule.name;
         this.activation = new RuleActivation(rule.getActivation());
         this.actionsSet = new HashSet<>();
         copyActionsSet(rule, worldContext);
         this.tickCounter = new Counter(0);
+        this.worldContext = worldContext;
     }
 
     private void copyActionsSet(Rule rule, World worldContext) {
@@ -73,9 +79,20 @@ public class Rule {
         // Check if the rule's activation is activated
         if (activation.isActivated(tickCounter)) {
             for (Action action : actionsSet) {
-                // Invoke only actions that are within the received entity's context
-                if (entity.getName().equals(action.getEntityContext()))
-                    action.invoke(entity);
+                // Invoke only actions that are within the received main entity's context
+                if (entity.getName().equals(action.getMainEntityContext()))  {
+                    // Check if a secondary entity was defined on this action
+                    if(action.getSecondaryEntity() == null) {
+                        action.invoke(entity);
+                    }
+                    else {
+                        List<Entity> chosenEntities = action.getSecondaryEntity().chooseSecondaryEntitiesFromPopulation(worldContext.entityManager);
+
+                        for (Entity chosenEntity : chosenEntities) {
+                            action.invoke(entity, chosenEntity);
+                        }
+                    }
+                }
             }
         }
     }

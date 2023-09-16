@@ -2,6 +2,7 @@ package com.idansh.engine.actions.condition;
 
 import com.idansh.engine.actions.Action;
 import com.idansh.engine.entity.Entity;
+import com.idansh.engine.entity.SecondaryEntity;
 import com.idansh.engine.world.World;
 
 import java.util.ArrayList;
@@ -53,8 +54,14 @@ public class MultiConditionAction extends ConditionAction{
      *
      * @param logicOp the logic operand OR/AND that will be used
      */
-    public MultiConditionAction(World worldContext, String entityContext, String logicOp, ThenOrElseActions thenActions, ThenOrElseActions elseActions, boolean isMainCondition) {
-        super(worldContext, entityContext, thenActions, elseActions, isMainCondition);
+    public MultiConditionAction(World worldContext, String mainEntityContext, SecondaryEntity secondaryEntity, String entityName, String logicOp, ThenOrElseActions thenActions, ThenOrElseActions elseActions, boolean isMainCondition) {
+        super(worldContext, mainEntityContext, secondaryEntity, entityName, thenActions, elseActions, isMainCondition);
+        this.logicOp = LogicOp.getLogicOp(logicOp);
+        this.innerConditions = new ArrayList<>();
+    }
+
+    public MultiConditionAction(World worldContext, String mainEntityContext, String entityName, String logicOp, ThenOrElseActions thenActions, ThenOrElseActions elseActions, boolean isMainCondition) {
+        super(worldContext, mainEntityContext, entityName, thenActions, elseActions, isMainCondition);
         this.logicOp = LogicOp.getLogicOp(logicOp);
         this.innerConditions = new ArrayList<>();
     }
@@ -67,6 +74,13 @@ public class MultiConditionAction extends ConditionAction{
     public String getActionTypeString() {
         return "condition";
     }
+
+
+    @Override
+    public void invoke(Entity mainEntity, Entity secondaryEntity) {
+        invoke(mainEntity);
+    }
+
 
     @Override
     public void invoke(Entity entity) {
@@ -120,7 +134,9 @@ public class MultiConditionAction extends ConditionAction{
         MultiConditionAction retMultiConditionAction =
                 new MultiConditionAction(
                         worldContext,
-                        getEntityContext(),
+                        getMainEntityContext(),
+                        getSecondaryEntity(),
+                        getEntityToInvokeOn(),
                         LogicOp.getLogicOpString(logicOp),
                         thenActions,
                         elseActions,

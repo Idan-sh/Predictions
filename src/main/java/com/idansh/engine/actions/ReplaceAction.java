@@ -1,6 +1,7 @@
 package com.idansh.engine.actions;
 
 import com.idansh.engine.entity.Entity;
+import com.idansh.engine.entity.SecondaryEntity;
 import com.idansh.engine.world.World;
 
 /**
@@ -48,13 +49,19 @@ public class ReplaceAction extends Action {
      *             'scratch' to create a fresh entity with new values.
      *             'derived' to create an entity with some values of the old entity which was killed.
      */
-    public ReplaceAction(World worldContext, String entityToKill, String entityToCreate, String mode) {
-        super(worldContext, entityToKill);
+    public ReplaceAction(World worldContext, String mainEntityContext, SecondaryEntity secondaryEntity, String entityToKill, String entityToCreate, String mode) {
+        super(worldContext, mainEntityContext, secondaryEntity, entityToKill);
 
         checkEntityContext(entityToCreate); // Check if an entity with the received name entityToCreate exists.
 
         this.entityToCreate = entityToCreate;
         this.mode = Mode.getMode(mode);
+    }
+
+
+    @Override
+    public void invoke(Entity mainEntity, Entity secondaryEntity) {
+        invoke(mainEntity);
     }
 
 
@@ -90,7 +97,14 @@ public class ReplaceAction extends Action {
 
     @Override
     public Action copy(World worldContext) {
-        return new ReplaceAction(worldContext, getEntityContext(), entityToCreate, Mode.getModeString(mode));
+        return new ReplaceAction(
+                worldContext,
+                getMainEntityContext(),
+                getSecondaryEntity(),
+                getEntityToInvokeOn(),
+                entityToCreate,
+                Mode.getModeString(mode)
+        );
     }
 
     @Override

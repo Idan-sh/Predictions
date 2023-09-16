@@ -2,6 +2,7 @@ package com.idansh.engine.actions.condition;
 
 import com.idansh.engine.actions.Action;
 import com.idansh.engine.entity.Entity;
+import com.idansh.engine.entity.SecondaryEntity;
 import com.idansh.engine.world.World;
 
 
@@ -12,8 +13,16 @@ public abstract class ConditionAction extends Action {
     private boolean isActivated;
 
 
-    public ConditionAction(World worldContext, String entityContext, ThenOrElseActions thenActions, ThenOrElseActions elseActions, boolean isMainCondition) {
-        super(worldContext, entityContext);
+    public ConditionAction(World worldContext, String mainEntityContext, SecondaryEntity secondaryEntity, String entityName, ThenOrElseActions thenActions, ThenOrElseActions elseActions, boolean isMainCondition) {
+        super(worldContext, mainEntityContext, secondaryEntity, entityName);
+        this.thenActions = thenActions;
+        this.elseActions = elseActions;
+        this.isMainCondition = isMainCondition;
+        this.isActivated = false;
+    }
+
+    public ConditionAction(World worldContext, String mainEntityContext, String entityName, ThenOrElseActions thenActions, ThenOrElseActions elseActions, boolean isMainCondition) {
+        super(worldContext, mainEntityContext, entityName);
         this.thenActions = thenActions;
         this.elseActions = elseActions;
         this.isMainCondition = isMainCondition;

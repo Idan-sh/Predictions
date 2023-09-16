@@ -3,6 +3,7 @@ package com.idansh.engine.jaxb.unmarshal.converter;
 import com.idansh.engine.actions.*;
 import com.idansh.engine.actions.condition.*;
 import com.idansh.engine.entity.EntityFactory;
+import com.idansh.engine.entity.SecondaryEntity;
 import com.idansh.engine.helpers.Range;
 import com.idansh.engine.jaxb.schema.generated.*;
 import com.idansh.engine.property.creator.factory.PropertyCreator;
@@ -47,7 +48,8 @@ public abstract class Converter {
 
         // Iterates over all PRDRules, converts each rule and adds it to the world
         prdWorld.getPRDRules().getPRDRule().forEach(
-                r -> retWorld.addRule(ruleConvert(r, retWorld))
+                r -> retWorld.addRule(
+                        ruleConvert(r, retWorld))
         );
 
         if(prdWorld.getPRDTermination().getPRDByUser() != null)
@@ -221,24 +223,28 @@ public abstract class Converter {
         Rule retRule;
 
         // Check if the PRDActivation field exists
-        if(prdRule.getPRDActivation() != null) {
+        if (prdRule.getPRDActivation() != null) {
             retRule = new Rule(
                     prdRule.getName(),
-                    activationConvert(prdRule.getPRDActivation()));
+                    activationConvert(prdRule.getPRDActivation()),
+                    worldContext
+            );
         } else {
             retRule = new Rule(
                     prdRule.getName(),
-                    new RuleActivation());
+                    new RuleActivation(),
+                    worldContext
+            );
         }
 
         // Iterates over all prdActions, converts them to actions and adds them to the rule
         prdRule.getPRDActions().getPRDAction().forEach(
                 a -> retRule.addAction(
                         actionConvert(
-                            a,
-                            worldContext,
-                            a.getEntity(),
-                            getSecondaryEntity(a)
+                                worldContext,
+                                a.getEntity(),
+                                secondEntityConvert(worldContext, a),
+                                a
                         )
                 )
         );
@@ -270,25 +276,30 @@ public abstract class Converter {
     /**
      * Converts a PRDAction object that was read from the XML file
      * into an Action Object.
-     * @param prdAction PRDAction object that was read from the XML file.
-     * @param mainEntityName Name of the main entity in which the action is defined.
-     * @param secondaryEntityName Name of the secondary entity in which the action is defined (optional).
+     * @param prdAction PRDAction object that was read from the XML file, defines the most inner action that we are currently converting.
+     * @param mainEntityContext Name of the main entity in which the action is defined.
+     * @param secondaryEntity The secondary entity in which the action is defined (optional).
      * @return Action object with the data of the PRDAction received.
      */
-    private static Action actionConvert(PRDAction prdAction, World worldContext, String mainEntityName, String secondaryEntityName) {
+    private static Action actionConvert(World worldContext, String mainEntityContext, SecondaryEntity secondaryEntity, PRDAction prdAction) {
         Action retAction;
         ExpressionConverter expressionConverter = new ExpressionConverter(worldContext);
+
+        String actionEntity = prdAction.getEntity();
+        String actionProperty = prdAction.getProperty();
 
         switch (Action.Type.getType(prdAction.getType())) {
             case INCREASE:
                 retAction = new IncreaseAction(
                         worldContext,
-                        prdAction.getEntity(),
-                        prdAction.getProperty(),
+                        mainEntityContext,
+                        secondaryEntity,
+                        actionEntity,
+                        actionProperty,
                         expressionConverter.convertExpression(
                                 "increase",
-                                mainEntityName,
-                                secondaryEntityName,
+                                mainEntityContext,
+                                secondaryEntity,
                                 prdAction.getProperty(),
                                 prdAction.getBy()
                         )
@@ -298,12 +309,14 @@ public abstract class Converter {
             case DECREASE:
                 retAction = new DecreaseAction(
                         worldContext,
-                        prdAction.getEntity(),
-                        prdAction.getProperty(),
+                        mainEntityContext,
+                        secondaryEntity,
+                        actionEntity,
+                        actionProperty,
                         expressionConverter.convertExpression(
                                 "decrease",
-                                mainEntityName,
-                                secondaryEntityName,
+                                mainEntityContext,
+                                secondaryEntity,
                                 prdAction.getProperty(),
                                 prdAction.getBy()
                         )
@@ -313,6 +326,8 @@ public abstract class Converter {
             case CALCULATION:
                 retAction = calculationActionConvert(
                         worldContext,
+                        mainEntityContext,
+                        secondaryEntity,
                         prdAction,
                         expressionConverter
                 );
@@ -321,7 +336,10 @@ public abstract class Converter {
             case CONDITION:
                 retAction = conditionActionConvert(
                         worldContext,
+                        mainEntityContext,
+                        secondaryEntity,
                         prdAction,
+                        prdAction.getPRDCondition(),
                         expressionConverter
                 );
                 break;
@@ -329,12 +347,13 @@ public abstract class Converter {
             case SET:
                 retAction = new SetAction(
                         worldContext,
-                        prdAction.getEntity(),
-                        prdAction.getProperty(),
+                        mainEntityContext,
+                        actionEntity,
+                        actionProperty,
                         expressionConverter.convertExpression(
                                 "set",
-                                mainEntityName,
-                                secondaryEntityName,
+                                mainEntityContext,
+                                secondaryEntity,
                                 prdAction.getProperty(),
                                 prdAction.getValue()
                         )
@@ -344,13 +363,16 @@ public abstract class Converter {
             case KILL:
                 retAction = new KillAction(
                         worldContext,
-                        mainEntityName
+                        mainEntityContext,
+                        actionEntity
                 );
                 break;
 
             case REPLACE:
                 retAction = new ReplaceAction(
                         worldContext,
+                        mainEntityContext,
+                        secondaryEntity,
                         prdAction.getKill(),
                         prdAction.getCreate(),
                         prdAction.getMode()
@@ -391,13 +413,14 @@ public abstract class Converter {
         return new ProximityConditionAction(
                 worldContext,
                 prdAction.getPRDBetween().getSourceEntity(),
+                prdAction.getPRDBetween().getSourceEntity(),
                 prdAction.getPRDBetween().getTargetEntity(),
                 thenActions,
                 expressionConverter.convertExpression(
                         "proximity",
                         prdAction.getPRDBetween().getSourceEntity(),
-                        prdAction.getPRDBetween().getTargetEntity(),
-                        prdAction.getPRDBetween().getTargetEntity(),
+                        null,
+                        null,
                         prdAction.getPRDEnvDepth().getOf()
                 )
         );
@@ -407,58 +430,40 @@ public abstract class Converter {
     /**
      * Converts a PRDAction of calculation that was read from the XML file
      * into a CalculationAction Object.
-     * @param prdAction PRDAction object that was read from the XML file.
+     * @param prdAction PRDAction object in which the PRDCondition is set.
      * @param worldContext the simulated world in which the conditions are set.
      * @param expressionConverter used for creating Expression objects from the XML file.
      * @return CalculationAction object with the data of the PRDAction received.
      */
-    private static CalculationAction calculationActionConvert(World worldContext, PRDAction prdAction, ExpressionConverter expressionConverter){
+    private static CalculationAction calculationActionConvert(World worldContext, String mainEntityContext, SecondaryEntity secondaryEntity, PRDAction prdAction, ExpressionConverter expressionConverter) {
         CalculationAction retCalculationAction;
         PRDMultiply prdMultiply = prdAction.getPRDMultiply();
         PRDDivide prdDivide = prdAction.getPRDDivide();
 
-        if(prdMultiply != null){
+        if(prdMultiply != null || prdDivide != null){
             retCalculationAction = new CalculationAction(
                     worldContext,
+                    mainEntityContext,
+                    secondaryEntity,
                     prdAction.getEntity(),
                     prdAction.getResultProp(),
                     expressionConverter.convertExpression(
                             "calculation",
                             prdAction.getEntity(),
-                            getSecondaryEntity(prdAction),
+                            secondaryEntity,
                             prdAction.getResultProp(),
-                            prdMultiply.getArg1()
+                            prdMultiply != null ? prdMultiply.getArg1() : prdDivide.getArg1()
                     ),
                     expressionConverter.convertExpression(
                             "calculation",
                             prdAction.getEntity(),
-                            getSecondaryEntity(prdAction),
+                            secondaryEntity,
                             prdAction.getResultProp(),
-                            prdMultiply.getArg2()
+                            prdMultiply != null ? prdMultiply.getArg2() : prdDivide.getArg2()
                     ),
-                    CalculationAction.Type.MULTIPLY);
-        } else if (prdDivide != null) {
-            retCalculationAction = new CalculationAction(
-                    worldContext,
-                    prdAction.getEntity(),
-                    prdAction.getResultProp(),
-                    expressionConverter.convertExpression(
-                            "calculation",
-                            prdAction.getEntity(),
-                            getSecondaryEntity(prdAction),
-                            prdAction.getResultProp(),
-                            prdDivide.getArg1()
-                    ),
-                    expressionConverter.convertExpression(
-                            "calculation",
-                            prdAction.getEntity(),
-                            getSecondaryEntity(prdAction),
-                            prdAction.getResultProp(),
-                            prdDivide.getArg2()
-                    ),
-                    CalculationAction.Type.DIVIDE);
-        }
-        else {
+                    prdMultiply != null ? CalculationAction.Type.MULTIPLY : CalculationAction.Type.DIVIDE
+            );
+        } else {
             throw new RuntimeException("invalid calculation action received from XML, both prdMultiply and prdDivide fields do not exist! please add them and try again...");
         }
 
@@ -469,33 +474,34 @@ public abstract class Converter {
     /**
      * Converts a PRDAction of single or multiple condition that was read from the XML file
      * into a ConditionAction Object.
-     * @param prdAction PRDAction object that was read from the XML file.
+     * @param prdAction PRDAction object in which the PRDCondition is set.
      * @param worldContext the simulated world in which the conditions are set.
      * @param expressionConverter used for creating Expression objects from the XML file.
      * @return ConditionAction object with the data of the PRDAction received.
      */
-    private static ConditionAction conditionActionConvert( World worldContext, PRDAction prdAction, ExpressionConverter expressionConverter){
-        PRDCondition prdCondition = prdAction.getPRDCondition();
+    private static ConditionAction conditionActionConvert(World worldContext, String mainEntityContext, SecondaryEntity secondaryEntity, PRDAction prdAction, PRDCondition prdCondition, ExpressionConverter expressionConverter){
         ThenOrElseActions thenActions = new ThenOrElseActions(), elseActions = new ThenOrElseActions();
 
         // Convert Then/Else action sets
-        thenOrElseConvert(prdAction, worldContext, thenActions, elseActions);
+        thenOrElseConvert(worldContext, mainEntityContext, secondaryEntity, prdAction, thenActions, elseActions);
 
         // Create main condition action depending on its type
         if (prdCondition.getSingularity().equals("single")) {
             return new SingleConditionAction(
                     worldContext,
-                    prdAction.getEntity(),
+                    mainEntityContext,
+                    secondaryEntity,
+                    prdCondition.getEntity(),
                     expressionConverter.convertPropertyExpression(
                             prdCondition.getEntity(),
-                            getSecondaryEntity(prdAction),
+                            secondaryEntity,
                             prdCondition.getProperty()
                     ),
                     prdCondition.getOperator(),
                     expressionConverter.convertExpression(
                             "condition",
                             prdAction.getEntity(),
-                            getSecondaryEntity(prdAction),
+                            secondaryEntity,
                             prdCondition.getProperty(),
                             prdCondition.getValue()
                     ),
@@ -504,16 +510,27 @@ public abstract class Converter {
                     true
             );
         } else if (prdCondition.getSingularity().equals("multiple")) {
-            MultiConditionAction retMultiConditionAction = new MultiConditionAction(
-                    worldContext,
-                    prdAction.getEntity(),
-                    prdCondition.getLogical(),
-                    thenActions,
-                    elseActions,
-                    true
-            );
+            MultiConditionAction retMultiConditionAction =
+                    new MultiConditionAction(
+                            worldContext,
+                            mainEntityContext,
+                            secondaryEntity,
+                            mainEntityContext,
+                            prdCondition.getLogical(),
+                            thenActions,
+                            elseActions,
+                            true
+                    );
             // Only in case of multiple conditions, convert the inner conditions and add them to the main condition action "retMultiConditionAction"
-            convertInnerConditions(prdAction, prdAction.getPRDCondition().getPRDCondition(), worldContext, expressionConverter, retMultiConditionAction);
+            convertInnerConditions(
+                    worldContext,
+                    mainEntityContext,
+                    secondaryEntity,
+                    prdAction,
+                    expressionConverter,
+                    prdAction.getPRDCondition().getPRDCondition(),
+                    retMultiConditionAction
+            );
 
             return retMultiConditionAction;
         } else {
@@ -530,25 +547,27 @@ public abstract class Converter {
      * @param expressionConverter used for creating Expression objects from the XML file.
      * @param mainConditionAction the main multi-action in which we search for inner conditions. these inner conditions will be added to the main condition action's list.
      */
-    private static void convertInnerConditions(PRDAction prdAction, List<PRDCondition> prdConditionList, World worldContext, ExpressionConverter expressionConverter, MultiConditionAction mainConditionAction) {
+    private static void convertInnerConditions(World worldContext, String mainEntityContext, SecondaryEntity secondaryEntity, PRDAction prdAction, ExpressionConverter expressionConverter, List<PRDCondition> prdConditionList, MultiConditionAction mainConditionAction) {
         // Convert each condition action in the list of the main condition action
-        prdConditionList.forEach(
-                prdCondition -> {
-                    // Create condition action depending on its type
-                    if (prdCondition.getSingularity().equals("single")) {
-                        mainConditionAction.addInnerCondition(new SingleConditionAction(
+        for (PRDCondition prdCondition : prdConditionList)
+            // Create condition action depending on its type
+            if (prdCondition.getSingularity().equals("single")) {
+                mainConditionAction.addInnerCondition(
+                        new SingleConditionAction(
                                 worldContext,
+                                mainEntityContext,
+                                secondaryEntity,
                                 prdCondition.getEntity(),
                                 expressionConverter.convertPropertyExpression(
                                         prdCondition.getEntity(),
-                                        getSecondaryEntity(prdAction),
+                                        secondaryEntity,
                                         prdCondition.getProperty()
                                 ),
                                 prdCondition.getOperator(),
                                 expressionConverter.convertExpression(
                                         "condition",
                                         prdCondition.getEntity(),
-                                        getSecondaryEntity(prdAction),
+                                        secondaryEntity,
                                         prdCondition.getProperty(),
                                         prdCondition.getValue()
                                 ),
@@ -556,52 +575,57 @@ public abstract class Converter {
                                 null,
                                 false
                         ));
-                    } else if (prdCondition.getSingularity().equals("multiple")) {
-                        MultiConditionAction multiConditionAction = new MultiConditionAction(
+            } else if (prdCondition.getSingularity().equals("multiple")) {
+                MultiConditionAction multiConditionAction =
+                        new MultiConditionAction(
                                 worldContext,
+                                mainEntityContext,
+                                secondaryEntity,
                                 prdAction.getEntity(),
                                 prdCondition.getLogical(),
                                 null,
                                 null,
                                 false
                         );
-                        // Find and convert all inner conditions of the multi-condition action
-                        convertInnerConditions(prdAction, prdCondition.getPRDCondition(), worldContext, expressionConverter, multiConditionAction);
-                        mainConditionAction.addInnerCondition(multiConditionAction);    // Add finished multi-condition action with inner conditions to the main condition action.
-                    } else {
-                        throw new RuntimeException("invalid condition action received from XML, singularity field's value is not \"single\" or \"multiple\"!");
-                    }
-                }
-        );
+
+                // Find and convert all inner conditions of the multi-condition action
+                convertInnerConditions(
+                        worldContext,
+                        mainEntityContext,
+                        secondaryEntity,
+                        prdAction,
+                        expressionConverter,
+                        prdCondition.getPRDCondition(),
+                        multiConditionAction
+                );
+                mainConditionAction.addInnerCondition(multiConditionAction);    // Add finished multi-condition action with inner conditions to the main condition action.
+            } else {
+                throw new RuntimeException("invalid condition action received from XML, singularity field's value is not \"single\" or \"multiple\"!");
+            }
     }
 
 
     /**
      * Convert Then and Else action sets from XML file, adds them into the proper action sets.
-     * @param prdAction PRDAction object that was read from the XML file.
      * @param worldContext the simulated world in which the conditions are set.
+     * @param mainEntityContext Name of the main entity in which the condition is defined.
+     * @param secondaryEntity The secondary entity defined within the main entity.
+     * @param prdAction PRDAction object that was read from the XML file.
      * @param thenActions ThenElseActions action set for the Then actions.
      * @param elseActions ThenElseActions action set for the Else actions (optional).
      */
-    private static void thenOrElseConvert(PRDAction prdAction, World worldContext, final ThenOrElseActions thenActions, final ThenOrElseActions elseActions){
-        prdAction.getPRDThen().getPRDAction().forEach(
-                a -> {
-                    PRDAction.PRDSecondaryEntity prdSecondaryEntity = prdAction.getPRDSecondaryEntity();
-                    String secondaryEntityName = null;
-
-                    if(prdSecondaryEntity != null)
-                        secondaryEntityName = prdSecondaryEntity.getEntity();
-
-                    thenActions.addAction(
-                            actionConvert(
-                                    a,
-                                    worldContext,
-                                    prdAction.getEntity(),
-                                    secondaryEntityName
-                            )
-                    );
-                }
-        );
+    private static void thenOrElseConvert(World worldContext, String mainEntityContext, SecondaryEntity secondaryEntity, PRDAction prdAction, final ThenOrElseActions thenActions, final ThenOrElseActions elseActions) {
+        // Convert the 'then' block of actions
+        for (PRDAction action : prdAction.getPRDThen().getPRDAction()) {
+            thenActions.addAction(
+                    actionConvert(
+                            worldContext,
+                            mainEntityContext,
+                            secondaryEntity,
+                            action
+                    )
+            );
+        }
 
         // Check if the then actions block contains no actions
         if(thenActions.isEmpty())
@@ -612,10 +636,10 @@ public abstract class Converter {
             prdAction.getPRDElse().getPRDAction().forEach(
                 a -> elseActions.addAction(
                         actionConvert(
-                                a,
                                 worldContext,
-                                prdAction.getEntity(),
-                                prdAction.getPRDSecondaryEntity().getEntity()
+                                mainEntityContext,
+                                secondaryEntity,
+                                a
                         )
                 )
         );
@@ -632,10 +656,10 @@ public abstract class Converter {
         prdAction.getPRDActions().getPRDAction().forEach(
                 a -> thenActions.addAction(
                         actionConvert(
-                                a,
                                 worldContext,
                                 prdAction.getPRDBetween().getSourceEntity(),
-                                prdAction.getPRDBetween().getTargetEntity()
+                                new SecondaryEntity(prdAction.getPRDBetween().getTargetEntity()),
+                                a
                         )
                 )
         );
@@ -647,15 +671,28 @@ public abstract class Converter {
 
 
     /**
-     * Returns a secondary entity's name if one exists,
+     * Returns a secondary entity object if one exists in the XML file,
      * Otherwise returns null.
      * @param prdAction a PRDAction in which the secondary entity might reside.
      */
-    private static String getSecondaryEntity(PRDAction prdAction) {
+    private static SecondaryEntity secondEntityConvert(World worldContext, PRDAction prdAction) {
         PRDAction.PRDSecondaryEntity prdSecondaryEntity = prdAction.getPRDSecondaryEntity();
 
         if(prdSecondaryEntity != null) {
-            return prdSecondaryEntity.getEntity();
+            SecondaryEntity secondaryEntity = new SecondaryEntity(
+                    prdSecondaryEntity.getEntity(),
+                    prdSecondaryEntity.getPRDSelection().getCount()
+            );
+
+            secondaryEntity.addNewConditionAction(
+                    conditionActionConvert(
+                            worldContext,
+                            prdAction.getEntity(),
+                            null,
+                            prdAction,
+                            prdSecondaryEntity.getPRDSelection().getPRDCondition(),
+                            new ExpressionConverter(worldContext)
+                    ));
         }
 
         return null;
