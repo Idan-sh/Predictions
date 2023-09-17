@@ -42,9 +42,9 @@ public class ReplaceAction extends Action {
 
 
     /**
-     * @param worldContext reference to the simulated world in which the action is preformed.
-     * @param entityToKill name entity on which the action will be preformed.
-     * @param entityToCreate name entity on which the action will be preformed.
+     * @param worldContext Reference to the simulated world in which the action is preformed.
+     * @param entityToKill Name of the entity on which the action will be preformed.
+     * @param entityToCreate Name of the entity on which the action will be preformed.
      * @param mode Mode of the 'Replace' action.
      *             'scratch' to create a fresh entity with new values.
      *             'derived' to create an entity with some values of the old entity which was killed.
@@ -73,20 +73,12 @@ public class ReplaceAction extends Action {
             case SCRATCH:
                 // Kill EntityToKill from the population
                 if(entity != null)
-                    worldContext.entityManager.killEntity(entity);
-
-                // Create and add to the population a new EntityToCreate
-                worldContext.entityManager.createEntity(entityToCreate);
+                    worldContext.entityManager.replaceEntity(entity, entityToCreate, true);
                 break;
 
             case DERIVED:
-                // todo - complete derived (for the time being same as scratch
-                // Kill EntityToKill from the population
                 if(entity != null)
-                    worldContext.entityManager.killEntity(entity);
-
-                // Create and add to the population a new EntityToCreate
-                worldContext.entityManager.createEntity(entityToCreate);
+                    worldContext.entityManager.replaceEntity(entity, entityToCreate, false);
                 break;
 
             default:

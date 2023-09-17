@@ -42,7 +42,7 @@ public class EntityManager {
         entityFactories.forEach(
                 (name , factory) -> {
                     for (int i = 0; i < factory.getPopulationCount(); i++) {
-                        population.add(factory.createEntity());
+                        population.add(factory.createEntityFromScratch());
                     }
                 }
         );
@@ -86,7 +86,7 @@ public class EntityManager {
 
 
     /**
-     * Kills a single entity of the given ID from the population.
+     * Kills a single entity from the population.
      * @param entityToKill an entity instance in the population to kill.
      */
     public void killEntity(Entity entityToKill) {
@@ -98,17 +98,40 @@ public class EntityManager {
 
 
     /**
+     * Kills and replaces a single entity from the population.
+     * @param entityToReplace an entity instance in the population to replace.
+     * @param isFromScratch if true will create a completely new instance of the entity,
+     *                      otherwise will create a new instance that is derived from
+     *                      this entity with some old properties used in the new entity.
+     */
+    public void replaceEntity(Entity entityToReplace, String entityName, boolean isFromScratch) {
+        if(!population.contains(entityToReplace))
+            return;
+
+        entityToReplace.replace(entityName, isFromScratch);
+    }
+
+
+    /**
      * Creates a new entity and adds it to the population.
      * @param entityToCreate Name of the entity factory of which an instance
      *                       will be created and added into the population.
      * @throws IllegalArgumentException In case an entity factory with the given name doesn't exist.
      */
-    public void createEntity(String entityToCreate) {
-        population.add(getEntityFactory(entityToCreate).createEntity());
+    public void createEntityFromScratch(String entityToCreate) {
+        population.add(getEntityFactory(entityToCreate).createEntityFromScratch());
     }
 
-    public List<Entity> getPopulation() {
-        return population;
+
+    /**
+     * Creates a new entity from an existing entity and adds it to the population.
+     * @param entityToCreateFrom Entity instance of which the new instance will be created.
+     * @param entityToCreate Name of the entity factory of which an instance
+     *                       will be created and added into the population.
+     * @throws IllegalArgumentException In case an entity factory with the given name doesn't exist.
+     */
+    public void createEntityDerived(Entity entityToCreateFrom, String entityToCreate) {
+        population.add(getEntityFactory(entityToCreate).createEntityDerived(entityToCreateFrom));
     }
 
 
@@ -127,21 +150,36 @@ public class EntityManager {
     }
 
 
-    public Map<String, EntityFactory> getEntityFactories() {
-        return entityFactories;
-    }
-
     /**
      * Removes all dead entities from the population,
      * and decreases the population counter for the dead entity instance's main entity.
+     * Also replaces some entities that were set up from replacement.
      */
     public void removeDeadEntitiesFromPopulation() {
         for (Entity entity : population) {
+            // Check if the entity is set to be killed
             if (!entity.isAlive()) {
+                // Check if the entity is set to be replaced
+                if (entity.isToReplace()) {
+                    if(entity.isCreateAnotherFromScratch())
+                        createEntityFromScratch(entity.getEntityNameToCreate());
+                    else
+                        createEntityDerived(entity, entity.getEntityNameToCreate());
+                }
+                // Kill the entity
                 entityFactories.get(entity.getName()).decreasePopulationCounter();
                 population.remove(entity);
             }
         }
+    }
+
+
+    public Map<String, EntityFactory> getEntityFactories() {
+        return entityFactories;
+    }
+
+    public List<Entity> getPopulation() {
+        return population;
     }
 
     public int getPopulationSize() {

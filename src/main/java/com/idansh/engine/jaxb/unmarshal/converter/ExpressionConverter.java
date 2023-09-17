@@ -1,6 +1,5 @@
 package com.idansh.engine.jaxb.unmarshal.converter;
 
-import com.idansh.engine.entity.Entity;
 import com.idansh.engine.entity.EntityFactory;
 import com.idansh.engine.entity.EntityManager;
 import com.idansh.engine.entity.SecondaryEntity;

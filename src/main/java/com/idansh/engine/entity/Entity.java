@@ -15,12 +15,17 @@ public class Entity {
     private final Counter populationCounter;    // The amount of entities of this type currently in the world
     private final Map<String, Property> properties;  // Properties that define this entity, key is a unique name
     private boolean isAlive;
+    private boolean createAnotherFromScratch;
+    private boolean createAnotherDerived;
+    private String entityNameToCreate;
 
     public Entity(String name, Counter populationCounter) {
         this.populationCounter = populationCounter;
         this.name = name;
         this.properties = new HashMap<>();
         this.isAlive = true;
+        this.createAnotherFromScratch = false;
+        this.createAnotherDerived = false;
     }
 
     public String getName() {
@@ -59,7 +64,42 @@ public class Entity {
     }
 
 
+    /**
+     * Sets the entity to be killed, and sets that another
+     * entity instance will be created from it.
+     * @param entityName Name of the entity of which the new instance will be created.
+     * @param isFromScratch if true will create a completely new instance of the entity,
+     *                      otherwise will create a new instance that is derived from
+     *                      this entity with some old properties used in the new entity.
+     */
+    public void replace(String entityName, boolean isFromScratch) {
+        this.isAlive = false; // this entity should be killed
+        this.entityNameToCreate = entityName;
+
+        if(isFromScratch)
+            this.createAnotherFromScratch = true;
+        else
+            this.createAnotherDerived = true;
+    }
+
+
+    public boolean isToReplace() {
+        return createAnotherDerived || createAnotherFromScratch;
+    }
+
     public boolean isAlive() {
         return isAlive;
+    }
+
+    public boolean isCreateAnotherFromScratch() {
+        return createAnotherFromScratch;
+    }
+
+    public boolean isCreateAnotherDerived() {
+        return createAnotherDerived;
+    }
+
+    public String getEntityNameToCreate() {
+        return entityNameToCreate;
     }
 }
