@@ -190,7 +190,8 @@ public class ResultsController implements Initializable {
             Platform.runLater(() ->
                 mainController.showInformationAlert(
                         "Simulation Completed Successfully",
-                        "completed simulation ID: " + chosenExecutionID
+                        "Completed Simulation ID: " + chosenExecutionID +
+                                "\nSimulation End Reason: " + simulationResult.getEndReason()
                 )
             );
 

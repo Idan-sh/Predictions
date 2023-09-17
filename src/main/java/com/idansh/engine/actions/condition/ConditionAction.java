@@ -35,12 +35,27 @@ public abstract class ConditionAction extends Action {
      * or invokes "else" actions set if condition is false.
      * @param isCondition the value of the condition defined in the action.
      */
-    public void invokeActionsSet(Entity entity, boolean isCondition) {
+    public void invokeActionsSet(Entity mainEntity, Entity secondaryEntity, boolean isCondition) {
         if(thenActions != null && isCondition)
-            thenActions.invoke(entity);
+            thenActions.invoke(mainEntity, secondaryEntity);
         else
             if(elseActions != null && !elseActions.isEmpty())
-                elseActions.invoke(entity);
+                elseActions.invoke(mainEntity, secondaryEntity);
+    }
+
+
+    /**
+     * Invokes "then" actions set if condition is true,
+     * or invokes "else" actions set if condition is false.
+     * @param isCondition the value of the condition defined in the action.
+     */
+    public void invokeActionsSet(Entity mainEntity, boolean isCondition) {
+        if(thenActions != null && isCondition) {
+            thenActions.invoke(mainEntity);
+        }
+        else if(elseActions != null && !elseActions.isEmpty()) {
+            elseActions.invoke(mainEntity);
+        }
     }
 
 

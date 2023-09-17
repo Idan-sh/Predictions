@@ -15,7 +15,7 @@ import com.idansh.engine.world.World;
  *      otherwise (resulted "false"), a collection of "else" actions will be invoked.
  */
 public class SingleConditionAction extends ConditionAction{
-    private final Expression propertyExpression; // Possible types will be a PropertyExpression or a FunctionActivationExpression
+    private final Expression functionExpression;
     private final ConditionOperator operator;
     private final Expression expression;
 
@@ -27,9 +27,9 @@ public class SingleConditionAction extends ConditionAction{
      *                      possible values:  = (equal) / != (not equal) / bt (greater than) / lt (less than)
      * @param value         a number that will be compared to the property's value
      */
-    public SingleConditionAction(World worldContext, String mainEntityContext, SecondaryEntity secondaryEntity, String entityName, Expression propertyExpression, String operator, Expression value, ThenOrElseActions thenActions, ThenOrElseActions elseActions, boolean isMainCondition) {
+    public SingleConditionAction(World worldContext, String mainEntityContext, SecondaryEntity secondaryEntity, String entityName, Expression functionExpression, String operator, Expression value, ThenOrElseActions thenActions, ThenOrElseActions elseActions, boolean isMainCondition) {
         super(worldContext, mainEntityContext, secondaryEntity, entityName, thenActions, elseActions, isMainCondition);
-        this.propertyExpression = propertyExpression;
+        this.functionExpression = functionExpression;
         this.expression = value;
         this.operator = ConditionOperator.getConditionOperator(operator); // Try to convert to ConditionOperator, if fails throw exception
     }
@@ -41,9 +41,9 @@ public class SingleConditionAction extends ConditionAction{
      *                      possible values:  = (equal) / != (not equal) / bt (greater than) / lt (less than)
      * @param value         a number that will be compared to the property's value
      */
-    public SingleConditionAction(World worldContext, String mainEntityContext, String entityName, Expression propertyExpression, String operator, Expression value, ThenOrElseActions thenActions, ThenOrElseActions elseActions, boolean isMainCondition) {
+    public SingleConditionAction(World worldContext, String mainEntityContext, String entityName, Expression functionExpression, String operator, Expression value, ThenOrElseActions thenActions, ThenOrElseActions elseActions, boolean isMainCondition) {
         super(worldContext, mainEntityContext, entityName, thenActions, elseActions, isMainCondition);
-        this.propertyExpression = propertyExpression;
+        this.functionExpression = functionExpression;
         this.expression = value;
         this.operator = ConditionOperator.getConditionOperator(operator); // Try to convert to ConditionOperator, if fails throw exception
     }
@@ -57,44 +57,77 @@ public class SingleConditionAction extends ConditionAction{
 
     @Override
     public void invoke(Entity mainEntity, Entity secondaryEntity) {
-        invoke(mainEntity);
-    }
-
-
-    @Override
-    public void invoke(Entity entity) {
-        Object propertyValue = propertyExpression.getValue();
+        // todo - propertyValue is always 0.0, only on condition actions
+        Object propertyValue = functionExpression.getValue(mainEntity, secondaryEntity);
         boolean res;
 
         switch (operator) {
             case EQUAL:
-                res = isEqual(propertyValue, expression.getValue());
+                res = isEqual(propertyValue, expression.getValue(mainEntity, secondaryEntity));
                 if (res) setActivated(true);
                 if (isMainCondition())
-                    invokeActionsSet(entity, res);
+                    invokeActionsSet(mainEntity, secondaryEntity, res);
                 break;
 
             case NOT_EQUAL:
-                res = !isEqual(propertyValue, expression.getValue());
+                res = !isEqual(propertyValue, expression.getValue(mainEntity, secondaryEntity));
                 if (res) setActivated(true);
                 if (isMainCondition())
-                    invokeActionsSet(entity, res);
+                    invokeActionsSet(mainEntity, secondaryEntity, res);
                 break;
 
             case LESS_THAN:
                 // Check if the property's value is less than the expression's value
-                res = isLessThan(propertyValue, expression.getValue());
+                res = isLessThan(propertyValue, expression.getValue(mainEntity, secondaryEntity));
                 if (res) setActivated(true);
                 if (isMainCondition())
-                    invokeActionsSet(entity, res);
+                    invokeActionsSet(mainEntity, secondaryEntity, res);
                 break;
 
             case MORE_THAN:
                 // Check if the property's value is more than the expression's value
-                res = isLessThan(expression.getValue(), propertyValue);
+                res = isLessThan(expression.getValue(mainEntity, secondaryEntity), propertyValue);
                 if (res) setActivated(true);
                 if (isMainCondition())
-                    invokeActionsSet(entity, res);
+                    invokeActionsSet(mainEntity, secondaryEntity, res);
+                break;
+        }    }
+
+
+    @Override
+    public void invoke(Entity entityInstance) {
+        Object propertyValue = functionExpression.getValue(entityInstance);
+        boolean res;
+
+        switch (operator) {
+            case EQUAL:
+                res = isEqual(propertyValue, expression.getValue(entityInstance));
+                if (res) setActivated(true);
+                if (isMainCondition())
+                    invokeActionsSet(entityInstance, res);
+                break;
+
+            case NOT_EQUAL:
+                res = !isEqual(propertyValue, expression.getValue(entityInstance));
+                if (res) setActivated(true);
+                if (isMainCondition())
+                    invokeActionsSet(entityInstance, res);
+                break;
+
+            case LESS_THAN:
+                // Check if the property's value is less than the expression's value
+                res = isLessThan(propertyValue, expression.getValue(entityInstance));
+                if (res) setActivated(true);
+                if (isMainCondition())
+                    invokeActionsSet(entityInstance, res);
+                break;
+
+            case MORE_THAN:
+                // Check if the property's value is more than the expression's value
+                res = isLessThan(expression.getValue(entityInstance), propertyValue);
+                if (res) setActivated(true);
+                if (isMainCondition())
+                    invokeActionsSet(entityInstance, res);
                 break;
         }
     }
@@ -114,8 +147,8 @@ public class SingleConditionAction extends ConditionAction{
                 worldContext,
                 getMainEntityContext(),
                 getSecondaryEntity(),
-                getEntityToInvokeOn(),
-                propertyExpression,
+                getEntityToInvokeOnName(),
+                functionExpression,
                 ConditionOperator.getConditionOperatorString(operator),
                 expression,
                 thenActions,

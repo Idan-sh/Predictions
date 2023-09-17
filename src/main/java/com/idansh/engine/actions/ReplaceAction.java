@@ -61,24 +61,19 @@ public class ReplaceAction extends Action {
 
     @Override
     public void invoke(Entity mainEntity, Entity secondaryEntity) {
-        invoke(mainEntity);
-    }
-
-
-    @Override
-    public void invoke(Entity entity) {
         World worldContext = getWorldContext();
+        Entity entityToInvokeOn = getEntityToInvokeOn(mainEntity, secondaryEntity);
 
         switch (mode) {
             case SCRATCH:
                 // Kill EntityToKill from the population
-                if(entity != null)
-                    worldContext.entityManager.replaceEntity(entity, entityToCreate, true);
+                if(entityToInvokeOn != null)
+                    worldContext.entityManager.replaceEntity(entityToInvokeOn, entityToCreate, true);
                 break;
 
             case DERIVED:
-                if(entity != null)
-                    worldContext.entityManager.replaceEntity(entity, entityToCreate, false);
+                if(entityToInvokeOn != null)
+                    worldContext.entityManager.replaceEntity(entityToInvokeOn, entityToCreate, false);
                 break;
 
             default:
@@ -88,12 +83,18 @@ public class ReplaceAction extends Action {
 
 
     @Override
+    public void invoke(Entity entity) {
+        invoke(entity, null);
+    }
+
+
+    @Override
     public Action copy(World worldContext) {
         return new ReplaceAction(
                 worldContext,
                 getMainEntityContext(),
                 getSecondaryEntity(),
-                getEntityToInvokeOn(),
+                getEntityToInvokeOnName(),
                 entityToCreate,
                 Mode.getModeString(mode)
         );

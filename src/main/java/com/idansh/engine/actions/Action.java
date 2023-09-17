@@ -48,27 +48,27 @@ public abstract class Action {
     private final String mainEntityContext;
     private final World worldContext;
     private final SecondaryEntity secondaryEntity; // Optional
-    private final String entityToInvokeOn;
+    private final String entityToInvokeOnName;
 
 
-    public Action(World worldContext, String mainEntityContext, String entityToInvokeOn) {
+    public Action(World worldContext, String mainEntityContext, String entityToInvokeOnName) {
         this.mainEntityContext = mainEntityContext;
         this.worldContext = worldContext;
         this.secondaryEntity = null;
 
-        checkEntityToInvokeOn(entityToInvokeOn);
-        this.entityToInvokeOn = entityToInvokeOn;
+        checkEntityToInvokeOn(entityToInvokeOnName);
+        this.entityToInvokeOnName = entityToInvokeOnName;
 
         checkEntityContext(mainEntityContext);
     }
 
-    public Action(World worldContext, String mainEntityContext, SecondaryEntity secondaryEntity, String entityToInvokeOn) {
+    public Action(World worldContext, String mainEntityContext, SecondaryEntity secondaryEntity, String entityToInvokeOnName) {
         this.mainEntityContext = mainEntityContext;
         this.worldContext = worldContext;
         this.secondaryEntity = secondaryEntity;
 
-        checkEntityToInvokeOn(entityToInvokeOn);
-        this.entityToInvokeOn = entityToInvokeOn;
+        checkEntityToInvokeOn(entityToInvokeOnName);
+        this.entityToInvokeOnName = entityToInvokeOnName;
 
         checkEntityContext(mainEntityContext);
     }
@@ -79,6 +79,27 @@ public abstract class Action {
                 throw new IllegalArgumentException("Invalid action received in the XML file, " +
                         "cannot create action on entity \"" + entityToInvokeOn + "\" which is not the main or secondary entity!" +
                         "\nMain entity: " + mainEntityContext + "\nSecondary entity: " + secondaryEntity.getName());
+        }
+    }
+
+
+    /**
+     * Checks on which entity the action should be performed,
+     * returns that entity.
+     * Decides it by the entityToInvokeOnName's value.
+     */
+    public Entity getEntityToInvokeOn(Entity mainEntity, Entity secondaryEntity) {
+        if (secondaryEntity == null) return mainEntity;
+
+        // Check if the action can be invoked on each entity instance received
+        if (entityToInvokeOnName.equals(mainEntity.getName())) {
+            return mainEntity;
+        } else if (entityToInvokeOnName.equals(secondaryEntity.getName())) {
+            return secondaryEntity;
+        } else {
+            throw new IllegalArgumentException("Cannot perform action on " + entityToInvokeOnName +
+                    " Received invalid entity instances with names \"" + mainEntity.getName() +
+                    "\", \"" + secondaryEntity.getName() + "\".");
         }
     }
 
@@ -129,7 +150,7 @@ public abstract class Action {
         return worldContext;
     }
 
-    public String getEntityToInvokeOn() {
-        return entityToInvokeOn;
+    public String getEntityToInvokeOnName() {
+        return entityToInvokeOnName;
     }
 }

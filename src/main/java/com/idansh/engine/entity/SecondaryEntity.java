@@ -5,6 +5,7 @@ import com.idansh.engine.helpers.RandomValue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Defines how a secondary entity can be chosen within an Action.
@@ -61,30 +62,36 @@ public class SecondaryEntity {
     public List<Entity> chooseSecondaryEntitiesFromPopulation(EntityManager entityManager) {
         List<Entity> chosenSecondaryEntities = new ArrayList<>();
         List<Entity> allSecondaryEntityInstances = entityManager.getAllEntityInstancesInPopulation(name);
+        List<Entity> secondaryEntityInstancesThatConditionApplies = new ArrayList<>();
 
         int amountChosen = 0;
         int amountToChoose = amount;
         if(amountToChoose == -1)
             return allSecondaryEntityInstances; // Choose all population
 
-        // The maximum amount that is possible to choose is the amount of secondary entity instances in the population
-        amountToChoose = Math.min(amountToChoose, allSecondaryEntityInstances.size());
-
-
-        while (amountChosen < amountToChoose){
-            int rndIndex = RandomValue.getRandomInt(0, allSecondaryEntityInstances.size() - 1); // Choose a random index in the population
-            Entity entityChosen = allSecondaryEntityInstances.get(rndIndex);
-
+        // Go through allSecondaryEntityInstances, create new list only with the entities that the conditions are activated on
+        for (Entity entity : allSecondaryEntityInstances) {
             for (ConditionAction conditionAction : conditions) {
-                conditionAction.invoke(entityChosen);
+                conditionAction.invoke(entity);
 
                 if(conditionAction.isActivated()) {
-                    chosenSecondaryEntities.add(entityChosen);
-                    amountChosen++;
+                    secondaryEntityInstancesThatConditionApplies.add(entity);
                 }
-
             }
         }
+
+        // The maximum amount that is possible to choose is the amount of secondary entity instances in the population
+        amountToChoose = Math.min(amountToChoose, secondaryEntityInstancesThatConditionApplies.size());
+
+        System.out.println("\n\nstarting loop");
+        while (amountChosen < amountToChoose) {
+            System.out.println("im in secondary entity loop wheeee");
+            int rndIndex = RandomValue.getRandomInt(0, secondaryEntityInstancesThatConditionApplies.size() - 1); // Choose a random index in the population
+            Entity entityChosen = secondaryEntityInstancesThatConditionApplies.get(rndIndex);
+            chosenSecondaryEntities.add(entityChosen);
+            amountChosen++;
+        }
+        System.out.println("finished loop :(");
 
         return chosenSecondaryEntities;
     }

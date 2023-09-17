@@ -1,5 +1,6 @@
 package com.idansh.engine.expression.functions;
 
+import com.idansh.engine.entity.Entity;
 import com.idansh.engine.expression.api.Expression;
 import com.idansh.engine.property.instance.PropertyType;
 
@@ -27,8 +28,15 @@ public class PercentFunctionExpression extends FunctionActivationExpression {
     }
 
     @Override
-    public Object getValue() {
+    public Object getValue(Entity entityInstance) {
         // Calculate and return the percentage
-        return (float) whole.getValue() * (float) percentage.getValue() / 100;
+        return (float) whole.getValue(entityInstance) * (float) percentage.getValue(entityInstance) / 100;
+    }
+
+    @Override
+    public Object getValue(Entity mainEntityInstance, Entity secondaryEntityInstance) {
+        // Calculate and return the percentage
+        return (float) whole.getValue(mainEntityInstance, secondaryEntityInstance)
+                * (float) percentage.getValue(mainEntityInstance, secondaryEntityInstance) / 100;
     }
 }

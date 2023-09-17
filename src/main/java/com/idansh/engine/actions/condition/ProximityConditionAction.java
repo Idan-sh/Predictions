@@ -50,7 +50,7 @@ public class ProximityConditionAction extends ConditionAction {
         return new ProximityConditionAction(
                 worldContext,
                 getMainEntityContext(),
-                getEntityToInvokeOn(),
+                getEntityToInvokeOnName(),
                 targetEntity,
                 thenActions,
                 proximityDepth

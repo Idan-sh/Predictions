@@ -73,9 +73,9 @@ public class Property {
         if(!isNewValueOfPropertyType(newValue))
             throw new IllegalArgumentException("value received in setValue is not of the property's type! new value received is of type " + newValue.getClass() + ", while the property's type is " + type.getTypeString());
 
-        // Checks if the newValue is a number, and if so, checks if it's in the range.
-        if((newValue instanceof Integer || newValue instanceof Float) && isRangeOverflow(newValue))
-            throw new IllegalArgumentException("newValue received in setValue is not within the property's range! new value received is " + newValue + ", while the property's range is (" + range.getBottom() + ", " + range.getTop() + ")");
+        // Check if the new value is not within the property range
+        if(isRangeOverflow(newValue))
+            return;
 
         // Update the value
         if(newValue instanceof Integer)

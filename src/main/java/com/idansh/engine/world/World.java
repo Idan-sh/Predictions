@@ -152,7 +152,9 @@ public class World implements Runnable {
 
             // Try to invoke each rule of the simulation on each entity instance in the population
             for (Entity entity : entityManager.getPopulation()) {
-                rulesMap.values().forEach((rule) -> rule.invoke(entity));
+                for (Rule rule : rulesMap.values()) {
+                    rule.invoke(entity);
+                }
             }
 
             // Try to reset the tick counter of each rule

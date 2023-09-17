@@ -7,7 +7,6 @@ import com.idansh.engine.environment.ActiveEnvironmentVariables;
 import com.idansh.engine.expression.api.Expression;
 import com.idansh.engine.expression.fixed.FixedValueExpression;
 import com.idansh.engine.expression.functions.*;
-import com.idansh.engine.expression.property.PropertyExpression;
 import com.idansh.engine.property.instance.PropertyType;
 import com.idansh.engine.world.World;
 import javafx.util.Pair;
@@ -323,7 +322,7 @@ public class ExpressionConverter {
             // Try to get the entity's property with the given name, if one does not exist continue
             entityFactory.getPropertyFactory(prdStr);
 
-            return new PropertyExpression(worldContext, entityName, prdStr);
+            return new EvaluateFunctionExpression(worldContext.entityManager, entityName, prdStr);
         } catch (IllegalArgumentException ignored) { }
         return null;
     }

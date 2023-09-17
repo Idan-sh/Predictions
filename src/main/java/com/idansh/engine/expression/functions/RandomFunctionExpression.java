@@ -1,5 +1,6 @@
 package com.idansh.engine.expression.functions;
 
+import com.idansh.engine.entity.Entity;
 import com.idansh.engine.property.instance.PropertyType;
 
 import java.util.Random;
@@ -23,7 +24,14 @@ public class RandomFunctionExpression extends FunctionActivationExpression {
      * @return randomly generated integer between 0 and max
      */
     @Override
-    public Object getValue() {
+    public Object getValue(Entity ignored) {
+        Random random = new Random();
+        return random.nextInt(maxValue + 1);
+    }
+
+
+    @Override
+    public Object getValue(Entity ignored1, Entity ignored2) {
         Random random = new Random();
         return random.nextInt(maxValue + 1);
     }

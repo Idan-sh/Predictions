@@ -3,6 +3,7 @@ package com.idansh.engine.actions;
 import com.idansh.engine.entity.Entity;
 import com.idansh.engine.entity.SecondaryEntity;
 import com.idansh.engine.expression.api.Expression;
+import com.idansh.engine.property.creator.factory.PropertyFactory;
 import com.idansh.engine.property.instance.Property;
 import com.idansh.engine.world.World;
 
@@ -33,23 +34,38 @@ public class IncreaseAction extends Action {
 
     @Override
     public void invoke(Entity mainEntity, Entity secondaryEntity) {
-        invoke(mainEntity);
+        PropertyFactory propertyFactory = getWorldContext().entityManager.getEntityFactory(getEntityToInvokeOnName()).getPropertyFactory(propertyName);
+        Property property;
+
+        if (!propertyFactory.isNumericProperty())
+            throw new IllegalArgumentException("Can preform increase only on numeric properties!\n" +
+                    "the property if of type \"" + propertyFactory.getType() + "\".");
+
+        Entity entityToInvokeOn = getEntityToInvokeOn(mainEntity, secondaryEntity);
+        property = entityToInvokeOn.getPropertyByName(propertyName);
+
+        if(property != null)
+            property.addNumToValue(amount.getValue(mainEntity, secondaryEntity));
+        else throw new IllegalArgumentException("Cannot perform increase action on " + getEntityToInvokeOnName() +
+                " invalid property name defined.");
     }
 
     @Override
     public void invoke(Entity entity) {
-        Property property = entity.getPropertyByName(propertyName);
-
-        if (!property.isNumericProperty())
-            throw new IllegalArgumentException("can preform increase only on numeric properties! the property if of type \"" + property.getType() + "\".");
-
-        property.addNumToValue(amount.getValue());
+        invoke(entity, null);
     }
 
 
     @Override
     public Action copy(World worldContext) {
-        return new IncreaseAction(worldContext, getMainEntityContext(), getEntityToInvokeOn(), propertyName, amount);
+        return new IncreaseAction(
+                worldContext,
+                getMainEntityContext(),
+                getSecondaryEntity(),
+                getEntityToInvokeOnName(),
+                propertyName,
+                amount
+        );
     }
 
 

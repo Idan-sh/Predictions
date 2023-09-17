@@ -1,5 +1,6 @@
 package com.idansh.engine.expression.functions;
 
+import com.idansh.engine.entity.Entity;
 import com.idansh.engine.environment.ActiveEnvironmentVariables;
 import com.idansh.engine.property.instance.PropertyType;
 
@@ -20,7 +21,12 @@ public class EnvironmentFunctionExpression extends FunctionActivationExpression 
      * @return The value of the environment variable.
      */
     @Override
-    public Object getValue() {
+    public Object getValue(Entity ignored) {
+        return activeEnvironmentVariables.getActiveEnvironmentVariable(environmentVariableName).getValue();
+    }
+
+    @Override
+    public Object getValue(Entity ignored1, Entity ignored2) {
         return activeEnvironmentVariables.getActiveEnvironmentVariable(environmentVariableName).getValue();
     }
 

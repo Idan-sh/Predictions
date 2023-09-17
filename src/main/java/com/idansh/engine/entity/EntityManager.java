@@ -65,7 +65,7 @@ public class EntityManager {
     /**
      * Returns an entity in the population with the given name.
      */
-    public Entity getEntityInPopulationByIndex(String name) {
+    public Entity getEntityInPopulationByName(String name) {
         // Find an entity with the given name in the population
         Optional<Entity> retEntity =
                 population.stream().filter(e -> e.getName().equals(name)).findAny();

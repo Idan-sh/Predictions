@@ -44,13 +44,15 @@ public class SetAction extends Action {
 
     @Override
     public void invoke(Entity mainEntity, Entity secondaryEntity) {
-        invoke(mainEntity);
+        Entity entityToInvokeOn = getEntityToInvokeOn(mainEntity, secondaryEntity);
+        Property property = entityToInvokeOn.getPropertyByName(propertyName);
+        property.setValue(amount.getValue(mainEntity, secondaryEntity));
     }
+
 
     @Override
     public void invoke(Entity entity) {
-        Property property = entity.getPropertyByName(propertyName);
-        property.setValue(amount.getValue());
+        invoke(entity, null);
     }
 
 
@@ -60,7 +62,7 @@ public class SetAction extends Action {
                 worldContext,
                 getMainEntityContext(),
                 getSecondaryEntity(),
-                getEntityToInvokeOn(),
+                getEntityToInvokeOnName(),
                 propertyName,
                 amount
         );

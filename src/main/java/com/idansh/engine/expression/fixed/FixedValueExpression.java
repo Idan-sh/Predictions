@@ -1,5 +1,6 @@
 package com.idansh.engine.expression.fixed;
 
+import com.idansh.engine.entity.Entity;
 import com.idansh.engine.expression.api.Expression;
 import com.idansh.engine.property.instance.PropertyType;
 
@@ -17,7 +18,12 @@ public class FixedValueExpression implements Expression {
     }
 
     @Override
-    public Object getValue() {
+    public Object getValue(Entity ignored) {
+        return value;
+    }
+
+    @Override
+    public Object getValue(Entity ignored1, Entity ignored2) {
         return value;
     }
 

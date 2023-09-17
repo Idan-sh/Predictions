@@ -16,13 +16,15 @@ public class SimulationResultDTO {
     private final SimulationTime simulationTime;
     private final int completedTicks, maxTicks;
     private final List<EntityDTO> entityDTOList;
+    private final String endReason;
 
-    public SimulationResultDTO(int id, SimulationTime simulationTime, int completedTicks, int maxTicks) {
+    public SimulationResultDTO(int id, SimulationTime simulationTime, int completedTicks, int maxTicks, String endReason) {
         this.id = id;
         this.simulationTime = simulationTime;
         this.completedTicks = completedTicks;
         this.maxTicks = maxTicks;
         this.entityDTOList = new ArrayList<>();
+        this.endReason = endReason;
     }
 
     public void addEntityDTO(EntityDTO entityDTO) {
@@ -48,5 +50,9 @@ public class SimulationResultDTO {
 
     public SimulationTime getSimulationTime() {
         return simulationTime;
+    }
+
+    public String getEndReason() {
+        return endReason;
     }
 }

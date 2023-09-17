@@ -78,9 +78,30 @@ public class MultiConditionAction extends ConditionAction{
 
     @Override
     public void invoke(Entity mainEntity, Entity secondaryEntity) {
-        invoke(mainEntity);
-    }
+        List<Boolean> innerConditionsResults = new ArrayList<>();
 
+        if(innerConditions.size() == 0)
+            throw new RuntimeException("no inner conditions were set inside multi-condition action!");
+
+        for (ConditionAction conditionAction : innerConditions) {
+            // Try to activate the inner condition
+            conditionAction.invoke(mainEntity, secondaryEntity);
+
+            // Check if the inner condition was activated, add the result to the list
+            if (conditionAction.isActivated()) {
+                innerConditionsResults.add(true);
+
+                // Reset condition activation for future use
+                conditionAction.setActivated(false);
+            } else
+                innerConditionsResults.add(false);
+        }
+
+        setActivated(innerConditionsResults);
+
+        // Invoke "then" actions if both the multi-condition was activated and the condition is a main condition, otherwise invoke "else" actions
+        invokeActionsSet(mainEntity, secondaryEntity, isActivated() && isMainCondition());
+    }
 
     @Override
     public void invoke(Entity entity) {
@@ -103,6 +124,18 @@ public class MultiConditionAction extends ConditionAction{
                 innerConditionsResults.add(false);
         }
 
+        setActivated(innerConditionsResults);
+
+        // Invoke "then" actions if both the multi-condition was activated and the condition is a main condition, otherwise invoke "else" actions
+        invokeActionsSet(entity, isActivated() && isMainCondition());
+    }
+
+
+    /**
+     * Check if the condition is activated.
+     * @param innerConditionsResults Boolean results of inner conditions.
+     */
+    private void setActivated(List<Boolean> innerConditionsResults) {
         switch (logicOp) {
             case OR:
                 // Check if at least one of the inner conditions resulted as "true", if so activate this condition
@@ -115,9 +148,6 @@ public class MultiConditionAction extends ConditionAction{
                 setActivated(!innerConditionsResults.contains(false));
                 break;
         }
-
-        // Invoke "then" actions if both the multi-condition was activated and the condition is a main condition, otherwise invoke "else" actions
-        invokeActionsSet(entity, isActivated() && isMainCondition());
     }
 
 
@@ -136,7 +166,7 @@ public class MultiConditionAction extends ConditionAction{
                         worldContext,
                         getMainEntityContext(),
                         getSecondaryEntity(),
-                        getEntityToInvokeOn(),
+                        getEntityToInvokeOnName(),
                         LogicOp.getLogicOpString(logicOp),
                         thenActions,
                         elseActions,

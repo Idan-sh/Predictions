@@ -46,15 +46,11 @@ public class CalculationAction extends Action {
 
     @Override
     public void invoke(Entity mainEntity, Entity secondaryEntity) {
-        invoke(mainEntity);
-    }
+        Object val1 = getArgValue(arg1, mainEntity, secondaryEntity);
+        Object val2 = getArgValue(arg2, mainEntity, secondaryEntity);
 
-    @Override
-    public void invoke(Entity entity) {
-        Property propertyToSave = entity.getPropertyByName(propertyName);
 
-        Object val1 = arg1.getValue();
-        Object val2 = arg2.getValue();
+        Property propertyToSave = getEntityToInvokeOn(mainEntity, secondaryEntity).getPropertyByName(propertyName);
 
         if (!propertyToSave.isNumericProperty())
             throw new IllegalArgumentException("can preform calculation only on numeric properties! the property if of type \"" + propertyToSave.getType() + "\".");
@@ -79,6 +75,18 @@ public class CalculationAction extends Action {
         }
     }
 
+    @Override
+    public void invoke(Entity entity) {
+        invoke(entity, null);
+    }
+
+    private Object getArgValue(Expression arg, Entity mainEntity, Entity secondaryEntity) {
+        if(secondaryEntity != null)
+            return arg.getValue(mainEntity, secondaryEntity);
+
+        return arg.getValue(mainEntity);
+    }
+
 
     @Override
     public Action copy(World worldContext) {
@@ -86,7 +94,7 @@ public class CalculationAction extends Action {
                 worldContext,
                 getMainEntityContext(),
                 getSecondaryEntity(),
-                getEntityToInvokeOn(),
+                getEntityToInvokeOnName(),
                 propertyName,
                 arg1,
                 arg2,

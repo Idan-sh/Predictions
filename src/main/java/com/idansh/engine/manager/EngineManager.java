@@ -88,11 +88,11 @@ public class EngineManager {
                             ruleName,
                             rule.getActivation().getTicks(),
                             rule.getActivation().getProbability(),
-                            rule.getActionsSet().size()
+                            rule.getActionsList().size()
                     );
 
                     // Add actions' names to the DTO
-                    rule.getActionsSet().forEach(
+                    rule.getActionsList().forEach(
                             a -> ruleDTO.addActionName(a.getActionTypeString())
                     );
 
@@ -226,7 +226,8 @@ public class EngineManager {
                 simulationResult.getId(),
                 simulationResult.getSimulationTime(),
                 simulationResult.getCompletedTicks(),
-                simulationResult.getMaxTicks()
+                simulationResult.getMaxTicks(),
+                simulationResult.getEndReason()
         );
 
         simulationResult.getEntityManager().getEntityFactories().forEach(
@@ -325,11 +326,11 @@ public class EngineManager {
                             ruleName,
                             rule.getActivation().getTicks(),
                             rule.getActivation().getProbability(),
-                            rule.getActionsSet().size()
+                            rule.getActionsList().size()
                     );
 
                     // Add actions' names to the DTO
-                    rule.getActionsSet().forEach(
+                    rule.getActionsList().forEach(
                             a -> ruleDTO.addActionName(a.getActionTypeString())
                     );
 

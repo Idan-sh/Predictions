@@ -28,23 +28,31 @@ public class KillAction extends Action {
 
     @Override
     public void invoke(Entity mainEntity, Entity secondaryEntity) {
-        if (mainEntity != null && getEntityToInvokeOn().equals(mainEntity.getName()))
+        if (mainEntity != null && getEntityToInvokeOnName().equals(mainEntity.getName())) {
             mainEntity.kill();
-        else if (secondaryEntity != null && getEntityToInvokeOn().equals(secondaryEntity.getName()))
+        }
+        else if (secondaryEntity != null && getEntityToInvokeOnName().equals(secondaryEntity.getName())) {
             secondaryEntity.kill();
+        }
     }
 
     @Override
     public void invoke(Entity entity) {
         World worldContext = getWorldContext();
 
-        if(entity != null && getEntityToInvokeOn().equals(entity.getName()))
+        if(entity != null && getEntityToInvokeOnName().equals(entity.getName())) {
             worldContext.entityManager.killEntity(entity);
+        }
     }
 
     @Override
     public Action copy(World worldContext) {
-        return new KillAction(worldContext, getMainEntityContext(), getSecondaryEntity(), getEntityToInvokeOn());
+        return new KillAction(
+                worldContext,
+                getMainEntityContext(),
+                getSecondaryEntity(),
+                getEntityToInvokeOnName()
+        );
     }
 
     @Override

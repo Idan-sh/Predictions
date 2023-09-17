@@ -1,5 +1,6 @@
 package com.idansh.engine.expression.functions;
 
+import com.idansh.engine.entity.Entity;
 import com.idansh.engine.expression.api.Expression;
 import com.idansh.engine.property.instance.PropertyType;
 
@@ -57,5 +58,5 @@ public abstract class FunctionActivationExpression implements Expression {
     public abstract PropertyType getType();
 
     @Override
-    public abstract Object getValue();
+    public abstract Object getValue(Entity entityInstance);
 }

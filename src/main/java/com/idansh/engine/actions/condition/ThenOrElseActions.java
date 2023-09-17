@@ -47,11 +47,23 @@ public class ThenOrElseActions {
 
     /**
      * Invokes each action in the Then/Else set of actions.
-     * @param entity the entity instance on which the actions will be invoked
+     * @param mainEntity The main entity instance on which the actions will be invoked
+     * @param secondaryEntity The secondary entity instance on which the actions will be invoked.
      */
-    public void invoke(Entity entity){
+    public void invoke(Entity mainEntity, Entity secondaryEntity) {
         actionsToInvoke.forEach(
-                action -> action.invoke(entity)
+                action -> action.invoke(mainEntity, secondaryEntity)
+        );
+    }
+
+
+    /**
+     * Invokes each action in the Then/Else set of actions.
+     * @param mainEntity the entity instance on which the actions will be invoked
+     */
+    public void invoke(Entity mainEntity) {
+        actionsToInvoke.forEach(
+                action -> action.invoke(mainEntity)
         );
     }
 
