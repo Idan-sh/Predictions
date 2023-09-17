@@ -76,7 +76,7 @@ public class EngineHandler {
      * 1. key: the property's value
      * 2. value: the amount of entities in the population with this value
      */
-    public Map<Object, Integer> getPropertyValues(int simulationResultID, PropertyDTO propertyDTO) {
-        return engineManager.getPropertyValues(simulationResultID, propertyDTO);
+    public Map<Object, Integer> getPropertyValues(int simulationResultID, String entityName, String propertyName) {
+        return engineManager.getPropertyValues(simulationResultID, entityName, propertyName);
     }
 }

@@ -141,8 +141,10 @@ public class World implements Runnable {
         // Check if the current tick has reached the termination rule tick defined, if one does not exist keeps going until reached the timer defined or the user decided to stop the simulation
         while((!terminationRules.containsKey(TerminationRule.Type.TICKS)) || (terminationRules.containsKey(TerminationRule.Type.TICKS) && tickCounter.getCount() < terminationRules.get(TerminationRule.Type.TICKS).getValue())) {
             // Checks if the timer expired, if so end simulation
-            if (countdown.isFinished())
+            if (countdown.isFinished()) {
                 simulationResult = endSimulation("Timer Expired");
+                return;
+            }
 
             // Remove all previously killed entities from the population
             entityManager.removeDeadEntitiesFromPopulation();

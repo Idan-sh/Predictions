@@ -114,7 +114,7 @@ public class ResultsController implements Initializable {
 
         // Setup on action events for entity and property choice boxes:
         entityChoiceBox.setOnAction(event -> onEntitySelect(entityChoiceBox.getValue()));
-        propertyChoiceBox.setOnAction(event -> onPropertySelect(propertyChoiceBox.getValue()));
+        propertyChoiceBox.setOnAction(event -> onPropertySelect(entityChoiceBox.getValue(), propertyChoiceBox.getValue()));
 
         // Setup Execution Results tree view:
         propertyDetailsTreeView.setRoot(new TreeItem<>("root-item"));
@@ -289,9 +289,10 @@ public class ResultsController implements Initializable {
     /**
      * When a property is chosen from the execution results section's properties choice box,
      * Shows various information on it in the Tree View of the execution results.
-     * @param propertyDTO the propertyDTO which was chosen by the user.
+     * @param propertyDTO the propertyDTO of the property to get its values.
+     * @param entityDTO the entityDTO of the entity that the property is defined in.
      */
-    public void onPropertySelect(PropertyDTO propertyDTO) {
+    public void onPropertySelect(EntityDTO entityDTO, PropertyDTO propertyDTO) {
         if (propertyDTO != null) {
             boolean isNumeric = propertyDTO.getType().equals("float") || propertyDTO.getType().equals("decimal");
 
@@ -303,7 +304,7 @@ public class ResultsController implements Initializable {
 
             // For each property value, show the number of instances with said value
             TreeItem<String> histogramItem = new TreeItem<>("Final Population's Property Values");
-            for (Map.Entry<Object, Integer> entry : mainController.getPropertyValues(chosenExecutionID, propertyDTO).entrySet()) {
+            for (Map.Entry<Object, Integer> entry : mainController.getPropertyValues(chosenExecutionID, entityDTO.getName(), propertyDTO.getName()).entrySet()) {
                 if (isNumeric) {
                     if ((entry.getKey() instanceof Integer))
                         sum += (Integer) entry.getKey();

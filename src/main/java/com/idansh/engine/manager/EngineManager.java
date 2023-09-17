@@ -9,6 +9,7 @@ import com.idansh.dto.rule.TerminationRuleDTO;
 import com.idansh.dto.simulation.LoadedSimulationDTO;
 import com.idansh.dto.simulation.RunningSimulationDTO;
 import com.idansh.dto.simulation.SimulationResultDTO;
+import com.idansh.engine.entity.Entity;
 import com.idansh.engine.helpers.Range;
 import com.idansh.engine.manager.result.SimulationResult;
 import com.idansh.engine.property.creator.factory.PropertyFactory;
@@ -367,22 +368,24 @@ public class EngineManager {
      * Gets a map of:
      * 1. key: the property's value
      * 2. value: the amount of entities in the population with this value
+     * @param entityName Name of the entity in which the property is defined.
+     * @param propertyName Name of the property to get its values.
+     * @param simulationResultID ID of the simulation result that contains the info.
      */
-    public Map<Object, Integer> getPropertyValues(int simulationResultID, PropertyDTO propertyDTO) {
+    public Map<Object, Integer> getPropertyValues(int simulationResultID, String entityName, String propertyName) {
         Map<Object, Integer> retValuesMap = new LinkedHashMap<>();
 
-        simulationsPool.get(simulationResultID).entityManager.getPopulation().forEach(
-                entity -> {
-                    Object entityValue = entity.getPropertyByName(propertyDTO.getName()).getValue();
+        for (Entity entity : simulationsPool.get(simulationResultID).entityManager.getPopulation()) {
+            if (entity.getName().equals(entityName)) {
+                Object entityValue = entity.getPropertyByName(propertyName).getValue();
 
-                    if(retValuesMap.containsKey(entityValue)) {
-                        int oldVal = retValuesMap.get(entityValue);
-                        retValuesMap.put(entityValue, oldVal + 1);
-                    }
-                    else
-                        retValuesMap.put(entityValue, 1);
-                }
-        );
+                if (retValuesMap.containsKey(entityValue)) {
+                    int oldVal = retValuesMap.get(entityValue);
+                    retValuesMap.put(entityValue, oldVal + 1);
+                } else
+                    retValuesMap.put(entityValue, 1);
+            }
+        }
 
         return retValuesMap;
     }

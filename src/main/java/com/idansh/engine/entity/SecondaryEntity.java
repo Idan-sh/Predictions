@@ -5,7 +5,6 @@ import com.idansh.engine.helpers.RandomValue;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Defines how a secondary entity can be chosen within an Action.
@@ -83,15 +82,12 @@ public class SecondaryEntity {
         // The maximum amount that is possible to choose is the amount of secondary entity instances in the population
         amountToChoose = Math.min(amountToChoose, secondaryEntityInstancesThatConditionApplies.size());
 
-        System.out.println("\n\nstarting loop");
         while (amountChosen < amountToChoose) {
-            System.out.println("im in secondary entity loop wheeee");
             int rndIndex = RandomValue.getRandomInt(0, secondaryEntityInstancesThatConditionApplies.size() - 1); // Choose a random index in the population
             Entity entityChosen = secondaryEntityInstancesThatConditionApplies.get(rndIndex);
             chosenSecondaryEntities.add(entityChosen);
             amountChosen++;
         }
-        System.out.println("finished loop :(");
 
         return chosenSecondaryEntities;
     }

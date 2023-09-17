@@ -220,7 +220,7 @@ public class AppController implements Initializable {
      * 1. key: the property's value
      * 2. value: the amount of entities in the population with this value
      */
-    public Map<Object, Integer> getPropertyValues(int simulationResultID, PropertyDTO propertyDTO) {
-        return engineHandler.getPropertyValues(simulationResultID, propertyDTO);
+    public Map<Object, Integer> getPropertyValues(int simulationResultID, String entityName, String propertyName) {
+        return engineHandler.getPropertyValues(simulationResultID, entityName, propertyName);
     }
 }
