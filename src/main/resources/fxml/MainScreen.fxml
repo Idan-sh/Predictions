@@ -35,7 +35,7 @@
                      </cursor>
                   </Button>
                   <TextField fx:id="simulationPathTextField" editable="false" prefWidth="300.0" text="No Simulation Loaded" HBox.hgrow="ALWAYS" />
-                  <Button alignment="CENTER" contentDisplay="CENTER" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" text="Queue Managmet" textAlignment="CENTER">
+                  <Button fx:id="queueManagementButton" alignment="CENTER" contentDisplay="CENTER" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#queueManagementButtonListener" prefHeight="50.0" text="Queue Management" textAlignment="CENTER">
                      <cursor>
                         <Cursor fx:constant="OPEN_HAND" />
                      </cursor></Button>

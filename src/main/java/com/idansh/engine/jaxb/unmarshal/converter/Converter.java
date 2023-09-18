@@ -411,7 +411,6 @@ public abstract class Converter {
         } else {
             mainContext = prdAction.getPRDBetween().getSourceEntity();
             secondaryContext = prdAction.getPRDBetween().getTargetEntity();
-            System.out.println("got proximity " + mainContext + ", " + secondaryContext);
         }
 
         if (!worldContext.entityManager.isEntityFactoryValid(mainContext))

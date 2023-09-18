@@ -1,14 +1,21 @@
 package com.idansh.javafx.controllers;
 
-import com.idansh.dto.property.PropertyDTO;
 import com.idansh.dto.simulation.LoadedSimulationDTO;
+import com.idansh.dto.simulation.ThreadsDTO;
 import com.idansh.javafx.manager.EngineHandler;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Popup;
+import javafx.stage.Stage;
 
 import java.io.File;
 import java.net.URL;
@@ -56,6 +63,8 @@ public class AppController implements Initializable {
     @FXML
     private Button loadFileButton;
     @FXML
+    private Button queueManagementButton;
+    @FXML
     private TextField simulationPathTextField;
     @FXML
     private TabPane appTabPane;
@@ -95,6 +104,44 @@ public class AppController implements Initializable {
         }
     }
 
+    @FXML
+    public void queueManagementButtonListener(){
+        ListView<String> queueManagementListView = new ListView<>();
+        Stage popupStage = new Stage();
+        popupStage.setTitle("Threads Queue Management");
+
+        Scene popupScene = new Scene(queueManagementListView, 300, 78);
+        popupStage.setScene(popupScene);
+        popupStage.show();
+
+        // Create and start a thread that displays the current number of threads in the system
+        Thread taskThread = new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(200); // Pause for 200 milliseconds
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                // Update the UI from the JavaFX Application Thread
+                Platform.runLater(() -> {
+                    ThreadsDTO threadsDTO = engineHandler.getThreadsDTO();
+
+                    queueManagementListView.getItems().clear();
+                    queueManagementListView.getItems().add("Running Threads: " + threadsDTO.getNofRunningThreads());
+                    queueManagementListView.getItems().add("Queueing Threads: " + threadsDTO.getNofQueueThreads());
+                    queueManagementListView.getItems().add("Finished Threads: " + threadsDTO.getNofFinishedThreads());
+
+                    queueManagementListView.setMinHeight(Region.USE_PREF_SIZE);
+                    queueManagementListView.setPrefHeight(Region.USE_COMPUTED_SIZE);
+                    queueManagementListView.setMaxHeight(Region.USE_COMPUTED_SIZE);
+                });
+            }
+        });
+
+        taskThread.start();
+    }
+
 
     /**
      * Opens file chooser dialog, which allows the user
@@ -109,6 +156,7 @@ public class AppController implements Initializable {
                 new FileChooser.ExtensionFilter("XML Files", "*.xml")
         );
 
+        // Open file chooser dialog
         File selectedFile = fileChooser.showOpenDialog(loadFileButton.getScene().getWindow());
 
         // Check if the user canceled and chose no file

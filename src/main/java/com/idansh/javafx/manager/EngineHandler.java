@@ -3,6 +3,7 @@ package com.idansh.javafx.manager;
 import com.idansh.dto.environment.EnvironmentVariablesListDTO;
 import com.idansh.dto.property.PropertyDTO;
 import com.idansh.dto.simulation.LoadedSimulationDTO;
+import com.idansh.dto.simulation.ThreadsDTO;
 import com.idansh.engine.manager.EngineManager;
 
 import java.io.File;
@@ -78,5 +79,10 @@ public class EngineHandler {
      */
     public Map<Object, Integer> getPropertyValues(int simulationResultID, String entityName, String propertyName) {
         return engineManager.getPropertyValues(simulationResultID, entityName, propertyName);
+    }
+
+
+    public ThreadsDTO getThreadsDTO() {
+        return engineManager.getThreadsDTO();
     }
 }

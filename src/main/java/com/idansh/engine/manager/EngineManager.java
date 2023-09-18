@@ -1,6 +1,5 @@
 package com.idansh.engine.manager;
 
-import com.idansh.dto.action.ActionDTO;
 import com.idansh.dto.entity.EntityDTO;
 import com.idansh.dto.environment.EnvironmentVariablesListDTO;
 import com.idansh.dto.property.PropertyDTO;
@@ -10,6 +9,7 @@ import com.idansh.dto.rule.TerminationRuleDTO;
 import com.idansh.dto.simulation.LoadedSimulationDTO;
 import com.idansh.dto.simulation.RunningSimulationDTO;
 import com.idansh.dto.simulation.SimulationResultDTO;
+import com.idansh.dto.simulation.ThreadsDTO;
 import com.idansh.engine.actions.Action;
 import com.idansh.engine.entity.Entity;
 import com.idansh.engine.helpers.Range;
@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * The UI will handle the engine through this class.
@@ -30,7 +31,7 @@ import java.util.concurrent.Executors;
  */
 public class EngineManager {
     private World loadedWorld;                              // The currently loaded world. This world will not run but only be used to create instances for running
-    private ExecutorService threadPool;               // Thread management for simulation runs
+    private ThreadPoolExecutor threadPool;               // Thread management for simulation runs
     private final Map<Integer, World> simulationsPool;      // Simulated worlds map: currently running simulations and finished simulations. Key = ID of the simulation, Value = simulated world
 
     public EngineManager() {
@@ -44,7 +45,7 @@ public class EngineManager {
      * @param threadCount max number of threads that can run simultaneously.
      */
     private void createThreadPool(int threadCount) {
-        threadPool = Executors.newFixedThreadPool(threadCount);
+        threadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(threadCount);
     }
 
     /**
@@ -410,5 +411,20 @@ public class EngineManager {
      */
     public void setEntityAmount(String entityName, int amount) {
         loadedWorld.entityManager.getEntityFactory(entityName).setInitPopulation(amount);
+    }
+
+
+    /**
+     * Get the number of running, queueing and finished threads in the thread pool.
+     */
+    public ThreadsDTO getThreadsDTO() {
+        if (threadPool == null)
+            return new ThreadsDTO(0, 0 , 0);
+
+        return new ThreadsDTO(
+                threadPool.getQueue().size(),
+                threadPool.getActiveCount(),
+                Long.valueOf(threadPool.getCompletedTaskCount()).intValue()
+        );
     }
 }
