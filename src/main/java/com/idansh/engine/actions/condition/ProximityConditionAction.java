@@ -3,6 +3,7 @@ package com.idansh.engine.actions.condition;
 import com.idansh.dto.action.ActionDTO;
 import com.idansh.engine.actions.Action;
 import com.idansh.engine.entity.Entity;
+import com.idansh.engine.entity.SecondaryEntity;
 import com.idansh.engine.expression.api.Expression;
 import com.idansh.engine.property.instance.PropertyType;
 import com.idansh.engine.world.World;
@@ -15,6 +16,16 @@ public class ProximityConditionAction extends ConditionAction {
     private final String targetEntity;          // Will be searched in the population within the proximity of the source entity
     private final Expression proximityDepth;    // The distance (location radius) of which the target entity will be searched from the source entity
 
+
+    public ProximityConditionAction(World worldContext, String mainEntityContext, SecondaryEntity secondaryEntity, String sourceEntity, String targetEntity, ThenOrElseActions thenActions, Expression proximityDepth) {
+        super(worldContext, mainEntityContext, sourceEntity, thenActions, null, true);
+
+        if(!proximityDepth.getType().equals(PropertyType.INTEGER) && !proximityDepth.getType().equals(PropertyType.FLOAT))
+            throw new IllegalArgumentException("Cannot create proximity action with an non-numeric expression, got expression of type \"" + proximityDepth.getType() + "\".");
+
+        this.targetEntity = targetEntity;
+        this.proximityDepth = proximityDepth;
+    }
 
     public ProximityConditionAction(World worldContext, String mainEntityContext, String sourceEntity, String targetEntity, ThenOrElseActions thenActions, Expression proximityDepth) {
         super(worldContext, mainEntityContext, sourceEntity, thenActions, null, true);
@@ -63,6 +74,7 @@ public class ProximityConditionAction extends ConditionAction {
         return new ProximityConditionAction(
                 worldContext,
                 getMainEntityContext(),
+                getSecondaryEntity(),
                 getEntityToInvokeOnName(),
                 targetEntity,
                 thenActions,

@@ -219,9 +219,9 @@ public class ExpressionConverter {
      */
     private void checkEntityContext(Pair<String, String> entityPropertyPair, String mainEntityContext, SecondaryEntity secondaryEntityContext) {
         if(!mainEntityContext.equals(entityPropertyPair.getKey()) && !(secondaryEntityContext != null && secondaryEntityContext.getName().equals(entityPropertyPair.getKey()))) {
-            throw new IllegalArgumentException("Cannot evaluate with entity " + entityPropertyPair.getKey()
-                    + " on main entity context \"" + mainEntityContext + "\", and secondary entity context \"" + (secondaryEntityContext == null ? "N/A" : secondaryEntityContext) + "\"."
-                    + "\nEvaluate only works on an argument with an entity name "
+            throw new IllegalArgumentException("Invalid function expression argument of entity \"" + entityPropertyPair.getKey()
+                    + "\", on main entity context \"" + mainEntityContext + "\" and secondary entity context \"" + (secondaryEntityContext == null ? "N/A" : secondaryEntityContext.getName()) + "\"."
+                    + "\n\nFunction expression can only work on an argument with an entity name "
                     + "that equals to the main or secondary entities in context."
             );
         }

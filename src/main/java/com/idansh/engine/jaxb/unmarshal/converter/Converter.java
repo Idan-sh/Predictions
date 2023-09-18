@@ -287,6 +287,9 @@ public abstract class Converter {
         Action retAction;
         ExpressionConverter expressionConverter = new ExpressionConverter(worldContext);
 
+        // Check if entity contexts received are valid
+        checkEntityContexts(worldContext, mainEntityContext, secondaryEntity, prdAction);
+
         String actionEntity = prdAction.getEntity();
         String actionProperty = prdAction.getProperty();
 
@@ -385,6 +388,7 @@ public abstract class Converter {
             case PROXIMITY:
                 retAction = proximityActionConvert(
                         worldContext,
+                        secondaryEntity,
                         prdAction,
                         expressionConverter
                 );
@@ -397,6 +401,28 @@ public abstract class Converter {
         return retAction;
     }
 
+    private static void checkEntityContexts(World worldContext, String mainEntityContext, SecondaryEntity secondaryEntity, PRDAction prdAction) {
+        Action.Type actionType = Action.Type.getType(prdAction.getType());
+        String mainContext, secondaryContext;
+
+        if (!actionType.equals(Action.Type.PROXIMITY)) {
+            mainContext = mainEntityContext;
+            secondaryContext = secondaryEntity != null ? secondaryEntity.getName() : null;
+        } else {
+            mainContext = prdAction.getPRDBetween().getSourceEntity();
+            secondaryContext = prdAction.getPRDBetween().getTargetEntity();
+            System.out.println("got proximity " + mainContext + ", " + secondaryContext);
+        }
+
+        if (!worldContext.entityManager.isEntityFactoryValid(mainContext))
+            throw new IllegalArgumentException("Cannot convert action \"" + prdAction.getType() + "\".\nInvalid main entity context received with name \""
+                    + mainContext + "\", no entity of this name was defined...");
+
+        if (!worldContext.entityManager.isEntityFactoryValid(secondaryContext))
+            throw new IllegalArgumentException("Cannot convert action \"" + prdAction.getType() + "\".\nInvalid secondary entity context received with name \""
+                    + secondaryContext + "\", no entity of this name was defined...");
+    }
+
 
     /**
      * Converts a PRDAction of proximity condition that was read from the XML file
@@ -406,7 +432,7 @@ public abstract class Converter {
      * @param expressionConverter used for creating Expression objects from the XML file.
      * @return ProximityConditionAction object with the data of the PRDAction received.
      */
-    private static ProximityConditionAction proximityActionConvert(World worldContext, PRDAction prdAction, ExpressionConverter expressionConverter) {
+    private static ProximityConditionAction proximityActionConvert(World worldContext, SecondaryEntity secondaryEntity, PRDAction prdAction, ExpressionConverter expressionConverter) {
         ThenOrElseActions thenActions = new ThenOrElseActions();
 
         // Convert 'then' action sets
@@ -416,6 +442,7 @@ public abstract class Converter {
         return new ProximityConditionAction(
                 worldContext,
                 prdAction.getPRDBetween().getSourceEntity(),
+                secondaryEntity,
                 prdAction.getPRDBetween().getSourceEntity(),
                 prdAction.getPRDBetween().getTargetEntity(),
                 thenActions,
@@ -681,11 +708,17 @@ public abstract class Converter {
      * Returns a secondary entity object if one exists in the XML file,
      * Otherwise returns null.
      * @param prdAction a PRDAction in which the secondary entity might reside.
+     * @throws IllegalArgumentException in case there is no secondary entity with the name received from the XML file.
      */
     private static SecondaryEntity secondEntityConvert(World worldContext, PRDAction prdAction) {
         PRDAction.PRDSecondaryEntity prdSecondaryEntity = prdAction.getPRDSecondaryEntity();
 
         if(prdSecondaryEntity != null) {
+            // Check if there is an entity with the name of the received secondary entity, if not throw exception
+            if(!worldContext.entityManager.isEntityFactoryValid(prdSecondaryEntity.getEntity()))
+                throw new IllegalArgumentException("Invalid secondary entity name \"" + prdSecondaryEntity.getEntity()
+                        + "\".\nNo entity of this name exist in the simulation...");
+
             SecondaryEntity secondaryEntity = new SecondaryEntity(
                     prdSecondaryEntity.getEntity(),
                     prdSecondaryEntity.getPRDSelection().getCount()

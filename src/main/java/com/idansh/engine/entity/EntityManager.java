@@ -63,6 +63,17 @@ public class EntityManager {
 
 
     /**
+     * @param name Name of the entity factory to check if exists.
+     * @return true if exists, false otherwise.
+     */
+    public boolean isEntityFactoryValid(String name) {
+        if(name == null) return true;
+
+        return entityFactories.containsKey(name);
+    }
+
+
+    /**
      * Returns an entity in the population with the given name.
      */
     public Entity getEntityInPopulationByName(String name) {

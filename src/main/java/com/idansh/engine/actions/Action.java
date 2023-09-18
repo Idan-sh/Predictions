@@ -106,9 +106,12 @@ public abstract class Action {
 
     /**
      * Check if there is an entity factory with the name of the value of the received entityContext.
+     * @throws IllegalArgumentException in case the entity context received is invalid.
      */
     public void checkEntityContext(String entityContext) {
-        worldContext.entityManager.getEntityFactory(entityContext);
+        if(!worldContext.entityManager.isEntityFactoryValid(entityContext))
+            throw new IllegalArgumentException("Invalid entity context \"" + entityContext +
+                    "\", no entity defined with this name...");
     }
 
 
