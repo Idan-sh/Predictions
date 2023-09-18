@@ -34,6 +34,8 @@ public abstract class Converter {
     public static World worldConvert(PRDWorld prdWorld) {
         World retWorld = new World();
 
+        retWorld.setThreadCount(prdWorld.getPRDThreadCount());
+
         // Iterates over all PRDEnvironmentProperties, converts each property and adds it to the world
         prdWorld.getPRDEnvironment().getPRDEnvProperty().forEach(
                 p -> retWorld.addEnvironmentVariableFactory(environmentVariableConvert(p))
@@ -370,7 +372,6 @@ public abstract class Converter {
                 break;
 
             case REPLACE:
-                System.out.println("got replace");
                 retAction = new ReplaceAction(
                         worldContext,
                         mainEntityContext,

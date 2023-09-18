@@ -28,15 +28,22 @@ import java.util.concurrent.Executors;
  */
 public class EngineManager {
     private World loadedWorld;                              // The currently loaded world. This world will not run but only be used to create instances for running
-    private final ExecutorService threadPool;               // Thread management for simulation runs
+    private ExecutorService threadPool;               // Thread management for simulation runs
     private final Map<Integer, World> simulationsPool;      // Simulated worlds map: currently running simulations and finished simulations. Key = ID of the simulation, Value = simulated world
 
     public EngineManager() {
         loadedWorld = null;
-        threadPool = Executors.newCachedThreadPool();
         simulationsPool = new HashMap<>();
+        threadPool = null;
     }
 
+    /**
+     * Create and add a new Thread Pool into the engine.
+     * @param threadCount max number of threads that can run simultaneously.
+     */
+    private void createThreadPool(int threadCount) {
+        threadPool = Executors.newFixedThreadPool(threadCount);
+    }
 
     /**
      * @return returns to the UI a DTO that contains information on the current loaded simulated world.
@@ -123,6 +130,11 @@ public class EngineManager {
      */
     public void loadSimulationFromFile(File file) {
             loadedWorld = Reader.readWorld(file);
+
+            // If one does not already exist, create a thread pool with the received thread count
+            if(threadPool == null) {
+                createThreadPool(loadedWorld.getThreadCount());
+            }
     }
 
 

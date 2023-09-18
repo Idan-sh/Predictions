@@ -30,6 +30,7 @@ public class World implements Runnable {
     private final Timer timer;                                                      // Timer for the termination rule SECONDS
     private final SimulationTime simulationTime;                                    // Holds the simulation's start and end times
     private SimulationResult simulationResult;
+    private Integer threadCount;                                                  // The max number of threads that will be able to run simultaneously
 
 
     /**
@@ -45,6 +46,7 @@ public class World implements Runnable {
         this.timer = new Timer();
         this.simulationTime = new SimulationTime();
         this.simulationResult = null;
+        this.threadCount = null;
     }
 
 
@@ -71,12 +73,14 @@ public class World implements Runnable {
         );
 
         this.environmentVariablesManager = new EnvironmentVariablesManager(world.environmentVariablesManager);
+        this.activeEnvironmentVariables = null;
         this.tickCounter = new Counter(0);
         this.timer = new Timer();
         this.simulationTime = new SimulationTime();
         this.entityManager.initEntityPopulation();
         this.simulationResult = null;
         this.id = SimulationIdGenerator.getID();
+        this.threadCount = world.threadCount;
     }
 
 
@@ -219,6 +223,14 @@ public class World implements Runnable {
 
     public boolean isSimulationFinished() {
         return simulationResult != null;
+    }
+
+    public void setThreadCount(int threadCount) {
+        this.threadCount = threadCount;
+    }
+
+    public int getThreadCount() {
+        return threadCount;
     }
 }
 
