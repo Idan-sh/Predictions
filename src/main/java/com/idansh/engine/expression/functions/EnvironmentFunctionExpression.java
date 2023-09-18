@@ -38,4 +38,9 @@ public class EnvironmentFunctionExpression extends FunctionActivationExpression 
     public PropertyType getType() {
         return activeEnvironmentVariables.getActiveEnvironmentVariable(environmentVariableName).getType();
     }
+
+    @Override
+    public String getAsString() {
+        return "EnvironmentVariable(" + environmentVariableName + ")";
+    }
 }

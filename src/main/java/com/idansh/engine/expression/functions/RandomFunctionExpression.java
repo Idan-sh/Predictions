@@ -41,4 +41,10 @@ public class RandomFunctionExpression extends FunctionActivationExpression {
     public PropertyType getType() {
         return PropertyType.INTEGER;
     }
+
+
+    @Override
+    public String getAsString() {
+        return "Random(" + maxValue + ")";
+    }
 }

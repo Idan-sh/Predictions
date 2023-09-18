@@ -1,5 +1,6 @@
 package com.idansh.engine.actions.condition;
 
+import com.idansh.dto.action.ActionDTO;
 import com.idansh.engine.actions.Action;
 import com.idansh.engine.entity.Entity;
 import com.idansh.engine.entity.SecondaryEntity;
@@ -179,5 +180,20 @@ public class MultiConditionAction extends ConditionAction{
         }
 
         return retMultiConditionAction;
+    }
+
+
+    @Override
+    public ActionDTO getActionDTO() {
+        ActionDTO retActionDTO = getBasicActionDTO();
+
+        retActionDTO.addArgument("Entity Name", getEntityToInvokeOnName());
+        retActionDTO.addArgument("Logic Operand", LogicOp.getLogicOpString(logicOp));
+        retActionDTO.addArgument("Amount of Inner Conditions", Integer.valueOf(innerConditions.size()).toString());
+
+        retActionDTO.addExtraInfo("Amount of 'then' Actions", Integer.valueOf(getThenActions().getActionsToInvoke().size()).toString());
+        retActionDTO.addExtraInfo("Amount of 'else' Actions", Integer.valueOf(getElseActions().getActionsToInvoke().size()).toString());
+
+        return retActionDTO;
     }
 }

@@ -1,5 +1,6 @@
 package com.idansh.engine.actions;
 
+import com.idansh.dto.action.ActionDTO;
 import com.idansh.engine.entity.Entity;
 import com.idansh.engine.entity.SecondaryEntity;
 import com.idansh.engine.world.World;
@@ -137,6 +138,23 @@ public abstract class Action {
      */
     public abstract Action copy(World worldContext);
 
+
+    /**
+     * @return DTO containing info on the action.
+     */
+    public abstract ActionDTO getActionDTO();
+
+
+    /**
+     * @return a basic Action DTO without params or extra information.
+     */
+    public ActionDTO getBasicActionDTO() {
+        return new ActionDTO(
+                getActionTypeString(),
+                getMainEntityContext(),
+                secondaryEntity != null ? secondaryEntity.getName() : null
+        );
+    }
 
     public String getMainEntityContext() {
         return mainEntityContext;

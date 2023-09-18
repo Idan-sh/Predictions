@@ -1,5 +1,7 @@
 package com.idansh.dto.rule;
 
+import com.idansh.dto.action.ActionDTO;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,18 +10,18 @@ public class RuleDTO {
     private final int ticks;
     private final double probability;
     private final int nofActions;
-    private List<String> actionNamesList;
+    private final List<ActionDTO> actionDTOList;
 
     public RuleDTO(String name, int ticks, double probability, int nofActions) {
         this.name = name;
         this.ticks = ticks;
         this.probability = probability;
         this.nofActions = nofActions;
-        this.actionNamesList = new ArrayList<>();
+        this.actionDTOList = new ArrayList<>();
     }
 
-    public void addActionName(String name) {
-        actionNamesList.add(name);
+    public void addActionDTO(ActionDTO actionDTO) {
+        actionDTOList.add(actionDTO);
     }
 
     public String getName() {
@@ -38,8 +40,8 @@ public class RuleDTO {
         return nofActions;
     }
 
-    public List<String> getActionNamesList() {
-        return actionNamesList;
+    public List<ActionDTO> getActionDTOList() {
+        return actionDTOList;
     }
 
     @Override

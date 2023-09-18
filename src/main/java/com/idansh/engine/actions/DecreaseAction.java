@@ -1,5 +1,6 @@
 package com.idansh.engine.actions;
 
+import com.idansh.dto.action.ActionDTO;
 import com.idansh.engine.entity.Entity;
 import com.idansh.engine.entity.SecondaryEntity;
 import com.idansh.engine.expression.api.Expression;
@@ -60,6 +61,18 @@ public class DecreaseAction extends Action {
     @Override
     public Action copy(World worldContext) {
         return new DecreaseAction(worldContext, getMainEntityContext(), getEntityToInvokeOnName(), propertyName, amount);
+    }
+
+
+    @Override
+    public ActionDTO getActionDTO() {
+        ActionDTO retActionDTO = getBasicActionDTO();
+
+        retActionDTO.addArgument("Amount", amount.getAsString());
+        retActionDTO.addArgument("Entity Name", getEntityToInvokeOnName());
+        retActionDTO.addArgument("Property Name", propertyName);
+
+        return retActionDTO;
     }
 
 

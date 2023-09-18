@@ -1,5 +1,6 @@
 package com.idansh.engine.actions;
 
+import com.idansh.dto.action.ActionDTO;
 import com.idansh.engine.entity.Entity;
 import com.idansh.engine.entity.SecondaryEntity;
 import com.idansh.engine.world.World;
@@ -36,6 +37,7 @@ public class KillAction extends Action {
         }
     }
 
+
     @Override
     public void invoke(Entity entity) {
         World worldContext = getWorldContext();
@@ -44,6 +46,7 @@ public class KillAction extends Action {
             worldContext.entityManager.killEntity(entity);
         }
     }
+
 
     @Override
     public Action copy(World worldContext) {
@@ -54,6 +57,17 @@ public class KillAction extends Action {
                 getEntityToInvokeOnName()
         );
     }
+
+
+    @Override
+    public ActionDTO getActionDTO() {
+        ActionDTO retActionDTO = getBasicActionDTO();
+
+        retActionDTO.addArgument("Entity Name", getEntityToInvokeOnName());
+
+        return retActionDTO;
+    }
+
 
     @Override
     public String getActionTypeString() {

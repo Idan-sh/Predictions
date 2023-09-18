@@ -1,5 +1,6 @@
 package com.idansh.engine.actions.condition;
 
+import com.idansh.dto.action.ActionDTO;
 import com.idansh.engine.actions.Action;
 import com.idansh.engine.entity.Entity;
 import com.idansh.engine.expression.api.Expression;
@@ -42,6 +43,18 @@ public class ProximityConditionAction extends ConditionAction {
         // todo - complete proximity invoke
     }
 
+    @Override
+    public ActionDTO getActionDTO() {
+        ActionDTO retActionDTO = getBasicActionDTO();
+
+        retActionDTO.addArgument("Source Entity", getEntityToInvokeOnName());
+        retActionDTO.addArgument("Target Entity", targetEntity);
+        retActionDTO.addArgument("Depth", proximityDepth.getAsString());
+
+        retActionDTO.addExtraInfo("Amount of Actions", Integer.valueOf(getThenActions().getActionsToInvoke().size()).toString());
+
+        return retActionDTO;
+    }
 
     @Override
     public Action copy(World worldContext) {

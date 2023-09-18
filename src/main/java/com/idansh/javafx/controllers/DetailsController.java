@@ -1,5 +1,6 @@
 package com.idansh.javafx.controllers;
 
+import com.idansh.dto.action.ActionDTO;
 import com.idansh.dto.entity.EntityDTO;
 import com.idansh.dto.environment.EnvironmentVariableDTO;
 import com.idansh.dto.property.PropertyDTO;
@@ -170,7 +171,7 @@ public class DetailsController {
      * @param ruleDTO DTO of the rule to display.
      */
     private void addRuleDetails(RuleDTO ruleDTO) {
-        String ACTION_NAMES_TITLE = "Action Names";
+        String ACTIONS_TITLE = "Actions:";
         String NOF_ACTIONS_TITLE = "Number of Actions: ";
         String PROBABILITY_TITLE = "Probability: ";
         String TICKS_TITLE = "Ticks: ";
@@ -184,15 +185,54 @@ public class DetailsController {
         TreeItem<String> probabilityItem = new TreeItem<>(PROBABILITY_TITLE + ruleDTO.getProbability());
         TreeItem<String> nofActionsItem = new TreeItem<>(NOF_ACTIONS_TITLE + ruleDTO.getNofActions());
 
-        TreeItem<String> actionNamesRoot = new TreeItem<>(ACTION_NAMES_TITLE);
+        TreeItem<String> actionsRoot = new TreeItem<>(ACTIONS_TITLE);
 
-        // Add each action name to the action names root
-        ruleDTO.getActionNamesList().forEach(
-                actionName -> actionNamesRoot.getChildren().add(new TreeItem<>(actionName))
-        );
+        // Add each action to the actions root
+        for (ActionDTO actionDTO : ruleDTO.getActionDTOList()) {
+            addActionDetails(actionsRoot, actionDTO);
+        }
 
         // Add all rule details to the main root
-        mainRoot.getChildren().addAll(nameItem, ticksItem, probabilityItem, nofActionsItem, actionNamesRoot);
+        mainRoot.getChildren().addAll(nameItem, ticksItem, probabilityItem, nofActionsItem, actionsRoot);
+    }
+
+    /**
+     * Add action details into the main root received,
+     * using info from the actionDTO received.
+     */
+    private void addActionDetails(TreeItem<String> mainRoot, ActionDTO actionDTO) {
+        TreeItem<String> actionDetailsRoot = new TreeItem<>(actionDTO.getType());
+
+        TreeItem<String> mainEntityItem = new TreeItem<>("Main Entity Context: " + actionDTO.getMainEntityContext());
+
+        TreeItem<String> secondaryEntityItem = new TreeItem<>("Secondary Entity Context: " + actionDTO.getSecondaryEntityContext());
+
+        TreeItem<String> argumentsRoot = new TreeItem<>("Arguments");
+        actionDTO.getArgumentsMap().forEach(
+                (argName, argValue) ->
+                    argumentsRoot.getChildren().add(new TreeItem<>(argName + ":  " + argValue))
+        );
+
+        TreeItem<String> extraInfoRoot = new TreeItem<>("Extra Information");
+        actionDTO.getExtraInfoMap().forEach(
+                (extraInfoName, extraInfoValue) ->
+                        extraInfoRoot.getChildren().add(new TreeItem<>(extraInfoName + ":  " + extraInfoValue))
+        );
+
+        // Add items:
+        actionDetailsRoot.getChildren().add(mainEntityItem);
+
+        // Check if there is a secondary entity defined in the action
+        if (actionDTO.getSecondaryEntityContext() != null)
+            actionDetailsRoot.getChildren().add(secondaryEntityItem);
+
+        actionDetailsRoot.getChildren().add(argumentsRoot);
+
+        // Check if extra info was added
+        if (!extraInfoRoot.getChildren().isEmpty())
+            actionDetailsRoot.getChildren().add(extraInfoRoot);
+
+        mainRoot.getChildren().add(actionDetailsRoot);
     }
 
 

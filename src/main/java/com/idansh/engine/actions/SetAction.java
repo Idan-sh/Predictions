@@ -1,5 +1,6 @@
 package com.idansh.engine.actions;
 
+import com.idansh.dto.action.ActionDTO;
 import com.idansh.engine.entity.Entity;
 import com.idansh.engine.entity.SecondaryEntity;
 import com.idansh.engine.expression.api.Expression;
@@ -67,6 +68,19 @@ public class SetAction extends Action {
                 amount
         );
     }
+
+
+    @Override
+    public ActionDTO getActionDTO() {
+        ActionDTO retActionDTO = getBasicActionDTO();
+
+        retActionDTO.addArgument("Entity Name", getEntityToInvokeOnName());
+        retActionDTO.addArgument("Property Name", propertyName);
+        retActionDTO.addArgument("Value", amount.getAsString());
+
+        return retActionDTO;
+    }
+
 
     @Override
     public String getActionTypeString() {

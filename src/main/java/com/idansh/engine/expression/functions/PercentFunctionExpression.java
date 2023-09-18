@@ -39,4 +39,10 @@ public class PercentFunctionExpression extends FunctionActivationExpression {
         return (float) whole.getValue(mainEntityInstance, secondaryEntityInstance)
                 * (float) percentage.getValue(mainEntityInstance, secondaryEntityInstance) / 100;
     }
+
+
+    @Override
+    public String getAsString() {
+        return "Percent(" + whole.getAsString() + ", " + percentage.getAsString() + ")";
+    }
 }

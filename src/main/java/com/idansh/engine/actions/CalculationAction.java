@@ -1,5 +1,6 @@
 package com.idansh.engine.actions;
 
+import com.idansh.dto.action.ActionDTO;
 import com.idansh.engine.entity.Entity;
 import com.idansh.engine.entity.SecondaryEntity;
 import com.idansh.engine.expression.api.Expression;
@@ -100,6 +101,22 @@ public class CalculationAction extends Action {
                 arg2,
                 type
         );
+    }
+
+
+    @Override
+    public ActionDTO getActionDTO() {
+        ActionDTO retActionDTO = getBasicActionDTO();
+
+        retActionDTO.addArgument("Entity Name", getEntityToInvokeOnName());
+        retActionDTO.addArgument("Result Property Name", propertyName);
+
+        if(type.equals(Type.DIVIDE))
+            retActionDTO.addExtraInfo("Divide", arg1.getAsString() + " / " + arg2.getAsString());
+        else
+            retActionDTO.addExtraInfo("Multiply", arg1.getAsString() + " * " + arg2.getAsString());
+
+        return retActionDTO;
     }
 
 

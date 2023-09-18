@@ -21,8 +21,16 @@ public interface Expression {
      */
     Object getValue(Entity mainEntityInstance, Entity secondaryEntityInstance);
 
+
     /**
      * @return The type of the expression.
      */
     PropertyType getType();
+
+
+    /**
+     * @return The expression in a string format,
+     * without getting the real value if it's a function expression.
+     */
+    String getAsString();
 }

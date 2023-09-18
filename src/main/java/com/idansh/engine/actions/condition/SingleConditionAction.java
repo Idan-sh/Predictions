@@ -1,5 +1,6 @@
 package com.idansh.engine.actions.condition;
 
+import com.idansh.dto.action.ActionDTO;
 import com.idansh.engine.actions.Action;
 import com.idansh.engine.entity.Entity;
 import com.idansh.engine.entity.SecondaryEntity;
@@ -57,7 +58,6 @@ public class SingleConditionAction extends ConditionAction{
 
     @Override
     public void invoke(Entity mainEntity, Entity secondaryEntity) {
-        // todo - propertyValue is always 0.0, only on condition actions
         Object propertyValue = functionExpression.getValue(mainEntity, secondaryEntity);
         boolean res;
 
@@ -155,6 +155,21 @@ public class SingleConditionAction extends ConditionAction{
                 elseActions,
                 isMainCondition()
         );
+    }
+
+
+    @Override
+    public ActionDTO getActionDTO() {
+        ActionDTO retActionDTO = getBasicActionDTO();
+
+        retActionDTO.addArgument("Entity Name", getEntityToInvokeOnName());
+        retActionDTO.addArgument("Property", functionExpression.getAsString());
+        retActionDTO.addArgument("Operator", ConditionOperator.getConditionOperatorString(operator));
+
+        retActionDTO.addExtraInfo("Amount of 'then' Actions", Integer.valueOf(getThenActions().getActionsToInvoke().size()).toString());
+        retActionDTO.addExtraInfo("Amount of 'else' Actions", Integer.valueOf(getElseActions().getActionsToInvoke().size()).toString());
+
+        return retActionDTO;
     }
 
 

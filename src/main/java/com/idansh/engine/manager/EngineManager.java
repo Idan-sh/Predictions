@@ -1,5 +1,6 @@
 package com.idansh.engine.manager;
 
+import com.idansh.dto.action.ActionDTO;
 import com.idansh.dto.entity.EntityDTO;
 import com.idansh.dto.environment.EnvironmentVariablesListDTO;
 import com.idansh.dto.property.PropertyDTO;
@@ -9,6 +10,7 @@ import com.idansh.dto.rule.TerminationRuleDTO;
 import com.idansh.dto.simulation.LoadedSimulationDTO;
 import com.idansh.dto.simulation.RunningSimulationDTO;
 import com.idansh.dto.simulation.SimulationResultDTO;
+import com.idansh.engine.actions.Action;
 import com.idansh.engine.entity.Entity;
 import com.idansh.engine.helpers.Range;
 import com.idansh.engine.manager.result.SimulationResult;
@@ -100,9 +102,9 @@ public class EngineManager {
                     );
 
                     // Add actions' names to the DTO
-                    rule.getActionsList().forEach(
-                            a -> ruleDTO.addActionName(a.getActionTypeString())
-                    );
+                    for (Action action : rule.getActionsList()) {
+                        ruleDTO.addActionDTO(action.getActionDTO());
+                    }
 
                     loadedSimulationDTO.addRuleDTO(ruleDTO);
                 }
@@ -343,9 +345,9 @@ public class EngineManager {
                     );
 
                     // Add actions' names to the DTO
-                    rule.getActionsList().forEach(
-                            a -> ruleDTO.addActionName(a.getActionTypeString())
-                    );
+                    for (Action action : rule.getActionsList()) {
+                        ruleDTO.addActionDTO(action.getActionDTO());
+                    }
 
                     runningSimulationDTO.addRuleDTO(ruleDTO);
                 }

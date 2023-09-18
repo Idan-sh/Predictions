@@ -41,4 +41,10 @@ public class TicksFunctionActivation extends FunctionActivationExpression {
                     "main and secondary entity instances received does not have the defined entity name \"" + entityName + " or property name \"" + propertyName + "\".");
         }
     }
+
+
+    @Override
+    public String getAsString() {
+        return "Ticks(" + entityName + ", " + propertyName + ")";
+    }
 }

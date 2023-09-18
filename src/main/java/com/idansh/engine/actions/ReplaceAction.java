@@ -1,5 +1,6 @@
 package com.idansh.engine.actions;
 
+import com.idansh.dto.action.ActionDTO;
 import com.idansh.engine.entity.Entity;
 import com.idansh.engine.entity.SecondaryEntity;
 import com.idansh.engine.world.World;
@@ -97,6 +98,19 @@ public class ReplaceAction extends Action {
                 Mode.getModeString(mode)
         );
     }
+
+
+    @Override
+    public ActionDTO getActionDTO() {
+        ActionDTO retActionDTO = getBasicActionDTO();
+
+        retActionDTO.addArgument("Entity Name To Kill", getEntityToInvokeOnName());
+        retActionDTO.addArgument("Entity Name To Create", entityToCreate);
+        retActionDTO.addArgument("Mode", Mode.getModeString(mode));
+
+        return retActionDTO;
+    }
+
 
     @Override
     public String getActionTypeString() {

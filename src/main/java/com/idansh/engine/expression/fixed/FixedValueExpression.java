@@ -31,4 +31,9 @@ public class FixedValueExpression implements Expression {
     public PropertyType getType() {
         return type;
     }
+
+    @Override
+    public String getAsString() {
+        return value.toString();
+    }
 }
