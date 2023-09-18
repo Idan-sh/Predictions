@@ -52,6 +52,7 @@ public class ReplaceAction extends Action {
     public ReplaceAction(World worldContext, String mainEntityContext, SecondaryEntity secondaryEntity, String entityToKill, String entityToCreate, String mode) {
         super(worldContext, mainEntityContext, secondaryEntity, entityToKill);
 
+        System.out.println("created replace action with main " + mainEntityContext + ", secondary " + secondaryEntity.getName() + ", entity to kill " + entityToKill + ", entity to create " + entityToCreate + ", mode " + mode);
         checkEntityContext(entityToCreate); // Check if an entity with the received name entityToCreate exists.
 
         this.entityToCreate = entityToCreate;
@@ -61,19 +62,20 @@ public class ReplaceAction extends Action {
 
     @Override
     public void invoke(Entity mainEntity, Entity secondaryEntity) {
+        System.out.println("invoking replace with main entity " + mainEntity.getName() + ", and secondary " + secondaryEntity);
         World worldContext = getWorldContext();
         Entity entityToInvokeOn = getEntityToInvokeOn(mainEntity, secondaryEntity);
 
         switch (mode) {
             case SCRATCH:
+                System.out.println("got scratch");
                 // Kill EntityToKill from the population
-                if(entityToInvokeOn != null)
-                    worldContext.entityManager.replaceEntity(entityToInvokeOn, entityToCreate, true);
+                worldContext.entityManager.replaceEntity(entityToInvokeOn, entityToCreate, true);
                 break;
 
             case DERIVED:
-                if(entityToInvokeOn != null)
-                    worldContext.entityManager.replaceEntity(entityToInvokeOn, entityToCreate, false);
+                System.out.println("got derived");
+                worldContext.entityManager.replaceEntity(entityToInvokeOn, entityToCreate, false);
                 break;
 
             default:
@@ -90,6 +92,7 @@ public class ReplaceAction extends Action {
 
     @Override
     public Action copy(World worldContext) {
+        System.out.println("copy replace");
         return new ReplaceAction(
                 worldContext,
                 getMainEntityContext(),
@@ -102,6 +105,6 @@ public class ReplaceAction extends Action {
 
     @Override
     public String getActionTypeString() {
-        return "kill";
+        return "replace";
     }
 }

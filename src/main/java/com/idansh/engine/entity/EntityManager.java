@@ -119,6 +119,8 @@ public class EntityManager {
      * @throws IllegalArgumentException In case an entity factory with the given name doesn't exist.
      */
     public void createEntityFromScratch(String entityToCreate) {
+        System.out.println("creating from scratch the entity " + entityToCreate);
+
         population.add(getEntityFactory(entityToCreate).createEntityFromScratch());
     }
 
@@ -161,10 +163,16 @@ public class EntityManager {
             if (!entity.isAlive()) {
                 // Check if the entity is set to be replaced
                 if (entity.isToReplace()) {
-                    if(entity.isCreateAnotherFromScratch())
+                    System.out.println("replacing entity");
+                    if(entity.isCreateAnotherFromScratch()) {
+                        System.out.println("replacing from scratch");
                         createEntityFromScratch(entity.getEntityNameToCreate());
-                    else
+                    }
+                    else {
+                        System.out.println("replacing derived");
                         createEntityDerived(entity, entity.getEntityNameToCreate());
+                    }
+                    entityFactories.get(entity.getEntityNameToCreate()).increasePopulationCounter();
                 }
                 // Kill the entity
                 entityFactories.get(entity.getName()).decreasePopulationCounter();

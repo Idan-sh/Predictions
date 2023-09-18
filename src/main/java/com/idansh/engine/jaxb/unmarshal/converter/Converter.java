@@ -370,6 +370,7 @@ public abstract class Converter {
                 break;
 
             case REPLACE:
+                System.out.println("got replace");
                 retAction = new ReplaceAction(
                         worldContext,
                         mainEntityContext,

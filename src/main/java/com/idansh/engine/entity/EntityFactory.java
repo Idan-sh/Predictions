@@ -126,6 +126,14 @@ public class EntityFactory {
 
 
     /**
+     * Increases the counter for the amount of entity instances in the population of this entity factory.
+     */
+    public void increasePopulationCounter() {
+        populationCounter.increaseCount();
+    }
+
+
+    /**
      * Decreases the counter for the amount of entity instances in the population of this entity factory.
      */
     public void decreasePopulationCounter() {
