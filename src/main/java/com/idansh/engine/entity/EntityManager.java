@@ -174,13 +174,10 @@ public class EntityManager {
             if (!entity.isAlive()) {
                 // Check if the entity is set to be replaced
                 if (entity.isToReplace()) {
-                    System.out.println("replacing entity");
                     if(entity.isCreateAnotherFromScratch()) {
-                        System.out.println("replacing from scratch");
                         createEntityFromScratch(entity.getEntityNameToCreate());
                     }
                     else {
-                        System.out.println("replacing derived");
                         createEntityDerived(entity, entity.getEntityNameToCreate());
                     }
                     entityFactories.get(entity.getEntityNameToCreate()).increasePopulationCounter();

@@ -17,6 +17,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -379,6 +380,10 @@ public class ResultsController implements Initializable {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
 
+        // Set titles for the axes
+        xAxis.setLabel("Ticks");
+        yAxis.setLabel("Entity Amount in Population");
+
         // Create the line chart
         LineChart<Number, Number> lineChart = new LineChart<>(xAxis, yAxis);
         lineChart.setTitle("Entities Amounts Graph");
@@ -402,8 +407,9 @@ public class ResultsController implements Initializable {
         // Create popup to display the graph
         Stage popupStage = new Stage();
         popupStage.setTitle("Entities Amounts Graph");
+        popupStage.initModality(Modality.APPLICATION_MODAL); // Allow only using the graph window, until closed
 
-        Scene popupScene = new Scene(lineChart, 400, 200);
+        Scene popupScene = new Scene(lineChart, 600, 400);
         popupStage.setScene(popupScene);
         popupStage.show();
     }
