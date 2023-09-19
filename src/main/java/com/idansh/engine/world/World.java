@@ -166,6 +166,11 @@ public class World implements Runnable {
                 try {
                     // Check every 300 milliseconds if the simulation was ordered to resume running
                     do {
+                        if (isToStop) {
+                            simulationResult = endSimulation("Stopped By User");
+                            return;
+                        }
+
                         Thread.sleep(300);
                     } while (!isToResume);
                 } catch (InterruptedException e) {
