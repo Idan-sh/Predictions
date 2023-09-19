@@ -1,6 +1,9 @@
 package com.idansh.engine.property.instance;
 
+import com.idansh.engine.helpers.Consistency;
+import com.idansh.engine.helpers.Counter;
 import com.idansh.engine.helpers.Range;
+import com.idansh.engine.property.creator.factory.PropertyFactory;
 
 import java.util.List;
 
@@ -10,12 +13,16 @@ import java.util.List;
  * @apiNote Current possible value types: int, float, boolean, string
  */
 public class Property {
+    private final PropertyFactory parentFactory;
     private final String name;
     private final PropertyType type;
     private final Range range;  // Optional field, can be set for numeric properties.
     private Object value;
 
-    public Property(String name, PropertyType type, Object value) {
+    private final Counter ticksValueUnchangedCounter;
+    private boolean wasValueChanged;
+
+    public Property(PropertyFactory parentFactory, String name, PropertyType type, Object value) {
         this.name = name;
         this.type = type;
 
@@ -25,9 +32,12 @@ public class Property {
             this.value = value;
 
         this.range = null;
+        this.ticksValueUnchangedCounter = new Counter(0);
+        this.wasValueChanged = false;
+        this.parentFactory = parentFactory;
     }
 
-    public Property(String name, PropertyType type, Object value, Range range) {
+    public Property(PropertyFactory parentFactory, String name, PropertyType type, Object value, Range range) {
         this.name = name;
         this.type = type;
 
@@ -37,6 +47,9 @@ public class Property {
             this.value = value;
 
         this.range = range;
+        this.ticksValueUnchangedCounter = new Counter(0);
+        this.wasValueChanged = false;
+        this.parentFactory = parentFactory;
     }
 
     public String getName() {
@@ -53,6 +66,31 @@ public class Property {
 
     public Range getRange() {
         return range;
+    }
+
+    public int getNofTicksValueUnchanged() {
+        return ticksValueUnchangedCounter.getCount();
+    }
+
+    public boolean wasValueChanged() {
+        return wasValueChanged;
+    }
+
+    /**
+     * Call this function on each simulation tick,
+     * if the property's value changed then reset the unchanged value ticks counter,
+     * otherwise increase it by one.
+     */
+    public void checkValueChange() {
+        // If the value changed, reset the tick counter
+        if (wasValueChanged) {
+            if(getNofTicksValueUnchanged() != 0)
+                parentFactory.addTicksToConsistency(getNofTicksValueUnchanged());
+            wasValueChanged = false;
+            ticksValueUnchangedCounter.resetCount();
+        } else {
+            ticksValueUnchangedCounter.increaseCount();
+        }
     }
 
     /**
@@ -82,6 +120,8 @@ public class Property {
             this.value = new Float((Integer) newValue);
         else
             this.value = newValue;
+
+        this.wasValueChanged = true;
     }
 
 
@@ -138,6 +178,8 @@ public class Property {
         else {
             value = (float) value + (float) toAdd;
         }
+
+        this.wasValueChanged = true;
     }
 
 

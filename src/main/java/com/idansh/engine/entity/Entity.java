@@ -83,6 +83,16 @@ public class Entity {
     }
 
 
+    /**
+     * Check if the value has changed in each property of the entity.
+     */
+    public void checkPropertiesValueChange() {
+        for (Property property : properties.values()) {
+            property.checkValueChange();
+        }
+    }
+
+
     public boolean isToReplace() {
         return createAnotherDerived || createAnotherFromScratch;
     }

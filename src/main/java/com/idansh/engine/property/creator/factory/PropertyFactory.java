@@ -62,4 +62,17 @@ public interface PropertyFactory {
      * Deep copies a property factory.
      */
     PropertyFactory copy();
+
+
+    /**
+     * Add the number of ticks a property value wasn't changed,
+     * after it was changed to add to the sum.
+     */
+    void addTicksToConsistency(int nofTicksUnchanged);
+
+
+    /**
+     * Get the consistency of the value of the property.
+     */
+    float getConsistency();
 }

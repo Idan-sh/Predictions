@@ -98,7 +98,7 @@ public class NewExecutionController {
 
         int maxNofEntities = mainController.getMaxNofEntities();
         if(totalAmount.get() > maxNofEntities)
-            throw new IllegalArgumentException("there can be only " + maxNofEntities
+            throw new IllegalArgumentException("there can be a maximum of " + maxNofEntities
                     + " entities in the simulation. Please lower the number of entities...");
     }
 

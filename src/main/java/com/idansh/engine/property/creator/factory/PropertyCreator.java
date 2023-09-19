@@ -1,5 +1,6 @@
 package com.idansh.engine.property.creator.factory;
 
+import com.idansh.engine.helpers.Consistency;
 import com.idansh.engine.helpers.Range;
 import com.idansh.engine.property.creator.generator.value.fixed.FixedValueGenerator;
 import com.idansh.engine.property.instance.Property;
@@ -15,6 +16,7 @@ public class PropertyCreator<T> implements PropertyFactory{
     private final PropertyType type;
     private ValueGenerator<T> valueGenerator;
     private final Range range;
+    private final Consistency ticksConsistency;
 
 
     /**
@@ -27,6 +29,7 @@ public class PropertyCreator<T> implements PropertyFactory{
         this.type = type;
         this.valueGenerator = valueGenerator;
         this.range = null;
+        this.ticksConsistency = new Consistency();
     }
 
     /**
@@ -45,6 +48,7 @@ public class PropertyCreator<T> implements PropertyFactory{
         this.range = range;
         this.name = name;
         this.valueGenerator = valueGenerator;
+        this.ticksConsistency = new Consistency();
     }
 
     /**
@@ -55,9 +59,9 @@ public class PropertyCreator<T> implements PropertyFactory{
     public Property createProperty() {
         // Add range only for numeric properties
         if(type.equals(PropertyType.FLOAT))
-            return new Property(name, type, valueGenerator.generateValue(), range);
+            return new Property(this, name, type, valueGenerator.generateValue(), range);
         else
-            return new Property(name, type, valueGenerator.generateValue());
+            return new Property(this, name, type, valueGenerator.generateValue());
     }
 
     @Override
@@ -66,6 +70,16 @@ public class PropertyCreator<T> implements PropertyFactory{
             throw new IllegalArgumentException("value received in updateValue is not of the property factory's type! got value of type " + newValue.getClass() + ", while the property factory is of type " + type.getTypeString());
 
         valueGenerator = new FixedValueGenerator<>((T) newValue);
+    }
+
+    @Override
+    public void addTicksToConsistency(int nofTicksUnchanged) {
+        ticksConsistency.addItem(nofTicksUnchanged);
+    }
+
+    @Override
+    public float getConsistency() {
+        return ticksConsistency.getConsistency();
     }
 
     @Override

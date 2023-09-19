@@ -193,6 +193,16 @@ public class EntityManager {
     }
 
 
+    /**
+     * Check for each entity if its properties' values have changed.
+     */
+    public void checkPropertiesValueChange() {
+        for (Entity entity : population) {
+            entity.checkPropertiesValueChange();
+        }
+    }
+
+
     public Map<String, EntityFactory> getEntityFactories() {
         return entityFactories;
     }

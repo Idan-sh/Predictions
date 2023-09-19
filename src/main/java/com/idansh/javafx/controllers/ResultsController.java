@@ -318,8 +318,12 @@ public class ResultsController implements Initializable {
             }
 
             // Show the consistency of the property's value
-            TreeItem<String> consistencyItem = new TreeItem<>("Consistency");
-            // todo - calculate consistency of the property
+            TreeItem<String> consistencyItem = new TreeItem<>("Consistency of Value");
+            float consistency = propertyDTO.getConsistency();
+            if(consistency == 0)
+                consistencyItem.getChildren().add(new TreeItem<>("Value hasn't changed"));
+            else
+                consistencyItem.getChildren().add(new TreeItem<>(Float.valueOf(consistency).toString() + " Ticks"));
 
             // If property is numeric, show the average value of the property in the final population
             if (isNumeric) {

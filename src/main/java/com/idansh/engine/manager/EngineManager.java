@@ -83,7 +83,7 @@ public class EngineManager {
                                         rangeDTO,
                                         propertyFactory.isRandomGenerated(),
                                         propertyFactory.isRandomGenerated() ? null : propertyFactory.createProperty().getValue()    // If the value is not random, then get the fixed initial value
-                                        );
+                                );
                                 entityDTO.addPropertyDTOtoList(propertyDTO);
                             }
                     );
@@ -268,7 +268,9 @@ public class EngineManager {
                                                 propertyFactory.getType().getTypeString(),
                                                 rangeDTO,
                                                 propertyFactory.isRandomGenerated(),
-                                                propertyFactory.getValue())
+                                                propertyFactory.getValue(),
+                                                propertyFactory.getConsistency()
+                                        )
                                 );
                             }
                     );

@@ -149,6 +149,12 @@ public class World implements Runnable {
 
         // Check if the current tick has reached the termination rule tick defined, if one does not exist keeps going until reached the timer defined or the user decided to stop the simulation
         while ((!terminationRules.containsKey(TerminationRule.Type.TICKS)) || (terminationRules.containsKey(TerminationRule.Type.TICKS) && tickCounter.getCount() < terminationRules.get(TerminationRule.Type.TICKS).getValue())) {
+            // Check if the properties' values have changed for each entity in the population
+            entityManager.checkPropertiesValueChange();
+
+            // Remove all previously killed entities from the population
+            entityManager.removeDeadEntitiesFromPopulation();
+
             // Checks if the timer expired, if so end simulation
             if (countdown.isFinished()) {
                 simulationResult = endSimulation("Timer Expired");
@@ -178,9 +184,6 @@ public class World implements Runnable {
                 }
             }
 
-            // Remove all previously killed entities from the population
-            entityManager.removeDeadEntitiesFromPopulation();
-
             // Increase the tick counter of each rule
             rulesMap.values().forEach(Rule::increaseTickCounter);
 
@@ -196,6 +199,8 @@ public class World implements Runnable {
 
             tickCounter.increaseCount();  // Increase the tick counter of the simulation
         }
+        entityManager.checkPropertiesValueChange();         // Check if the properties' values have changed for each entity in the population
+        entityManager.removeDeadEntitiesFromPopulation();   // Remove all previously killed entities from the population
 
         // Ticks reached, end simulation
         simulationResult = endSimulation("Ticks Reached");
