@@ -25,7 +25,7 @@ public class TicksFunctionActivation extends FunctionActivationExpression {
             throw new IllegalArgumentException("Cannot get entity instance's value in the ticks expression, " +
                     "entity instance received does not have the defined entity name \"" + entityName + " or property name \"" + propertyName + "\".");
 
-        return 0; // todo - add ticks getValue()
+        return entityInstance.getNofTicksPropertyValueUnchanged(propertyName);
     }
 
 
@@ -33,9 +33,9 @@ public class TicksFunctionActivation extends FunctionActivationExpression {
     public Object getValue(Entity mainEntityInstance, Entity secondaryEntityInstance) {
         Property property;
         if (mainEntityInstance.getName().equals(entityName) && (property = mainEntityInstance.getPropertyByName(propertyName)) != null) {
-            return 0; // todo - add ticks getValue()
+            return mainEntityInstance.getNofTicksPropertyValueUnchanged(property.getName());
         } else if (secondaryEntityInstance.getName().equals(entityName) && (property = secondaryEntityInstance.getPropertyByName(propertyName)) != null) {
-            return 0;
+            return secondaryEntityInstance.getNofTicksPropertyValueUnchanged(property.getName());
         } else {
             throw new IllegalArgumentException("Cannot get entity instance's value in the ticks function expression, " +
                     "main and secondary entity instances received does not have the defined entity name \"" + entityName + " or property name \"" + propertyName + "\".");

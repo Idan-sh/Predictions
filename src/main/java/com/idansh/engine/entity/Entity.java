@@ -112,4 +112,8 @@ public class Entity {
     public String getEntityNameToCreate() {
         return entityNameToCreate;
     }
+
+    public int getNofTicksPropertyValueUnchanged(String propertyName) {
+        return properties.get(propertyName).getNofTicksValueUnchanged();
+    }
 }
