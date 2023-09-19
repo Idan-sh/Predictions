@@ -21,7 +21,6 @@ import com.idansh.engine.jaxb.unmarshal.reader.Reader;
 
 import java.io.File;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -164,12 +163,13 @@ public class EngineManager {
      */
     public int createAndPutSimulation(EnvironmentVariablesListDTO environmentVariablesListDTO) {
         World runnableWorld = new World(loadedWorld);
+        World loadedWorldToSave = new World(loadedWorld);
 
-        updateEnvironmentVariablesFromInput(loadedWorld, environmentVariablesListDTO);
+        updateEnvironmentVariablesFromInput(loadedWorldToSave, environmentVariablesListDTO);
         updateEnvironmentVariablesFromInput(runnableWorld, environmentVariablesListDTO);
 
         // Save the currently loaded world for future use
-        loadedWorldsMap.put(runnableWorld.getId(), loadedWorld);
+        loadedWorldsMap.put(runnableWorld.getId(), loadedWorldToSave);
 
         // Add the simulation world to the simulations pool
         simulationsPool.put(runnableWorld.getId(), runnableWorld);
