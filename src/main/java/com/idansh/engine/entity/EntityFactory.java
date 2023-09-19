@@ -16,7 +16,7 @@ import java.util.Map;
 public class EntityFactory {
     private final String name;        // Unique name for this type of entity creation, e.g. "Smoker"
     private Counter populationCounter;     // Amount of entities of this type in the environment
-    private int initPopulation;
+    private Integer initPopulation;
     private final Map<String, PropertyFactory> propertiesToAssign;   // Properties that define this entity, the value of which will be assigned on instance creation
 
 
@@ -27,6 +27,7 @@ public class EntityFactory {
     public EntityFactory(String name) {
         this.name = name;
         this.propertiesToAssign = new HashMap<>();
+        this.initPopulation = null;
     }
 
     public EntityFactory(EntityFactory entityFactory) {
@@ -144,7 +145,7 @@ public class EntityFactory {
     /**
      * @return the initial amount of entity instances created in the population of this entity factory.
      */
-    public int getInitPopulation() {
+    public Integer getInitPopulation() {
         return initPopulation;
     }
 

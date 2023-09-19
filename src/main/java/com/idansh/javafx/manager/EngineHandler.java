@@ -47,6 +47,10 @@ public class EngineHandler {
     }
 
 
+    public LoadedSimulationDTO loadPreviouslyLoadedSimulation(int id) {
+        return engineManager.loadPreviouslyLoadedSimulation(id);
+    }
+
     /**
      * Get from the engine a simulation execution with the given ID.
      */

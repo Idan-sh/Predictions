@@ -57,7 +57,7 @@
                <content>
                   <fx:include fx:id="detailsComponent" source="Details.fxml" />
                </content></Tab>
-            <Tab closable="false" text="New Execution">
+            <Tab fx:id="newExecutionTab" closable="false" text="New Execution">
                <content>
                   <fx:include fx:id="newExecutionComponent" source="NewExecution.fxml" />
                </content>

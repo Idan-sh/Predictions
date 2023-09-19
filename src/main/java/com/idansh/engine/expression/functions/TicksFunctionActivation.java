@@ -21,9 +21,9 @@ public class TicksFunctionActivation extends FunctionActivationExpression {
 
     @Override
     public Object getValue(Entity entityInstance) {
-        if(!entityInstance.getName().equals(entityName) || entityInstance.getPropertyByName(propertyName) != null)
+        if(!entityInstance.getName().equals(entityName) || entityInstance.getPropertyByName(propertyName) == null)
             throw new IllegalArgumentException("Cannot get entity instance's value in the ticks expression, " +
-                    "entity instance received does not have the defined entity name \"" + entityName + " or property name \"" + propertyName + "\".");
+                    "entity instance \"" + entityInstance.getName() + "\" received does not have the defined entity name \"" + entityName + "\" or property name \"" + propertyName + "\".");
 
         return entityInstance.getNofTicksPropertyValueUnchanged(propertyName);
     }

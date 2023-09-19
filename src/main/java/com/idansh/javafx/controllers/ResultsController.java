@@ -341,6 +341,15 @@ public class ResultsController implements Initializable {
 
 
     @FXML
+    public void rerunSimulationButtonListener() {
+        ResultsTableItem selectedItem = executionListTableView.getSelectionModel().getSelectedItem();
+
+        mainController.displayNewExecutionDetails(mainController.loadPreviouslyLoadedSimulation(selectedItem.getId()));
+
+        mainController.moveToNewExecutionTab();
+    }
+
+    @FXML
     public void pauseSimulationButtonListener() {
         mainController.pauseSimulation(executionListTableView.getSelectionModel().getSelectedItem().getId());
     }

@@ -1,5 +1,6 @@
 package com.idansh.javafx.controllers;
 
+import com.idansh.dto.environment.EnvironmentVariableDTO;
 import com.idansh.dto.simulation.LoadedSimulationDTO;
 import com.idansh.dto.simulation.ThreadsDTO;
 import com.idansh.javafx.manager.EngineHandler;
@@ -19,6 +20,7 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.net.URL;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -185,6 +187,21 @@ public class AppController implements Initializable {
 
 
     /**
+     * Tell the engine to set a loaded simulation with the ID given as the current loaded simulation.
+     * @param id ID of the simulation to load its initial values into the current loaded simulation for
+     *           rerunning.
+     */
+    public LoadedSimulationDTO loadPreviouslyLoadedSimulation(int id) {
+        return engineHandler.loadPreviouslyLoadedSimulation(id);
+    }
+
+
+    public void displayNewExecutionDetails(LoadedSimulationDTO loadedSimulationDTO) {
+        newExecutionComponentController.displayDetails(loadedSimulationDTO);
+    }
+
+
+    /**
      * Returns whether a simulation was loaded into the program
      * from an XML file.
      */
@@ -192,6 +209,12 @@ public class AppController implements Initializable {
         return isSimulationLoaded;
     }
 
+    /**
+     * Chooses and shows the New Execution tab.
+     */
+    public void moveToNewExecutionTab() {
+        appTabPane.getSelectionModel().select(newExecutionTab);
+    }
 
     /**
      * Chooses and shows the Details tab.

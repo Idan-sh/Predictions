@@ -58,7 +58,7 @@ public class NewExecutionController {
             return;
         }
 
-        // Check if the input in valid, if not show error message
+        // Check if the input is valid, if not show error message
         try {
             getEntitiesInput();
             getEnvironmentVariablesInput();
@@ -218,6 +218,11 @@ public class NewExecutionController {
         // Create the label and text field for the environment variable
         Label label = createLabel(entityName);
         TextField textField = createTextField(entityName);
+        Integer initEntityAmount = entityDTO.getInitAmountInPopulation();
+        if (initEntityAmount != null)
+            textField.setText(Integer.toString(initEntityAmount));
+        else
+            textField.clear();
 
         // Set up a TextFormatter to accept only certain characters as input
         textField.setTextFormatter(TextFormatterHelper.getIntTextFormatter());

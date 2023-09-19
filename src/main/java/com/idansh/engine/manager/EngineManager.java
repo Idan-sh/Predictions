@@ -31,12 +31,15 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 public class EngineManager {
     private World loadedWorld;                              // The currently loaded world. This world will not run but only be used to create instances for running
-    private ThreadPoolExecutor threadPool;               // Thread management for simulation runs
+    private ThreadPoolExecutor threadPool;                  // Thread management for simulation runs
     private final Map<Integer, World> simulationsPool;      // Simulated worlds map: currently running simulations and finished simulations. Key = ID of the simulation, Value = simulated world
+    private final Map<Integer, World> loadedWorldsMap;            // Contains the initial values of all the loaded worlds that were loaded and ran in the system.
+
 
     public EngineManager() {
         loadedWorld = null;
         simulationsPool = new HashMap<>();
+        loadedWorldsMap = new HashMap<>();
         threadPool = null;
     }
 
@@ -61,8 +64,8 @@ public class EngineManager {
                     // Create entity DTO
                     EntityDTO entityDTO = new EntityDTO(
                             entityFactoryName,
-                            -1,
-                            -1
+                            null,
+                            entityFactory.getInitPopulation()
                     );
 
                     // Create properties for the entity DTO
@@ -141,6 +144,16 @@ public class EngineManager {
     }
 
 
+    public LoadedSimulationDTO loadPreviouslyLoadedSimulation(int id) {
+        World worldReceived = loadedWorldsMap.get(id);
+        if (worldReceived == null)
+            throw new IllegalArgumentException("Invalid ID " + id + ", no simulation with this ID previously ran.");
+
+        loadedWorld = worldReceived;
+        return getLoadedSimulationDetails();
+    }
+
+
     /**
      * Create a runnable World object and add it to the thread pool,
      * load user received input of environment variables into the runnable World,
@@ -152,7 +165,11 @@ public class EngineManager {
     public int createAndPutSimulation(EnvironmentVariablesListDTO environmentVariablesListDTO) {
         World runnableWorld = new World(loadedWorld);
 
+        updateEnvironmentVariablesFromInput(loadedWorld, environmentVariablesListDTO);
         updateEnvironmentVariablesFromInput(runnableWorld, environmentVariablesListDTO);
+
+        // Save the currently loaded world for future use
+        loadedWorldsMap.put(runnableWorld.getId(), loadedWorld);
 
         // Add the simulation world to the simulations pool
         simulationsPool.put(runnableWorld.getId(), runnableWorld);

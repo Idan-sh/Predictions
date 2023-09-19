@@ -10,11 +10,11 @@ import java.util.List;
  */
 public class EntityDTO {
     private final String name;
-    private final int currAmountInPopulation;
-    private final int initAmountInPopulation;
+    private final Integer currAmountInPopulation;
+    private final Integer initAmountInPopulation;
     private final List<PropertyDTO> propertyDTOList;
 
-    public EntityDTO(String name, int currAmountInPopulation, int initAmountInPopulation) {
+    public EntityDTO(String name, Integer currAmountInPopulation, Integer initAmountInPopulation) {
         this.name = name;
         this.currAmountInPopulation = currAmountInPopulation;
         this.initAmountInPopulation = initAmountInPopulation;
@@ -29,11 +29,11 @@ public class EntityDTO {
         return name;
     }
 
-    public int getCurrAmountInPopulation() {
+    public Integer getCurrAmountInPopulation() {
         return currAmountInPopulation;
     }
 
-    public int getInitAmountInPopulation() {
+    public Integer getInitAmountInPopulation() {
         return initAmountInPopulation;
     }
 
