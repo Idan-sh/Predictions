@@ -145,10 +145,13 @@
                                     <Font size="12.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="showGraphButton" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" mnemonicParsing="false" text="Show Entity&#10;Amounts Graph" textAlignment="CENTER">
+                              <Button fx:id="showGraphButton" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" mnemonicParsing="false" onAction="#showGraphButtonListener" text="Show Entities&#10;Amounts Graph" textAlignment="CENTER">
                                  <font>
                                     <Font size="12.0" />
                                  </font>
+                                 <VBox.margin>
+                                    <Insets bottom="10.0" />
+                                 </VBox.margin>
                               </Button>
                            </children>
                            <padding>

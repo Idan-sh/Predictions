@@ -4,14 +4,20 @@ import com.idansh.dto.entity.EntityDTO;
 import com.idansh.dto.property.PropertyDTO;
 import com.idansh.dto.simulation.RunningSimulationDTO;
 import com.idansh.dto.simulation.SimulationResultDTO;
+import com.idansh.dto.simulation.ThreadsDTO;
 import com.idansh.javafx.helpers.ResultsTableItem;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 
 import java.net.URL;
 import java.util.*;
@@ -362,5 +368,43 @@ public class ResultsController implements Initializable {
     @FXML
     public void stopSimulationButtonListener() {
         mainController.stopSimulation(executionListTableView.getSelectionModel().getSelectedItem().getId());
+    }
+
+
+    @FXML
+    public void showGraphButtonListener(){
+        ResultsTableItem selectedItem = executionListTableView.getSelectionModel().getSelectedItem();
+
+        // Create the X and Y axes
+        NumberAxis xAxis = new NumberAxis();
+        NumberAxis yAxis = new NumberAxis();
+
+        // Create the line chart
+        LineChart<Number, Number> lineChart = new LineChart<>(xAxis, yAxis);
+        lineChart.setTitle("Entities Amounts Graph");
+
+        // Add data points to the series
+        for (EntityDTO entityDTO : selectedItem.getEntityDTOList()) {
+            // Create a series to hold the data
+            XYChart.Series<Number, Number> entitySeries = new XYChart.Series<>();
+            entitySeries.setName("Entity \"" + entityDTO.getName() + "\"");
+
+            // Add data points to the series
+            int tick = 0;
+            for (Integer amount : entityDTO.getAmountHistogram()) {
+                entitySeries.getData().add(new XYChart.Data<>(tick++, amount));
+            }
+
+            // Add the series to the line chart
+            lineChart.getData().add(entitySeries);
+        }
+
+        // Create popup to display the graph
+        Stage popupStage = new Stage();
+        popupStage.setTitle("Entities Amounts Graph");
+
+        Scene popupScene = new Scene(lineChart, 400, 200);
+        popupStage.setScene(popupScene);
+        popupStage.show();
     }
 }

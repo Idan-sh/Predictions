@@ -203,6 +203,31 @@ public class EntityManager {
     }
 
 
+    /**
+     * Add the current amount of each entity in the population to its histogram.
+     */
+    private void addEntityAmountHistogram() {
+        for (EntityFactory entityFactory : entityFactories.values()) {
+            entityFactory.addAmountHistogramItem();
+        }
+    }
+
+
+    /**
+     * Called on tick advance in the simulation, performs multiple
+     * actions on the entities to set them up for the new tick.
+     */
+    public void tickAdvance() {
+        // Check if the properties' values have changed for each entity in the population
+        checkPropertiesValueChange();
+
+        // Remove all previously killed entities from the population
+        removeDeadEntitiesFromPopulation();
+
+        // Add the current amount of each entity in the population to its histogram
+        addEntityAmountHistogram();
+    }
+
     public Map<String, EntityFactory> getEntityFactories() {
         return entityFactories;
     }

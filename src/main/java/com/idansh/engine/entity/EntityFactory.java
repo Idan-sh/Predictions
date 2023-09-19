@@ -4,7 +4,9 @@ import com.idansh.engine.helpers.Counter;
 import com.idansh.engine.property.creator.factory.PropertyFactory;
 import com.idansh.engine.property.instance.Property;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,7 +20,7 @@ public class EntityFactory {
     private Counter populationCounter;     // Amount of entities of this type in the environment
     private Integer initPopulation;
     private final Map<String, PropertyFactory> propertiesToAssign;   // Properties that define this entity, the value of which will be assigned on instance creation
-
+    private final List<Integer> amountHistogram;
 
     /**
      * Constructor that defines the properties of new instances' information.
@@ -28,6 +30,7 @@ public class EntityFactory {
         this.name = name;
         this.propertiesToAssign = new HashMap<>();
         this.initPopulation = null;
+        this.amountHistogram = new ArrayList<>();
     }
 
     public EntityFactory(EntityFactory entityFactory) {
@@ -35,10 +38,15 @@ public class EntityFactory {
         this.populationCounter = new Counter(entityFactory.getPopulationCount());
         this.initPopulation = entityFactory.getInitPopulation();
         this.propertiesToAssign = new HashMap<>();
+        this.amountHistogram = new ArrayList<>();
 
         entityFactory.getPropertiesToAssign().forEach(
                 (name, propertyFactory) -> this.propertiesToAssign.put(name, propertyFactory.copy())
         );
+    }
+
+    public void addAmountHistogramItem() {
+        amountHistogram.add(populationCounter.getCount());
     }
 
     public String getName() {
@@ -152,5 +160,10 @@ public class EntityFactory {
     public void setInitPopulation(int initPopulation) {
         this.initPopulation = initPopulation;
         this.populationCounter = new Counter(initPopulation);
+    }
+
+
+    public List<Integer> getAmountHistogram() {
+        return amountHistogram;
     }
 }

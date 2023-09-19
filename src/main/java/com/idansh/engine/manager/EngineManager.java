@@ -64,7 +64,8 @@ public class EngineManager {
                     EntityDTO entityDTO = new EntityDTO(
                             entityFactoryName,
                             null,
-                            entityFactory.getInitPopulation()
+                            entityFactory.getInitPopulation(),
+                            null
                     );
 
                     // Create properties for the entity DTO
@@ -268,7 +269,9 @@ public class EngineManager {
                     EntityDTO entityDTO = new EntityDTO(
                             entityName,
                             entityFactory.getPopulationCount(),
-                            entityFactory.getInitPopulation());
+                            entityFactory.getInitPopulation(),
+                            entityFactory.getAmountHistogram()
+                    );
 
                     // Add properties DTOs to the entity DTO
                     entityFactory.getPropertiesToAssign().forEach(
@@ -325,7 +328,9 @@ public class EngineManager {
                     EntityDTO entityDTO = new EntityDTO(
                             entityFactoryName,
                             entityFactory.getPopulationCount(),
-                            entityFactory.getInitPopulation());
+                            entityFactory.getInitPopulation(),
+                            entityFactory.getAmountHistogram()
+                    );
 
                     // Create properties for the entity DTO
                     entityFactory.getPropertiesToAssign().forEach(
