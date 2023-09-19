@@ -14,11 +14,12 @@ import java.util.List;
 public class SimulationResultDTO {
     private final int id;
     private final SimulationTime simulationTime;
-    private final int completedTicks, maxTicks;
+    private final int completedTicks;
+    private final Integer maxTicks;
     private final List<EntityDTO> entityDTOList;
     private final String endReason;
 
-    public SimulationResultDTO(int id, SimulationTime simulationTime, int completedTicks, int maxTicks, String endReason) {
+    public SimulationResultDTO(int id, SimulationTime simulationTime, int completedTicks, Integer maxTicks, String endReason) {
         this.id = id;
         this.simulationTime = simulationTime;
         this.completedTicks = completedTicks;
@@ -44,7 +45,7 @@ public class SimulationResultDTO {
         return completedTicks;
     }
 
-    public int getMaxTicks() {
+    public Integer getMaxTicks() {
         return maxTicks;
     }
 

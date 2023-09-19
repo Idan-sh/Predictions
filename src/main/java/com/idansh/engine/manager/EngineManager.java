@@ -427,4 +427,34 @@ public class EngineManager {
                 Long.valueOf(threadPool.getCompletedTaskCount()).intValue()
         );
     }
+
+
+    /**
+     * Command a simulation to stop at the next Simulation Tick.
+     * @param simulationID ID of the simulation to stop.
+     */
+    public void stopSimulation(int simulationID) {
+        simulationsPool.get(simulationID).stop();
+    }
+
+
+
+    /**
+     * Command a simulation to pause at the next Simulation Tick.
+     * @param simulationID ID of the simulation to pause.
+     */
+    public void pauseSimulation(int simulationID) {
+        simulationsPool.get(simulationID).pause();
+    }
+
+
+
+
+    /**
+     * Command a simulation to resume from the Simulation Tick where it was paused.
+     * @param simulationID ID of the simulation to resume.
+     */
+    public void resumeSimulation(int simulationID) {
+        simulationsPool.get(simulationID).resume();
+    }
 }

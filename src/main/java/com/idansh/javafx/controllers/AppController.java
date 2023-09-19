@@ -131,10 +131,6 @@ public class AppController implements Initializable {
                     queueManagementListView.getItems().add("Running Threads: " + threadsDTO.getNofRunningThreads());
                     queueManagementListView.getItems().add("Queueing Threads: " + threadsDTO.getNofQueueThreads());
                     queueManagementListView.getItems().add("Finished Threads: " + threadsDTO.getNofFinishedThreads());
-
-                    queueManagementListView.setMinHeight(Region.USE_PREF_SIZE);
-                    queueManagementListView.setPrefHeight(Region.USE_COMPUTED_SIZE);
-                    queueManagementListView.setMaxHeight(Region.USE_COMPUTED_SIZE);
                 });
             }
         });
@@ -270,5 +266,18 @@ public class AppController implements Initializable {
      */
     public Map<Object, Integer> getPropertyValues(int simulationResultID, String entityName, String propertyName) {
         return engineHandler.getPropertyValues(simulationResultID, entityName, propertyName);
+    }
+
+
+    public void pauseSimulation(int simulationID) {
+        engineHandler.pauseSimulation(simulationID);
+    }
+
+    public void resumeSimulation(int simulationID) {
+        engineHandler.resumeSimulation(simulationID);
+    }
+
+    public void stopSimulation(int simulationID) {
+        engineHandler.stopSimulation(simulationID);
     }
 }

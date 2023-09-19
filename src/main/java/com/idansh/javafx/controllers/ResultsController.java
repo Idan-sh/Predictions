@@ -334,4 +334,20 @@ public class ResultsController implements Initializable {
             }
         }
     }
+
+
+    @FXML
+    public void pauseSimulationButtonListener() {
+        mainController.pauseSimulation(executionListTableView.getSelectionModel().getSelectedItem().getId());
+    }
+
+    @FXML
+    public void resumeSimulationButtonListener() {
+        mainController.resumeSimulation(executionListTableView.getSelectionModel().getSelectedItem().getId());
+    }
+
+    @FXML
+    public void stopSimulationButtonListener() {
+        mainController.stopSimulation(executionListTableView.getSelectionModel().getSelectedItem().getId());
+    }
 }

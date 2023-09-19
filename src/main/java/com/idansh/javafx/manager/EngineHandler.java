@@ -85,4 +85,17 @@ public class EngineHandler {
     public ThreadsDTO getThreadsDTO() {
         return engineManager.getThreadsDTO();
     }
+
+
+    public void stopSimulation(int simulationID) {
+        engineManager.stopSimulation(simulationID);
+    }
+
+    public void pauseSimulation(int simulationID) {
+        engineManager.pauseSimulation(simulationID);
+    }
+
+    public void resumeSimulation(int simulationID) {
+        engineManager.resumeSimulation(simulationID);
+    }
 }

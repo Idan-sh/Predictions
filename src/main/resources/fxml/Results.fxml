@@ -93,9 +93,9 @@
                                     <Insets right="10.0" />
                                  </padding>
                               </Label>
-                            <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" text="Pause" />
-                              <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" text="Resume" />
-                              <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" text="Stop" />
+                            <Button fx:id="pauseSimulationButton" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#pauseSimulationButtonListener" text="Pause" />
+                              <Button fx:id="resumeSimulationButton" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#resumeSimulationButtonListener" text="Resume" />
+                              <Button fx:id="stopSimulationButton" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#stopSimulationButtonListener" text="Stop" />
                            </children>
                            <GridPane.margin>
                               <Insets />

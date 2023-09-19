@@ -20,18 +20,19 @@ import java.util.*;
  * and the various functions of the simulation.
  */
 public class World implements Runnable {
-    private int id;                                                                 // The ID of the simulation, will be assigned on world run
     public final EntityManager entityManager;                                       // Contains all the entities (population) of the simulation
+    private int id;                                                                 // The ID of the simulation, will be assigned on world run
     private final Map<TerminationRule.Type, TerminationRule> terminationRules;      // Rules on when to end the simulation
     private final Map<String, Rule> rulesMap;                                       // Rules that can activate during the simulation
     private ActiveEnvironmentVariables activeEnvironmentVariables;                  // Contains all the activated environment variables
     public final EnvironmentVariablesManager environmentVariablesManager;           // Contains all the environment variables factories
     private final Counter tickCounter;                                              // The current iteration of the simulation
+    // todo - change to pausableTimer
     private final Timer timer;                                                      // Timer for the termination rule SECONDS
     private final SimulationTime simulationTime;                                    // Holds the simulation's start and end times
     private SimulationResult simulationResult;
-    private Integer threadCount;                                                  // The max number of threads that will be able to run simultaneously
-
+    private Integer threadCount;                                                    // The max number of threads that will be able to run simultaneously
+    private boolean isRunning, isToStop, isToResume, isToPause;                     // Flags for the simulation process
 
     /**
      * Initialize the simulated world.
@@ -47,6 +48,7 @@ public class World implements Runnable {
         this.simulationTime = new SimulationTime();
         this.simulationResult = null;
         this.threadCount = null;
+        this.isRunning = this.isToPause = this.isToResume = this.isToStop = false;
     }
 
 
@@ -81,6 +83,7 @@ public class World implements Runnable {
         this.simulationResult = null;
         this.id = SimulationIdGenerator.getID();
         this.threadCount = world.threadCount;
+        this.isRunning = this.isToPause = this.isToResume = this.isToStop = false;
     }
 
 
@@ -135,19 +138,39 @@ public class World implements Runnable {
      */
     @Override
     public void run() {
+        this.isRunning = true;
+
         // Timer countdown for the termination rule SECONDS
         Countdown countdown = new Countdown();
 
         // If a termination rule of SECONDS was set, starts a timer.
-        if(terminationRules.containsKey(TerminationRule.Type.SECONDS))
+        if (terminationRules.containsKey(TerminationRule.Type.SECONDS))
             timer.schedule(countdown, terminationRules.get(TerminationRule.Type.SECONDS).getValue() * 1000L); // Get the amount of seconds and multiply by 1000 to get in milliseconds
 
         // Check if the current tick has reached the termination rule tick defined, if one does not exist keeps going until reached the timer defined or the user decided to stop the simulation
-        while((!terminationRules.containsKey(TerminationRule.Type.TICKS)) || (terminationRules.containsKey(TerminationRule.Type.TICKS) && tickCounter.getCount() < terminationRules.get(TerminationRule.Type.TICKS).getValue())) {
+        while ((!terminationRules.containsKey(TerminationRule.Type.TICKS)) || (terminationRules.containsKey(TerminationRule.Type.TICKS) && tickCounter.getCount() < terminationRules.get(TerminationRule.Type.TICKS).getValue())) {
             // Checks if the timer expired, if so end simulation
             if (countdown.isFinished()) {
                 simulationResult = endSimulation("Timer Expired");
                 return;
+            }
+
+            // Check if the simulation was ordered to stop, if so then stops without completing this tick
+            if (isToStop) {
+                simulationResult = endSimulation("Stopped By User");
+                return;
+            }
+
+            // Check if the simulation was ordered to pause, if so then go into an infinite loop until ordered to resume
+            if (isToPause) {
+                try {
+                    // Check every 300 milliseconds if the simulation was ordered to resume running
+                    do {
+                        Thread.sleep(300);
+                    } while (!isToResume);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
 
             // Remove all previously killed entities from the population
@@ -188,7 +211,7 @@ public class World implements Runnable {
                 endReason,
                 entityManager,
                 getTickCount(),
-                terminationRules.get(TerminationRule.Type.TICKS).getValue()
+                terminationRules.containsKey(TerminationRule.Type.TICKS) ? terminationRules.get(TerminationRule.Type.TICKS).getValue() : null
         );
     }
 
@@ -231,6 +254,43 @@ public class World implements Runnable {
 
     public int getThreadCount() {
         return threadCount;
+    }
+
+
+    /**
+     * Stops the simulation at the next Simulation Tick.
+     */
+    public void stop() {
+        if(!isRunning)
+            return;
+
+        isToStop = true;
+        isRunning = false;
+    }
+
+
+    /**
+     * Pauses the simulation at the next Simulation Tick.
+     */
+    public void pause() {
+        if(!isRunning)
+            return;
+
+        isToPause = true;
+        isToResume = false;
+    }
+
+
+    /**
+     * Resumes the simulation from where it was last paused.
+     * @throws RuntimeException in case the simulation wasn't paused before the resume call.
+     */
+    public void resume() {
+        if(!isToPause || !isRunning)
+            return;
+
+        isToResume = true;
+        isToPause = false;
     }
 }
 

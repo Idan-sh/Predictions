@@ -12,12 +12,13 @@ import java.util.List;
 public class SimulationResult {
     private final int id;
     private final SimulationTime simulationTime;
-    private final int completedTicks, maxTicks;
+    private final int completedTicks;
+    private final Integer maxTicks;
     private final String endReason;
     private final EntityManager entityManager;
 
 
-    public SimulationResult(int id, SimulationTime simulationTime, String endReason , EntityManager entityManager, int completedTicks, int maxTicks) {
+    public SimulationResult(int id, SimulationTime simulationTime, String endReason , EntityManager entityManager, int completedTicks, Integer maxTicks) {
         this.id = id;
         this.simulationTime = simulationTime;
         this.endReason = endReason;
@@ -42,7 +43,7 @@ public class SimulationResult {
         return completedTicks;
     }
 
-    public int getMaxTicks() {
+    public Integer getMaxTicks() {
         return maxTicks;
     }
 
