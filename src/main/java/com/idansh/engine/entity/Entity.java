@@ -4,6 +4,7 @@ package com.idansh.engine.entity;
 import com.idansh.engine.helpers.Counter;
 import com.idansh.engine.property.instance.Property;
 
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,6 +19,7 @@ public class Entity {
     private boolean createAnotherFromScratch;
     private boolean createAnotherDerived;
     private String entityNameToCreate;
+    private Point gridLocation;
 
     public Entity(String name, Counter populationCounter) {
         this.populationCounter = populationCounter;
@@ -26,6 +28,7 @@ public class Entity {
         this.isAlive = true;
         this.createAnotherFromScratch = false;
         this.createAnotherDerived = false;
+        this.gridLocation = new Point();
     }
 
     public String getName() {
@@ -115,5 +118,24 @@ public class Entity {
 
     public int getNofTicksPropertyValueUnchanged(String propertyName) {
         return properties.get(propertyName).getNofTicksValueUnchanged();
+    }
+
+
+    /**
+     * Set the location of the entity in the grid,
+     * where X is the row and Y is the column.
+     */
+    public void setGridLocation(int x, int y) {
+        gridLocation.x = x;
+        gridLocation.y = y;
+    }
+
+
+    /**
+     * Get the location of the entity in the grid,
+     * where X is the row and Y is the column.
+     */
+    public Point getGridLocation() {
+        return gridLocation;
     }
 }
