@@ -132,6 +132,18 @@ public class Entity {
 
 
     /**
+     * Set the location of the entity in the grid,
+     * @param location Point containing:
+     *                 X = value of the row
+     *                 Y = value of the column
+     */
+    public void setGridLocation(Point location) {
+        gridLocation.x = location.x;
+        gridLocation.y = location.y;
+    }
+
+
+    /**
      * Get the location of the entity in the grid,
      * where X is the row and Y is the column.
      */

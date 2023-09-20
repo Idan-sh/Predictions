@@ -1,16 +1,20 @@
 package com.idansh.engine.entity;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class EntityManager {
     private final Map<String, EntityFactory> entityFactories;   // Each entity factory will define instructions on how to instantiate a single entity with a unique name
     private final List<Entity> population;
+    private final Grid grid;
 
 
-    public EntityManager() {
+    public EntityManager(int gridRows, int gridColumns) {
         this.entityFactories = new HashMap<>();
         this.population = new ArrayList<>(); // Note: using a thread-safe collection that can handle concurrent modifications and iterations (we try to kill entity instances while iterating on the population list)
+        this.grid = new Grid(gridRows, gridColumns);
     }
 
     public EntityManager(EntityManager entityManager) {
@@ -20,6 +24,8 @@ public class EntityManager {
         entityManager.getEntityFactories().forEach(
                 (name, entityFactory) -> this.entityFactories.put(name, new EntityFactory(entityFactory))
         );
+
+        this.grid = new Grid(entityManager.grid);
     }
 
 
@@ -35,7 +41,8 @@ public class EntityManager {
 
 
     /**
-     * Initializes the population of the world with entities using the entity factories.
+     * Initializes the population of the world with entities using the entity factories,
+     * and initializes the grid to hold the population.
      */
     public void initEntityPopulation() {
         // Run through all the entity factories, on each factory create populationCount instances.
@@ -46,6 +53,8 @@ public class EntityManager {
                     }
                 }
         );
+
+        grid.populateGrid(population);  // Initialize the grid with the population
     }
 
 
@@ -128,11 +137,12 @@ public class EntityManager {
      * @param entityToCreate Name of the entity factory of which an instance
      *                       will be created and added into the population.
      * @throws IllegalArgumentException In case an entity factory with the given name doesn't exist.
+     * @return the entity that was created and added to the population.
      */
-    public void createEntityFromScratch(String entityToCreate) {
-        System.out.println("creating from scratch the entity " + entityToCreate);
-
-        population.add(getEntityFactory(entityToCreate).createEntityFromScratch());
+    public Entity createEntityFromScratch(String entityToCreate) {
+        Entity newEntity = getEntityFactory(entityToCreate).createEntityFromScratch();
+        population.add(newEntity);
+        return newEntity;
     }
 
 
@@ -142,9 +152,12 @@ public class EntityManager {
      * @param entityToCreate Name of the entity factory of which an instance
      *                       will be created and added into the population.
      * @throws IllegalArgumentException In case an entity factory with the given name doesn't exist.
+     * @return the entity that was created and added to the population.
      */
-    public void createEntityDerived(Entity entityToCreateFrom, String entityToCreate) {
-        population.add(getEntityFactory(entityToCreate).createEntityDerived(entityToCreateFrom));
+    public Entity createEntityDerived(Entity entityToCreateFrom, String entityToCreate) {
+        Entity newEntity = getEntityFactory(entityToCreate).createEntityDerived(entityToCreateFrom);
+        population.add(newEntity);
+        return newEntity;
     }
 
 
@@ -169,19 +182,26 @@ public class EntityManager {
      * Also replaces some entities that were set up from replacement.
      */
     public void removeDeadEntitiesFromPopulation() {
+        Entity newEntity;
+
         for (Entity entity : population) {
             // Check if the entity is set to be killed
             if (!entity.isAlive()) {
                 // Check if the entity is set to be replaced
                 if (entity.isToReplace()) {
                     if(entity.isCreateAnotherFromScratch()) {
-                        createEntityFromScratch(entity.getEntityNameToCreate());
+                        newEntity = createEntityFromScratch(entity.getEntityNameToCreate());
+                        newEntity.setGridLocation(entity.getGridLocation());        // Replace the entity at the same location as the entity that was replaced
                     }
                     else {
-                        createEntityDerived(entity, entity.getEntityNameToCreate());
+                        newEntity = createEntityDerived(entity, entity.getEntityNameToCreate());
                     }
                     entityFactories.get(entity.getEntityNameToCreate()).increasePopulationCounter();
+                    grid.addEntityToGrid(newEntity.getGridLocation(), newEntity);   // Override the old entity in the grid with the newly created entity
+                } else {
+                    grid.removeEntityFromLocation(entity.getGridLocation());        // Remove the entity to kill from the grid
                 }
+
                 // Kill the entity
                 entityFactories.get(entity.getName()).decreasePopulationCounter();
                 population.remove(entity);
@@ -223,6 +243,9 @@ public class EntityManager {
 
         // Add the current amount of each entity in the population to its histogram
         addEntityAmountHistogram();
+
+        // Move entities in the grid
+        grid.moveEntities();
     }
 
     public Map<String, EntityFactory> getEntityFactories() {
@@ -235,5 +258,9 @@ public class EntityManager {
 
     public int getPopulationSize() {
         return population.size();
+    }
+
+    public int getMaxNumOfEntities() {
+        return grid.getNofColumns() * grid.getNofRows();
     }
 }

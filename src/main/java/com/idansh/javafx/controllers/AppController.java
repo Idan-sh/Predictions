@@ -234,8 +234,7 @@ public class AppController implements Initializable {
 
 
     public int getMaxNofEntities() {
-        return Integer.MAX_VALUE; // todo - change to the max total number of entities (received from XML file by the grid size).
-//        return simulationManager.getCurrentSimulationDetails();
+        return engineHandler.getMaxNofEntities();
     }
 
 

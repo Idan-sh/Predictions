@@ -116,6 +116,7 @@ public class EntityFactory {
                     }
                 });
 
+        entityInstance.setGridLocation(entityToCreateFrom.getGridLocation());
         return entityInstance;
     }
 

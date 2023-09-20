@@ -102,4 +102,8 @@ public class EngineHandler {
     public void resumeSimulation(int simulationID) {
         engineManager.resumeSimulation(simulationID);
     }
+
+    public int getMaxNofEntities() {
+        return engineManager.getMaxNofEntities();
+    }
 }

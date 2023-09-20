@@ -481,4 +481,13 @@ public class EngineManager {
     public void resumeSimulation(int simulationID) {
         simulationsPool.get(simulationID).resume();
     }
+
+
+    /**
+     * Returns the max number of entity instances that can be created
+     * in the currently loaded simulation.
+     */
+    public int getMaxNofEntities() {
+        return loadedWorld.entityManager.getMaxNumOfEntities();
+    }
 }

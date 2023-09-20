@@ -37,12 +37,12 @@ public class World implements Runnable {
     /**
      * Initialize the simulated world.
      */
-    public World() {
+    public World(int gridRows, int gridColumns) {
         this.terminationRules = new HashMap<>();
         this.rulesMap = new LinkedHashMap<>();
         this.environmentVariablesManager = new EnvironmentVariablesManager();
         this.activeEnvironmentVariables = null;
-        this.entityManager = new EntityManager();
+        this.entityManager = new EntityManager(gridRows, gridColumns);
         this.tickCounter = new Counter(0);
         this.timer = new Timer();
         this.simulationTime = new SimulationTime();

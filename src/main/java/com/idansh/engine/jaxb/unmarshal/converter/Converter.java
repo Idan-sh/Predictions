@@ -32,7 +32,8 @@ public abstract class Converter {
      * @return World object with the data of the PRDWorld received.
      */
     public static World worldConvert(PRDWorld prdWorld) {
-        World retWorld = new World();
+        PRDWorld.PRDGrid prdGrid = prdWorld.getPRDGrid();
+        World retWorld = new World(prdGrid.getRows(), prdGrid.getColumns());
 
         retWorld.setThreadCount(prdWorld.getPRDThreadCount());
 

@@ -118,13 +118,13 @@ public class Grid {
      * @param entity entity instance to move.
      */
     private void tryToMoveEntity(Entity entity) {
-        List<Object> possibleDirectionsList = Arrays.asList(EnumSet.allOf(Direction.class).toArray());
+        List<Direction> possibleDirectionsList = new ArrayList<>(Arrays.asList(Direction.values()));
         Random random = new Random();
 
         // Try to move in each direction in the list, if all fails keep unchanged
         while (!possibleDirectionsList.isEmpty()) {
             int rndDirectionInd = random.nextInt(possibleDirectionsList.size()); // Get a random direction index from the possible directions set
-            Direction direction = (Direction) possibleDirectionsList.get(rndDirectionInd);
+            Direction direction = possibleDirectionsList.get(rndDirectionInd);
 
             // Try to move in the randomized direction received, if successful then finish working
             if(tryToMoveEntityInDirection(entity, direction)) {
@@ -206,6 +206,21 @@ public class Grid {
         validateGridLocation(location);
 
         return grid[location.x][location.y];
+    }
+
+
+    /**
+     * Clears the grid in the received location.
+     * @return the entity that was removed from the location,
+     * or null if no entity was at that location.
+     */
+    public Entity removeEntityFromLocation(Point location) {
+        validateGridLocation(location);
+
+        Entity entityInLocation = grid[location.x][location.y];
+        grid[location.x][location.y] = null;    // Remove entity from location
+
+        return entityInLocation;
     }
 
 
