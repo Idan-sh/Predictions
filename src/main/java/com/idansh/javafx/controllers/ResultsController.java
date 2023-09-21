@@ -2,6 +2,7 @@ package com.idansh.javafx.controllers;
 
 import com.idansh.dto.entity.EntityDTO;
 import com.idansh.dto.property.PropertyDTO;
+import com.idansh.dto.simulation.LoadedSimulationDTO;
 import com.idansh.dto.simulation.RunningSimulationDTO;
 import com.idansh.dto.simulation.SimulationResultDTO;
 import com.idansh.javafx.helpers.ResultsTableItem;
@@ -310,17 +311,23 @@ public class ResultsController implements Initializable {
 
             // For each property value, show the number of instances with said value
             TreeItem<String> histogramItem = new TreeItem<>("Final Population's Property Values");
-            for (Map.Entry<Object, Integer> entry : mainController.getPropertyValues(chosenExecutionID, entityDTO.getName(), propertyDTO.getName()).entrySet()) {
-                if (isNumeric) {
-                    if ((entry.getKey() instanceof Integer))
-                        sum += (Integer) entry.getKey();
-                    else
-                        sum += (Float) entry.getKey();
 
-                    count++;
+            // Check if the final population is at 0 entities
+            if (entityDTO.getCurrAmountInPopulation() == 0) {
+                histogramItem.getChildren().add(new TreeItem<>("Final population has no entities of this type..."));
+            } else {
+                for (Map.Entry<Object, Integer> entry : mainController.getPropertyValues(chosenExecutionID, entityDTO.getName(), propertyDTO.getName()).entrySet()) {
+                    if (isNumeric) {
+                        if ((entry.getKey() instanceof Integer))
+                            sum += (Integer) entry.getKey();
+                        else
+                            sum += (Float) entry.getKey();
+
+                        count++;
+                    }
+
+                    histogramItem.getChildren().add(new TreeItem<>("Value: " + entry.getKey() + ", Amount in population: " + entry.getValue()));
                 }
-
-                histogramItem.getChildren().add(new TreeItem<>("Value: " + entry.getKey() + ", Amount in population: " + entry.getValue()));
             }
 
             // Show the consistency of the property's value
@@ -331,11 +338,12 @@ public class ResultsController implements Initializable {
             else
                 consistencyItem.getChildren().add(new TreeItem<>(Float.valueOf(consistency).toString() + " Ticks"));
 
-            // If property is numeric, show the average value of the property in the final population
-            if (isNumeric) {
-                float average = sum / count;
-
+            // If property is numeric, and there are entities in the final population,
+            // show the average value of the property in the final population
+            if (isNumeric && entityDTO.getCurrAmountInPopulation() != 0) {
                 TreeItem<String> averageValueItem = new TreeItem<>("Average Value in Final Population");
+
+                float average = sum / count;
                 averageValueItem.getChildren().add(new TreeItem<>(String.valueOf(average)));
 
                 root.getChildren().addAll(Arrays.asList(histogramItem, consistencyItem, averageValueItem));
@@ -350,7 +358,9 @@ public class ResultsController implements Initializable {
     public void rerunSimulationButtonListener() {
         ResultsTableItem selectedItem = executionListTableView.getSelectionModel().getSelectedItem();
 
-        mainController.displayNewExecutionDetails(mainController.loadPreviouslyLoadedSimulation(selectedItem.getId()));
+        LoadedSimulationDTO loadedSimulationDTO = mainController.loadPreviouslyLoadedSimulation(selectedItem.getId());
+        mainController.displayNewExecutionDetails(loadedSimulationDTO);
+        mainController.setLoadedSimulationDTO(loadedSimulationDTO);     // Update the loaded simulation in the main app controller
 
         mainController.moveToNewExecutionTab();
     }
