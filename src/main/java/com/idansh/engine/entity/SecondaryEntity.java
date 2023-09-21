@@ -95,4 +95,11 @@ public class SecondaryEntity {
     public String getName() {
         return name;
     }
+
+    /**
+     * @return true if the amount is defined, false otherwise.
+     */
+    public boolean isAmountDefined() {
+        return amount != null;
+    }
 }

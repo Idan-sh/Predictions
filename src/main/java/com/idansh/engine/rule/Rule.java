@@ -83,10 +83,9 @@ public class Rule {
                 // Invoke only actions that are within the received main entity's context
                 if (entity.getName().equals(action.getMainEntityContext()))  {
                     // Check if a secondary entity was defined on this action
-                    if(action.getSecondaryEntity() == null) {
+                    if(action.getSecondaryEntity() == null || !action.getSecondaryEntity().isAmountDefined()) {
                         action.invoke(entity);
-                    }
-                    else {
+                    } else {
                         List<Entity> chosenEntities = action.getSecondaryEntity().chooseSecondaryEntitiesFromPopulation(worldContext.entityManager);
 
                         for (Entity chosenEntity : chosenEntities) {

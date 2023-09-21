@@ -37,8 +37,16 @@ public abstract class RandomValue {
      * @param from minimum number of the range.
      * @param to maximum number of the range.
      */
-    public static float getRandomFloat(double from, double to) {
+    public static float getRandomFloatFromRange(double from, double to) {
         double randomDouble = from + (to - from) * rnd.nextDouble(); // Get a random double within the specified range
+        return (float) randomDouble; // Convert to float and return it
+    }
+
+    /**
+     * Get a random float number without a range.
+     */
+    public static float getRandomFloatWithoutRange() {
+        double randomDouble = rnd.nextInt() * rnd.nextDouble(); // Get a random double within the specified range
         return (float) randomDouble; // Convert to float and return it
     }
 

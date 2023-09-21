@@ -11,14 +11,17 @@ public class RandomFloatValueGenerator implements ValueGenerator<Float> {
     private final Range range;
 
     public RandomFloatValueGenerator(Range range) {
-        if(range == null) {
-            throw new IllegalArgumentException("Cannot create Random Float Value Generator, received no range!");
-        }
+        if (range != null && range.getBottom() > range.getTop())
+            throw new RuntimeException("Cannot create random float value generator, received range of bottom value " + range.getBottom() + " that is higher than the top value " + range.getTop());
+
         this.range = range;
     }
 
     @Override
     public Float generateValue() {
-        return RandomValue.getRandomFloat(range.getBottom(), range.getTop());
+        if (range == null)
+            return RandomValue.getRandomFloatWithoutRange();
+
+        return RandomValue.getRandomFloatFromRange(range.getBottom(), range.getTop());
     }
 }

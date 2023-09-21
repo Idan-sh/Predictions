@@ -39,11 +39,14 @@ public class EvaluateFunctionExpression extends FunctionActivationExpression {
         Property property;
         if (mainEntityInstance.getName().equals(entityName) && (property = mainEntityInstance.getPropertyByName(propertyName)) != null) {
             return property.getValue();
-        } else if (secondaryEntityInstance.getName().equals(entityName) && (property = secondaryEntityInstance.getPropertyByName(propertyName)) != null) {
+        } else if (secondaryEntityInstance != null && secondaryEntityInstance.getName().equals(entityName) && (property = secondaryEntityInstance.getPropertyByName(propertyName)) != null) {
             return property.getValue();
         } else {
-            throw new IllegalArgumentException("Cannot get entity instance's value in the evaluate function expression, " +
-                    "main and secondary entity instances received does not have the defined entity name \"" + entityName + " or property name \"" + propertyName + "\".");
+            throw new IllegalArgumentException("Cannot get entity instance's value in the evaluate function expression.\n" +
+                    "main entity \"" + mainEntityInstance.getName() + "\" and secondary entity \"" +
+                    (secondaryEntityInstance != null ? secondaryEntityInstance.getName() : "N/A") +
+                    "\" instances received does not have the defined entity name \"" + entityName +
+                    "\" or property name \"" + propertyName + "\".");
         }
     }
 

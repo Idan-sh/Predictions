@@ -74,7 +74,15 @@ public abstract class Action {
         checkEntityContext(mainEntityContext);
     }
 
+
+    /**
+     * Check that the entity to invoke an action on is valid.
+     */
     private void checkEntityToInvokeOn(String entityToInvokeOn) {
+        if(entityToInvokeOn == null)
+            throw new IllegalArgumentException("Invalid action received in the XML file, " +
+                    "received no entity to invoke on...");
+
         if (!entityToInvokeOn.equals(mainEntityContext)) {
             if (secondaryEntity != null && !entityToInvokeOn.equals(secondaryEntity.getName()))
                 throw new IllegalArgumentException("Invalid action received in the XML file, " +

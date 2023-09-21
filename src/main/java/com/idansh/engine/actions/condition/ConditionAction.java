@@ -13,8 +13,8 @@ public abstract class ConditionAction extends Action {
     private boolean isActivated;
 
 
-    public ConditionAction(World worldContext, String mainEntityContext, SecondaryEntity secondaryEntity, String entityName, ThenOrElseActions thenActions, ThenOrElseActions elseActions, boolean isMainCondition) {
-        super(worldContext, mainEntityContext, secondaryEntity, entityName);
+    public ConditionAction(World worldContext, String mainEntityContext, SecondaryEntity secondaryEntity, String entityToInvokeOn, ThenOrElseActions thenActions, ThenOrElseActions elseActions, boolean isMainCondition) {
+        super(worldContext, mainEntityContext, secondaryEntity, entityToInvokeOn);
         this.thenActions = thenActions;
         this.elseActions = elseActions;
         this.isMainCondition = isMainCondition;

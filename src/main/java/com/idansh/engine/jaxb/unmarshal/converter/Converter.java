@@ -389,7 +389,6 @@ public abstract class Converter {
             case PROXIMITY:
                 retAction = proximityActionConvert(
                         worldContext,
-                        secondaryEntity,
                         prdAction,
                         expressionConverter
                 );
@@ -432,11 +431,12 @@ public abstract class Converter {
      * @param expressionConverter used for creating Expression objects from the XML file.
      * @return ProximityConditionAction object with the data of the PRDAction received.
      */
-    private static ProximityConditionAction proximityActionConvert(World worldContext, SecondaryEntity secondaryEntity, PRDAction prdAction, ExpressionConverter expressionConverter) {
+    private static ProximityConditionAction proximityActionConvert(World worldContext, PRDAction prdAction, ExpressionConverter expressionConverter) {
         ThenOrElseActions thenActions = new ThenOrElseActions();
+        SecondaryEntity secondaryEntity = new SecondaryEntity(prdAction.getPRDBetween().getTargetEntity());
 
         // Convert 'then' action sets
-        proximityActionsConvert(prdAction, worldContext, thenActions);
+        proximityActionsConvert(prdAction, worldContext, secondaryEntity, thenActions);
 
         // Create and return result Proximity Action
         return new ProximityConditionAction(
@@ -449,7 +449,7 @@ public abstract class Converter {
                 expressionConverter.convertExpression(
                         "proximity",
                         prdAction.getPRDBetween().getSourceEntity(),
-                        null,
+                        new SecondaryEntity(prdAction.getPRDBetween().getTargetEntity()),
                         null,
                         prdAction.getPRDEnvDepth().getOf()
                 )
@@ -686,13 +686,13 @@ public abstract class Converter {
      * @param worldContext the simulated world in which the conditions are set.
      * @param thenActions ThenElseActions action set for the proximity's actions.
      */
-    private static void proximityActionsConvert(PRDAction prdAction, World worldContext, final ThenOrElseActions thenActions){
+    private static void proximityActionsConvert(PRDAction prdAction, World worldContext, SecondaryEntity secondaryEntity, final ThenOrElseActions thenActions){
         for (PRDAction action : prdAction.getPRDActions().getPRDAction()) {
             thenActions.addAction(
                     actionConvert(
                             worldContext,
                             prdAction.getPRDBetween().getSourceEntity(),
-                            new SecondaryEntity(prdAction.getPRDBetween().getTargetEntity()),
+                            secondaryEntity,
                             action
                     )
             );

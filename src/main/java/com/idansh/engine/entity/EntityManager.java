@@ -263,4 +263,32 @@ public class EntityManager {
     public int getMaxNumOfEntities() {
         return grid.getNofColumns() * grid.getNofRows();
     }
+
+
+    /**
+     * Get the entity that at the specified location in the grid.
+     * If there is no entity at that location, returns null.
+     */
+    public Entity getEntityFromGrid(Point location) {
+        grid.validateGridLocation(location);
+        return grid.getEntityFromGrid(location);
+    }
+
+
+    /**
+     * Returns a correct axis location of a given new location and a maximum size of the axis.
+     * @param axisSize      The size of the axis in which the new location is on.
+     * @param newLocation   The new location in the axis.
+     */
+    public int getAxisLocation(int axisSize, int newLocation) {
+        return grid.getAxisLocation(axisSize, newLocation);
+    }
+
+    public int getNofGridRows() {
+        return grid.getNofRows();
+    }
+
+    public int getNofGridColumns() {
+        return grid.getNofColumns();
+    }
 }

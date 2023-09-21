@@ -68,7 +68,7 @@ public class Grid {
      * @param point the location of the grid to check if out of bounds.
      *              x is the number of row, y is the number of column.
      */
-    private void validateGridLocation(Point point) {
+    public void validateGridLocation(Point point) {
         if (point.x >= nofRows || point.x < 0) {
             throw new IllegalArgumentException("Received out of bounds location of ("
                     + point.x + ", " + point.y + "). \nRows must be between " + 0 + " and " + (nofRows - 1) + " (included).");
@@ -189,7 +189,7 @@ public class Grid {
      * @param axisSize      The size of the axis in which the new location is on.
      * @param newLocation   The new location in the axis.
      */
-    private int getAxisLocation(int axisSize, int newLocation) {
+    public int getAxisLocation(int axisSize, int newLocation) {
         if (newLocation < 0)
             return axisSize + newLocation;
         else

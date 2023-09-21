@@ -55,8 +55,8 @@ public class MultiConditionAction extends ConditionAction{
      *
      * @param logicOp the logic operand OR/AND that will be used
      */
-    public MultiConditionAction(World worldContext, String mainEntityContext, SecondaryEntity secondaryEntity, String entityName, String logicOp, ThenOrElseActions thenActions, ThenOrElseActions elseActions, boolean isMainCondition) {
-        super(worldContext, mainEntityContext, secondaryEntity, entityName, thenActions, elseActions, isMainCondition);
+    public MultiConditionAction(World worldContext, String mainEntityContext, SecondaryEntity secondaryEntity, String entityToInvokeOn, String logicOp, ThenOrElseActions thenActions, ThenOrElseActions elseActions, boolean isMainCondition) {
+        super(worldContext, mainEntityContext, secondaryEntity, entityToInvokeOn, thenActions, elseActions, isMainCondition);
         this.logicOp = LogicOp.getLogicOp(logicOp);
         this.innerConditions = new ArrayList<>();
     }

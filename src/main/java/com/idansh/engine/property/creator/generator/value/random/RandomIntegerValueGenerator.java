@@ -16,6 +16,9 @@ public class RandomIntegerValueGenerator implements ValueGenerator<Integer> {
 
     @Override
     public Integer generateValue() {
+        if (range == null)
+            return (int) RandomValue.getRandomFloatWithoutRange();
+
         return RandomValue.getRandomInt(range.getBottom(), range.getTop());
     }
 }

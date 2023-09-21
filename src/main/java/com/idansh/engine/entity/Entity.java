@@ -19,7 +19,7 @@ public class Entity {
     private boolean createAnotherFromScratch;
     private boolean createAnotherDerived;
     private String entityNameToCreate;
-    private Point gridLocation;
+    private final Point gridLocation;
 
     public Entity(String name, Counter populationCounter) {
         this.populationCounter = populationCounter;
