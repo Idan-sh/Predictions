@@ -1,8 +1,5 @@
 package com.idansh.engine.world;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * The whole history of the simulated world's values.
  * Each tick will save the current world state into the histogram.

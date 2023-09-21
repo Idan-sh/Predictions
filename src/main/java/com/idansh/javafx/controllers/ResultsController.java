@@ -338,9 +338,9 @@ public class ResultsController implements Initializable {
                 TreeItem<String> averageValueItem = new TreeItem<>("Average Value in Final Population");
                 averageValueItem.getChildren().add(new TreeItem<>(String.valueOf(average)));
 
-                root.getChildren().addAll(histogramItem, consistencyItem, averageValueItem);
+                root.getChildren().addAll(Arrays.asList(histogramItem, consistencyItem, averageValueItem));
             } else {
-                root.getChildren().addAll(histogramItem, consistencyItem);
+                root.getChildren().addAll(Arrays.asList(histogramItem, consistencyItem));
             }
         }
     }

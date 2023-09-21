@@ -69,7 +69,7 @@ public class PropertyDTO {
         return value;
     }
 
-    public float getConsistency() {
+    public Float getConsistency() {
         return consistency;
     }
 

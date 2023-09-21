@@ -1,11 +1,9 @@
 package com.idansh.engine.property.instance;
 
-import com.idansh.engine.helpers.Consistency;
 import com.idansh.engine.helpers.Counter;
 import com.idansh.engine.helpers.Range;
 import com.idansh.engine.property.creator.factory.PropertyFactory;
 
-import java.util.List;
 
 /**
  * A property for an entity, base class without the value,

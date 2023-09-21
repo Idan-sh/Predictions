@@ -6,9 +6,7 @@ import com.idansh.engine.helpers.Counter;
 import com.idansh.engine.world.World;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class Rule {
     private final String name;

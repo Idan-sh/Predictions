@@ -1,6 +1,5 @@
 package com.idansh.javafx.controllers;
 
-import com.idansh.dto.environment.EnvironmentVariableDTO;
 import com.idansh.dto.simulation.LoadedSimulationDTO;
 import com.idansh.dto.simulation.ThreadsDTO;
 import com.idansh.javafx.manager.EngineHandler;
@@ -11,16 +10,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import javafx.stage.Modality;
-import javafx.stage.Popup;
 import javafx.stage.Stage;
 
 import java.io.File;
 import java.net.URL;
-import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
