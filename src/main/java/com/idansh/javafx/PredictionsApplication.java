@@ -11,7 +11,7 @@ public class PredictionsApplication extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         int APPLICATION_WIDTH = 500, APPLICATION_LENGTH = 400;
-        String MAIN_SCREEN_RELATIVE_PATH = "/fxml/MainScreen.fxml";
+        String MAIN_SCREEN_RELATIVE_PATH = "fxml/MainScreen.fxml";
 
         // Load the first screen in which a simulation can be loaded, and its details will be showed
         // this path is relative to the resources directory

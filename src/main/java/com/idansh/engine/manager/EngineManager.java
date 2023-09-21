@@ -165,6 +165,7 @@ public class EngineManager {
      */
     public int createAndPutSimulation(EnvironmentVariablesListDTO environmentVariablesListDTO) {
         World runnableWorld = new World(loadedWorld);
+        runnableWorld.generateNewID();
         World loadedWorldToSave = new World(loadedWorld);
 
         updateEnvironmentVariablesFromInput(loadedWorldToSave, environmentVariablesListDTO);

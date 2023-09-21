@@ -77,9 +77,13 @@ public class World implements Runnable {
         this.simulationTime = new SimulationTime();
         this.entityManager.initEntityPopulation();
         this.simulationResult = null;
-        this.id = SimulationIdGenerator.getID();
+        this.id = world.id;
         this.threadCount = world.threadCount;
         this.isRunning = this.isToPause = this.isToResume = this.isToStop = false;
+    }
+
+    public void generateNewID() {
+        this.id = SimulationIdGenerator.getID();
     }
 
 

@@ -92,6 +92,7 @@ public class AppController implements Initializable {
      */
     public void startCurrentLoadedSimulation() {
         try{
+            loadedSimulationDTO = engineHandler.getLoadedSimulationDetails(); // Update the loaded simulation DTO
             int simulationID = engineHandler.runSimulation(loadedSimulationDTO.getEnvironmentVariablesListDTO());
             resultsComponentController.addExecution(simulationID);
         } catch (RuntimeException e) {

@@ -59,6 +59,10 @@ public class EnvironmentVariablesManager {
      * @param name the name of the environment variable to get.
      */
     public PropertyFactory getEnvironmentVariable(String name) {
+        PropertyFactory envVar = envVariablesToCreate.get(name);
+        if (envVar == null)
+            throw new RuntimeException("Cannot get environment variable with name \"" + name + "\".");
+
         return envVariablesToCreate.get(name);
     }
 }
