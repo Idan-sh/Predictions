@@ -16,8 +16,9 @@ public class SimulationTime {
     private LocalDateTime endDate;
 
     // Time in milliseconds since epoch to the start of the running process
-    private final Long startTimeInMillis;
-    private Long endTimeInMillis;
+    private boolean isPaused;
+    private long elapsedTime;
+    private long lastContinueTime;
 
 
     /**
@@ -28,28 +29,51 @@ public class SimulationTime {
         this.startDate = LocalDateTime.now();
         this.endDate = null;
 
-        this.startTimeInMillis = System.currentTimeMillis();
-        this.endTimeInMillis = null;
+        this.lastContinueTime = System.currentTimeMillis();
+        this.elapsedTime = 0;
+        this.isPaused = false;
+    }
+
+    /**
+     * Copy a given simulation time's start date and current elapsed time,
+     * and finish it.
+     */
+    public SimulationTime(SimulationTime simulationTime) {
+        this.startDate = simulationTime.startDate;
+        this.elapsedTime = simulationTime.elapsedTime;
+        this.lastContinueTime = simulationTime.lastContinueTime;
+        this.isPaused = simulationTime.isPaused;
+        this.endDate = null;
+
+        if(!isPaused)
+            this.elapsedTime += System.currentTimeMillis() - lastContinueTime;
     }
 
     /**
      * Sets the simulation's end times to the current time.
      */
-    public void setEndTimes() {
+    public void finish() {
         this.endDate = LocalDateTime.now();
-        this.endTimeInMillis = System.currentTimeMillis();
+
+        if(!isPaused)
+            this.elapsedTime += System.currentTimeMillis() - lastContinueTime;
+    }
+
+    public void pauseElapsedTime() {
+        this.isPaused = true;
+        this.elapsedTime += System.currentTimeMillis() - lastContinueTime;
+    }
+
+    public void resumeElapsedTime() {
+        this.isPaused = false;
+        this.lastContinueTime = System.currentTimeMillis();
     }
 
     /**
-     * @return The time in seconds that has passed from the start to the end of the simulation.
-     *         Returns -1 in case the end times were not set.
+     * @return The time in seconds that has passed from the start of the simulation.
      */
-    public float getSecondsPassed() {
-        // Check if the timer was stopped
-        if(endTimeInMillis == null)
-            return (System.currentTimeMillis() - startTimeInMillis) / 1000f;
-
-        return (endTimeInMillis - startTimeInMillis) / 1000f;
+    public float getElapsedTime() {
+        return elapsedTime / 1000f;
     }
 
     public LocalDateTime getStartDate() {
@@ -78,13 +102,5 @@ public class SimulationTime {
             return dateTimeFormatter.format(endDate);
 
         return "N/A";
-    }
-
-    public long getStartTimeInMillis() {
-        return startTimeInMillis;
-    }
-
-    public long getEndTimeInMillis() {
-        return endTimeInMillis;
     }
 }

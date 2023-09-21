@@ -4,7 +4,6 @@ import com.idansh.dto.entity.EntityDTO;
 import com.idansh.dto.property.PropertyDTO;
 import com.idansh.dto.simulation.RunningSimulationDTO;
 import com.idansh.dto.simulation.SimulationResultDTO;
-import com.idansh.dto.simulation.ThreadsDTO;
 import com.idansh.javafx.helpers.ResultsTableItem;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -252,12 +251,12 @@ public class ResultsController implements Initializable {
             if(selectedItem.getMaxTicks() != null) {
                 progressListView.getItems().addAll(
                         ticksFormatterWithMax.apply(selectedItem.getCompletedTicks(), selectedItem.getMaxTicks()),
-                        timerFormatter.apply(selectedItem.getSimulationTime().getSecondsPassed())
+                        timerFormatter.apply(selectedItem.getSimulationTime().getElapsedTime())
                 );
             } else {
                 progressListView.getItems().addAll(
                         ticksFormatterWithoutMax.apply(selectedItem.getCompletedTicks()),
-                        timerFormatter.apply(selectedItem.getSimulationTime().getSecondsPassed())
+                        timerFormatter.apply(selectedItem.getSimulationTime().getElapsedTime())
                 );
             }
 

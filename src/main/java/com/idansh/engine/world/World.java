@@ -27,8 +27,6 @@ public class World implements Runnable {
     private ActiveEnvironmentVariables activeEnvironmentVariables;                  // Contains all the activated environment variables
     public final EnvironmentVariablesManager environmentVariablesManager;           // Contains all the environment variables factories
     private final Counter tickCounter;                                              // The current iteration of the simulation
-    // todo - change to pausableTimer
-    private final Timer timer;                                                      // Timer for the termination rule SECONDS
     private final SimulationTime simulationTime;                                    // Holds the simulation's start and end times
     private SimulationResult simulationResult;
     private Integer threadCount;                                                    // The max number of threads that will be able to run simultaneously
@@ -44,7 +42,6 @@ public class World implements Runnable {
         this.activeEnvironmentVariables = null;
         this.entityManager = new EntityManager(gridRows, gridColumns);
         this.tickCounter = new Counter(0);
-        this.timer = new Timer();
         this.simulationTime = new SimulationTime();
         this.simulationResult = null;
         this.threadCount = null;
@@ -77,7 +74,6 @@ public class World implements Runnable {
         this.environmentVariablesManager = new EnvironmentVariablesManager(world.environmentVariablesManager);
         this.activeEnvironmentVariables = null;
         this.tickCounter = new Counter(0);
-        this.timer = new Timer();
         this.simulationTime = new SimulationTime();
         this.entityManager.initEntityPopulation();
         this.simulationResult = null;
@@ -139,21 +135,23 @@ public class World implements Runnable {
     @Override
     public void run() {
         this.isRunning = true;
+        long timeToStop = -1;
 
         // Timer countdown for the termination rule SECONDS
         Countdown countdown = new Countdown();
 
         // If a termination rule of SECONDS was set, starts a timer.
-        if (terminationRules.containsKey(TerminationRule.Type.SECONDS))
-            timer.schedule(countdown, terminationRules.get(TerminationRule.Type.SECONDS).getValue() * 1000L); // Get the amount of seconds and multiply by 1000 to get in milliseconds
+        if (terminationRules.containsKey(TerminationRule.Type.SECONDS)) {
+            timeToStop = terminationRules.get(TerminationRule.Type.SECONDS).getValue() * 1000L; // Get the amount of seconds and multiply by 1000 to get in milliseconds
+        }
 
         // Check if the current tick has reached the termination rule tick defined, if one does not exist keeps going until reached the timer defined or the user decided to stop the simulation
         while ((!terminationRules.containsKey(TerminationRule.Type.TICKS)) || (terminationRules.containsKey(TerminationRule.Type.TICKS) && tickCounter.getCount() < terminationRules.get(TerminationRule.Type.TICKS).getValue())) {
             // Tell the entity manager the tick advanced
             entityManager.tickAdvance();
 
-            // Checks if the timer expired, if so end simulation
-            if (countdown.isFinished()) {
+            // Checks if the timer exists and is expired, if so end simulation
+            if (timeToStop != -1 && timeToStop < simulationTime.getElapsedTime()) {
                 simulationResult = endSimulation("Timer Expired");
                 return;
             }
@@ -167,6 +165,7 @@ public class World implements Runnable {
             // Check if the simulation was ordered to pause, if so then go into an infinite loop until ordered to resume
             if (isToPause) {
                 try {
+                    simulationTime.pauseElapsedTime();
                     // Check every 300 milliseconds if the simulation was ordered to resume running
                     do {
                         if (isToStop) {
@@ -179,6 +178,7 @@ public class World implements Runnable {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                simulationTime.resumeElapsedTime();
             }
 
             // Increase the tick counter of each rule
@@ -211,7 +211,7 @@ public class World implements Runnable {
      * @return the simulation's result details.
      */
     private SimulationResult endSimulation(String endReason) {
-        simulationTime.setEndTimes();
+        simulationTime.finish();
         return new SimulationResult(
                 id,
                 simulationTime,

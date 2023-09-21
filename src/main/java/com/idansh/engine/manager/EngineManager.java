@@ -13,6 +13,7 @@ import com.idansh.dto.simulation.ThreadsDTO;
 import com.idansh.engine.actions.Action;
 import com.idansh.engine.entity.Entity;
 import com.idansh.engine.helpers.Range;
+import com.idansh.engine.helpers.SimulationTime;
 import com.idansh.engine.manager.result.SimulationResult;
 import com.idansh.engine.property.creator.factory.PropertyFactory;
 import com.idansh.engine.rule.TerminationRule;
@@ -316,7 +317,7 @@ public class EngineManager {
                 new RunningSimulationDTO(
                         world.getId(),
                         getEnvironmentVariablesListDTO(world),
-                        world.getSimulationTime(),
+                        new SimulationTime(world.getSimulationTime()),
                         world.getTickCount(),
                         maxTicks
                 );
