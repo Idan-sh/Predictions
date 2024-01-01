@@ -1,7 +1,6 @@
 # Predictions
-A Java based project that runs simulations that evaluate the outcome of changes to an environment.
+A Java-based application designed for conducting simulations to assess the impact of modifications to an environment.  
 
-The simulations will define a population of entities that exists within a world, on which a set of "rules" are set to change
-statistically in one way or another some of the entities' properties.
+The simulations involve defining a population of entities within a virtual world, where a set of rules is applied to statistically modify certain properties of the entities.
 
-The system is generic, and is a foundation for various types of simulations on diverse environments.
+The system is characterized by its generality, serving as a robust foundation for diverse simulations across different environments. It offers a versatile platform capable of accommodating various types of simulations to model and analyze changes in complex systems."
