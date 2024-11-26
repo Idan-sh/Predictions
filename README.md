@@ -1,7 +1,7 @@
 <h1 align="center">Predictions</h1> 
 
 ## About
-A Java-based application designed for conducting simulations to assess the impact of modifications to an environment.  
+A JavaFX application designed for conducting simulations to assess the impact of modifications to an environment.  
 
 The simulations involve defining a population of entities within a virtual world, where a set of rules is applied to statistically modify certain properties of the entities.
 
